@@ -73,12 +73,17 @@ namespace UnflipYourRide
 						// ...or as a cardinal direction.
 						if (args[1] == "north" || args[1] == "n")
 							yaw = 0.0f;
-						if (args[1] == "west" || args[1] == "w")
+						else if (args[1] == "west" || args[1] == "w")
 							yaw = 270.0f;
-						if (args[1] == "south" || args[1] == "s")
+						else if (args[1] == "south" || args[1] == "s")
 							yaw = 180.0f;
-						if (args[1] == "east" || args[1] == "e")
+						else if (args[1] == "east" || args[1] == "e")
 							yaw = 90.0f;
+						else
+						{
+							ModConsole.Print("Incorrect angle: " + args[1]);
+							return;
+						}
 					}
 				}
 
