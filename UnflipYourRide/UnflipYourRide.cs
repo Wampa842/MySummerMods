@@ -14,6 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+using System;
 using MSCLoader;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace UnflipYourRide
 		public override string ID => "Unflip";
 		public override string Name => "Unflip";
 		public override string Author => "Wampa842";
-		public override string Version => "1.0.0";
+		public override string Version => "1.1.0";
 		public override bool UseAssetsFolder => false;
 
 		// GameObject names of the vehicles
@@ -37,7 +38,7 @@ namespace UnflipYourRide
 
 			public override string Help => "Restore a flipped vehicle - see 'unflip ?' for details.";
 
-			private const string _helpString = "Usage: unflip <0-6>|?\nExecuting this command will cause the selected vehicle's angles to reset.\nNumbers:\n 0: Satsuma\n 1: Gifu (truck)\n 2: Hayosiko (van)\n 3: Ruscko (ventti reward)\n 4: Ferndale (muscle car)\n 5: Kekmet (tractor)\n 6: Trailer\nWARNING: using this mod might damage your car and scatter the cargo.";
+			private const string _helpString = "Usage: unflip <0-6> [heading]\nExecuting this command will cause the selected vehicle's angles to reset.\nNumbers:\n 0: Satsuma\n 1: Gifu (truck)\n 2: Hayosiko (van)\n 3: Ruscko (ventti reward)\n 4: Ferndale (muscle car)\n 5: Kekmet (tractor)\n 6: Trailer\n'heading' can be a cardinal direction or angle.\nWARNING: using this mod might damage your car and scatter the cargo.";
 			public override void Run(string[] args)
 			{
 				// Check if the command can run in the first place
@@ -54,17 +55,36 @@ namespace UnflipYourRide
 					return;
 				}
 
-				// Otherwise, try to find the vehicle
+				// Otherwise, try to find the vehicle.
 				GameObject selected = GameObject.Find(vehicles[num]);
 				if (selected == null)
 				{
 					ModConsole.Print($"Could not find {vehicles[num]}");
 					return;
 				}
+				float yaw = selected.transform.localEulerAngles.y;
 
-				// If it is found, flip it and raise it so it doesn't ALWAYS fucking clip into the ground
+				// If it is found, check if the user has defined a second argument.
+				if (args.Length > 1)
+				{
+					// Try parsing it as an angle in degrees
+					if(!float.TryParse(args[1], out yaw))
+					{
+						// ...or as a cardinal direction.
+						if (args[1] == "north" || args[1] == "n")
+							yaw = 0.0f;
+						if (args[1] == "west" || args[1] == "w")
+							yaw = 90.0f;
+						if (args[1] == "south" || args[1] == "s")
+							yaw = 180.0f;
+						if (args[1] == "east" || args[1] == "e")
+							yaw = 270.0f;
+					}
+				}
+
+				// Then apply the transformations.
 				selected.transform.position = selected.transform.position + new Vector3(0, 1, 0);
-				selected.transform.eulerAngles = new Vector3(0, 0, 0);
+				selected.transform.localEulerAngles = new Vector3(0, yaw, 0);
 			}
 		}
 
