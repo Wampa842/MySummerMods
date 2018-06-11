@@ -17,9 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using MSCLoader;
 using UnityEngine;
 
-namespace FlipYourRide
+namespace UnflipYourRide
 {
-	public class FlipYourRide : Mod
+	public class UnflipYourRide : Mod
 	{
 		public override string ID => "Unflip";
 		public override string Name => "Unflip";
@@ -48,8 +48,7 @@ namespace FlipYourRide
 				}
 
 				// If the argument is missing, not a number, or out of range, display the help text.
-				int num;
-				if (args.Length < 1 || !int.TryParse(args[0], out num) || num < 0 || num >= vehicles.Length)
+				if (args.Length < 1 || !int.TryParse(args[0], out int num) || num < 0 || num >= vehicles.Length)
 				{
 					ModConsole.Print(_helpString);
 					return;
