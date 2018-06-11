@@ -74,11 +74,11 @@ namespace UnflipYourRide
 						if (args[1] == "north" || args[1] == "n")
 							yaw = 0.0f;
 						if (args[1] == "west" || args[1] == "w")
-							yaw = 90.0f;
+							yaw = 270.0f;
 						if (args[1] == "south" || args[1] == "s")
 							yaw = 180.0f;
 						if (args[1] == "east" || args[1] == "e")
-							yaw = 270.0f;
+							yaw = 90.0f;
 					}
 				}
 
