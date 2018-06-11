@@ -25,11 +25,11 @@ namespace UnflipYourRide
 		public override string ID => "Unflip";
 		public override string Name => "Unflip";
 		public override string Author => "Wampa842";
-		public override string Version => "1.1.0";
+		public override string Version => "1.0.0";
 		public override bool UseAssetsFolder => false;
 
 		// GameObject names of the vehicles
-		private static readonly string[] vehicles = { "SATSUMA(557kg, 248)", "GIFU(750/450psi)", "HAYOSIKO(1500kg, 250)", "RCO_RUSCKO12(270)", "FERNDALE(1630kg)", "KEKMET(350-400psi)", "Trailer" };
+		private static readonly string[] vehicles = { "SATSUMA(557kg, 248)", "GIFU(750/450psi)", "HAYOSIKO(1500kg, 250)", "RCO_RUSCKO12(270)", "FERNDALE(1630kg)", "KEKMET(350-400psi)" };
 
 		// Can't believe I can actually put to use something I've picked up in university.
 		public class UnflipCommand : ConsoleCommand
@@ -38,7 +38,7 @@ namespace UnflipYourRide
 
 			public override string Help => "Restore a flipped vehicle - see 'unflip ?' for details.";
 
-			private const string _helpString = "Usage: unflip <0-6> [heading]\nExecuting this command will cause the selected vehicle's angles to reset.\nNumbers:\n 0: Satsuma\n 1: Gifu (truck)\n 2: Hayosiko (van)\n 3: Ruscko (ventti reward)\n 4: Ferndale (muscle car)\n 5: Kekmet (tractor)\n 6: Trailer\n'heading' can be a cardinal direction or angle.\nWARNING: using this mod might damage your car and scatter the cargo.";
+			private const string _helpString = "Usage: unflip <0-6> [heading]\nExecuting this command will cause the selected vehicle's angles to reset.\nNumbers:\n 0: Satsuma\n 1: Gifu (truck)\n 2: Hayosiko (van)\n 3: Ruscko (ventti reward)\n 4: Ferndale (muscle car)\n 5: Kekmet (tractor)\n'heading' can be a cardinal direction or angle.\nWARNING: using this mod might damage your car and scatter the cargo.";
 			public override void Run(string[] args)
 			{
 				// Check if the command can run in the first place
