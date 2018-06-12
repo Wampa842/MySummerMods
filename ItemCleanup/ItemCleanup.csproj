@@ -52,4 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetPath)" "H:\Program Files\Steam\steamapps\common\My Summer Car\Mods" /Y /R</PostBuildEvent>
+  </PropertyGroup>
 </Project>

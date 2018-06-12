@@ -35,14 +35,14 @@ namespace ItemCleanup
 
 			public override string Help => "Removes items from the game, enter 'cleanup ?' for details";
 
-			private const string _helpString = "Usage: cleanup <item1 [item2...]>\nRemoves the items matching the arguments from the game.\nKeywords:\n 'empty': empty containers (except juice bottles)\n 'allempty': empty containers including juice\n 'food': all food items and cigarettes\n 'caritems': consumables (coolant, brake fluid, oil, etc) but not parts\n 'carparts': car parts that can be worn out (tyres, fan belt, etc)";
-			private string[] _workingKeywords = { "empty" };
-			private string[] _notWorkingKeywords = { "allempty", "food", "caritems", "carparts" };
+			private const string _helpString = "Usage: cleanup <item1 [item2...]>|?|help\nRemoves the items matching the arguments from the game.\nKeywords:\n 'empty': empty containers (except juice bottles)\n 'allempty': empty containers including juice\n 'food': all food items and cigarettes\n 'caritems': consumables (coolant, brake fluid, oil, etc) but not parts\n 'carparts': car parts that can be worn out (tyres, fan belt, etc)";
+			private string[] _workingKeywords = { "allempty" };
+			private string[] _notWorkingKeywords = { "empty", "food", "caritems", "carparts" };
 
 			public override void Run(string[] args)
 			{
 				// Display help text
-				if(args.Length < 1 || args[0] == "?" || args[0] == "help")
+				if (args.Length < 1 || args[0] == "?" || args[0] == "help")
 				{
 					ModConsole.Print(_helpString);
 					return;
@@ -51,7 +51,8 @@ namespace ItemCleanup
 				// List of all possible keywords
 				Dictionary<string, string[]> keywordsAvailable = new Dictionary<string, string[]>
 				{
-					{ "empty", new string[]{ "empty(itemx)", "bottle_empty", "can_empty" } }
+					{ "allempty", new string[]{ "empty(itemx)", "bottle_empty", "can_empty" } },
+					{ "food", new string[]{"sausages(itemx)", "macaron box(itemx", "pizza(itemx)", "milk(itemx)", "cigarettes(itemx)" } }
 				};
 				HashSet<string> keywordsActive = new HashSet<string>();
 
@@ -70,7 +71,7 @@ namespace ItemCleanup
 				// Iterate through all game objects - is this a good idea? How much of the game am I fucking up?
 				foreach (GameObject o in (GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[]))
 				{
-					// TODO
+					GameObject.Destroy(o);
 				}
 			}
 		}
