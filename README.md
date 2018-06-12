@@ -20,11 +20,16 @@ If `[angle]` is omitted, the vehicle will keep its original heading.
 
 If the command is called without or with wrong arguments, it'll display the help text.
 
-**Warning:** using this command will reset the car's rotation *instantaneously!* It might get damaged or stuck in the ground, especially the Gifu. If the trailer is connected to the Kekmet, it'll flail uncontrollably. Cargo will almost certainly be launched into low orbit. **Use at your own risk.**
+**Warning: use at your own risk.** Using this command will reset the car's rotation *instantaneously!* It might get damaged or stuck in the ground, especially the Gifu. If the trailer is connected to the Kekmet, it'll flail uncontrollably.  
+If there are objects inside the vehicle, physics might freak out when they clip into each other. Cargo will almost certainly be launched into low orbit.
 
 ---
 ### Item cleanup (WIP)
 A console command that removes certain items (e.g. empty bottles, food) from the world to improve (?) performance.
+
+---
+### Alivieska GPS (WIP)
+A tiny web server that hosts a JSON file containing the Satsuma's position and the game's time of day, and a web application that'll hopefully connect to it and display the player's position on a map.
 
 ---
 #### Usage
