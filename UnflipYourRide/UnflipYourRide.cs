@@ -22,8 +22,8 @@ namespace UnflipYourRide
 {
 	public class UnflipYourRide : Mod
 	{
-		public override string ID => "Unflip";
-		public override string Name => "Unflip";
+		public override string ID => "UnflipYourRide";
+		public override string Name => "Unflip Your Ride";
 		public override string Author => "Wampa842";
 		public override string Version => "1.0.0";
 		public override bool UseAssetsFolder => false;
