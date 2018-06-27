@@ -29,7 +29,28 @@ A console command that removes certain items (e.g. empty bottles, food) from the
 
 ---
 ### Alivieska GPS (WIP)
-A tiny web server that hosts a JSON file containing the Satsuma's position and the game's time of day, and a web application that'll hopefully connect to it and display the player's position on a map.
+A web server that hosts a JSON file containing the Satsuma's position, heading, and speed.
+
+The hosted content has the following structure:  
+```json
+"x": east-west position
+"y": height
+"z": north-south position
+"heading": angle from north in degrees
+"speed": speed in km/h
+"time": game time (todo, currently constant 0)
+```
+
+The server runs on `http://localhost:8080` by default. The port can be changed using either the `gps` console command (see below) or by editing the `server.cfg` file in the mod's config directory. The response header `Access-Control-Allow-Origin` is set to the request's origin.
+
+Usage: `gps [-p <port>] COMMAND`  
+where `COMMAND` is one of the following:
+- `start`: attempts to create a web server on the default port, or the port specified by the `-p` switch.
+- `restart` (TODO): stops and then starts the web server, for example, to change the port.
+- `stop`: halts the web server.
+- `write`: writes the server's content to file at `<mods>/Config/AlivieskaGpsServer/gps-output.json`.
+- `config` (TODO): accepts key-value pairs and writes them directly to `server.cfg`. The server has to be restarted before the changes take effect.
+- `help`: display the help text.
 
 ---
 #### Usage
