@@ -58,7 +58,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "H:\Program Files\Steam\steamapps\common\My Summer Car\Mods" /Y /R
-xcopy "$(TargetDir)server.cfg" "H:\Program Files\Steam\steamapps\common\My Summer Car\Mods\Config\AlivieskaGpsServer" /Y /R</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "H:\Program Files\Steam\steamapps\common\My Summer Car\Mods\" /Y /R /I
+xcopy "$(TargetDir)server.cfg" "H:\Program Files\Steam\steamapps\common\My Summer Car\Mods\Config\AlivieskaGpsServer\" /Y /R /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

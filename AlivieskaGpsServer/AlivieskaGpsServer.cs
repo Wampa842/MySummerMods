@@ -106,7 +106,7 @@ namespace AlivieskaGpsServer
 		public override string Version => "1.0.0";
 		public override bool UseAssetsFolder => false;
 
-		private readonly string _serverConfigPath;
+		private string _serverConfigPath;
 		private int _port = 8080;
 		private bool _autoStart = true;
 
@@ -130,11 +130,6 @@ namespace AlivieskaGpsServer
 					}
 				}
 			}
-		}
-
-		public AlivieskaGpsServer()
-		{
-			_serverConfigPath = Path.Combine(ModLoader.GetModConfigFolder(this), "server.cfg");
 		}
 
 		// The Satsuma or whatever other GameObject needs to be tracked
@@ -168,7 +163,7 @@ namespace AlivieskaGpsServer
 			{
 				try
 				{
-					Server = new WebServer(GetJsonContent, $"https://localhost:{_port}/");
+					Server = new WebServer(GetJsonContent, $"http://*:{_port}/");
 					ModConsole.Print("Creating server...");
 				}
 				catch (HttpListenerException ex)
@@ -272,6 +267,8 @@ namespace AlivieskaGpsServer
 
 		public override void OnLoad()
 		{
+			_serverConfigPath = Path.Combine(ModLoader.GetModConfigFolder(this), "server.cfg");
+			_loadConfig();
 			ConsoleCommand.Add(new GpsCommand(this));
 			_car = GameObject.Find("SATSUMA(557kg, 248)");
 			StartServer();
