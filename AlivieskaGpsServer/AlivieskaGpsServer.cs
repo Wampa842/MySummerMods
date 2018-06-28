@@ -168,7 +168,7 @@ namespace AlivieskaGpsServer
 			{
 				try
 				{
-					Server = new WebServer(GetJsonContent, $"http://localhost:{_port}/");
+					Server = new WebServer(GetJsonContent, $"https://localhost:{_port}/");
 					ModConsole.Print("Creating server...");
 				}
 				catch (HttpListenerException ex)
