@@ -1,16 +1,19 @@
 ﻿/*
-AlivieskaGpsClient is NOT part of the mod pack and is licensed separately.
-Connection between this and AlivieskaGpsServer happens exclusively through HTTP and it is only in the same repository for convenience.
+Copyright (C) 2018 Wampa842
 
-Copyright (c) 2018 Wampa842
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,108 +23,108 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Svg;
-using Svg.Transforms;
+using System.Net.Http;
 
 namespace AlivieskaGpsClient
 {
 	public partial class MainForm : Form
 	{
-		private float _prevX, _prevY;
-		private Point _circlePos;
-		private SvgDocument _svgDoc = null;
-		private SvgScale _svgScale;
-		private SvgTranslate _svgPan;
-		private string _svgPath = "resources\\map.svg";
+		private string _mapImagePath = "resources\\map.png";
+		private Bitmap _baseImage = null;
+		private Point _imageCenter;
+		private int _prevX, _prevY;
+		private Size _imageSize;
 
-		private void _initSvg()
-		{
-			return;
-			if(_svgDoc == null)
-				_svgDoc = SvgDocument.Open(_svgPath);
-			_svgScale = new SvgScale(zoomSlider.Value / 100);
-			_svgPan = new SvgTranslate(0.0f);
-			_svgDoc.Transforms = new SvgTransformCollection { _svgPan, _svgScale };
-			_svgDoc.Width = new SvgUnit(SvgUnitType.Pixel, mapImage.Width);
-			_svgDoc.Height = new SvgUnit(SvgUnitType.Pixel, mapImage.Height);
-			_svgDoc.X = 0;
-			_svgDoc.Y = 0;
-			//mapImage.Invalidate();
-		}
+		private HttpClient _httpClient = null;
 
 		public MainForm()
 		{
 			InitializeComponent();
 		}
 
-		private void mapImage_Click(object sender, EventArgs e)
-		{
-			//_circlePos = ((MouseEventArgs)e).Location;
-			//gpsDataX.Text = _circlePos.X.ToString();
-			//gpsDataZ.Text = _circlePos.Y.ToString();
-			//((PictureBox)sender).Invalidate();
-		}
-
-		private void mapImage_Paint(object sender, PaintEventArgs e)
-		{
-			if (_svgDoc != null)
-			{
-				((PictureBox)sender).Image = _svgDoc.Draw();
-			}
-			MapDrawing.DrawCircle(e.Graphics, _circlePos, new MapDrawing.CircleStyle());
-		}
-
-		private void MainForm_Validated(object sender, EventArgs e)
-		{
-			if (_svgDoc != null)
-			{
-				gpsDataX.Text = _svgPan.X.ToString();
-				gpsDataZ.Text = _svgPan.Y.ToString();
-				gpsDataY.Text = _svgScale.X.ToString();
-			}
-		}
-
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			BackgroundWorker worker = new BackgroundWorker();
-			worker.DoWork += (obj, args) => { _initSvg(); };
-			worker.RunWorkerAsync();
-			worker.RunWorkerCompleted += (obj, args) => { ((BackgroundWorker)obj).Dispose(); };
+			_baseImage = new Bitmap(_mapImagePath);
+			_imageCenter = new Point(mapImage.Width / 2, mapImage.Height / 2);
+			_imageSize = new Size(mapImage.Width, mapImage.Height);
+
+			mapImage.Invalidate();
 		}
 
 		private void zoomSlider_Scroll(object sender, EventArgs e)
 		{
-			_svgScale.X = _svgScale.Y = ((TrackBar)sender).Value / 100.0f;
+			_imageSize.Width = _imageSize.Height = zoomSlider.Value * 4;
+			zoomMultLabel.Text = ((TrackBar)sender).Value.ToString() + "%";
+			mapImage.Invalidate();
+		}
+
+		private void mapImage_Paint(object sender, PaintEventArgs e)
+		{
+			MapDrawing.DrawImageCenter(e.Graphics, _baseImage, _imageCenter, _imageSize);
+			MapDrawing.DrawPointsOfInterest(e.Graphics, _imageCenter, _imageSize);
+
 		}
 
 		private void mapImage_MouseDown(object sender, MouseEventArgs e)
 		{
-			_prevX = e.X;
-			_prevY = e.Y;
-		}
-
-		private void MainForm_Resize(object sender, EventArgs e)
-		{
-			_initSvg();
+			if (e.Button == MouseButtons.Left)
+			{
+				_prevX = e.X;
+				_prevY = e.Y;
+			}
+			if (e.Button == MouseButtons.Right)
+			{
+				float x = (e.X - _imageCenter.X) / (float)(zoomSlider.Value * 4);
+				float y = (e.Y - _imageCenter.Y) / (float)(zoomSlider.Value * 4);
+				gpsDataX.Text = x.ToString();
+				gpsDataZ.Text = y.ToString();
+				using (System.IO.StreamWriter writer = new System.IO.StreamWriter("locations.csv", true))
+					writer.WriteLineAsync($"\"{outputName.Text}\",\"{x}\",\"{y}\"");
+			}
 		}
 
 		private void mapImage_MouseMove(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left)
 			{
-				//_svgPan.X += e.X - _prevX;
-				//_prevX = e.X;
+				_imageCenter.X += e.X - _prevX;
+				_imageCenter.Y += e.Y - _prevY;
 
-				//_svgPan.Y += e.Y - _prevY;
-				//_prevY = e.Y;
-				_circlePos = e.Location;
+				((PictureBox)sender).Invalidate();
+
+				_prevX = e.X;
+				_prevY = e.Y;
 			}
-			mapImage.Invalidate();
+		}
+
+		private void gpsConnectButton_Click(object sender, EventArgs e)
+		{
+			if(_httpClient == null)
+			{
+				((Button)sender).Text = "Disconnect";
+			}
+			else
+			{
+				((Button)sender).Text = "Connect";
+			}
+		}
+
+		private void gpsUpdateTimer_Tick(object sender, EventArgs e)
+		{
+			if(_httpClient != null)
+			{
+
+			}
 		}
 	}
 
 	public static class MapDrawing
 	{
+		public static void DrawImageCenter(Graphics g, Image image, Point center, Size size)
+		{
+			g.DrawImage(image, center.X - size.Width / 2, center.Y - size.Height / 2, size.Width, size.Height);
+		}
+
 		public class CircleStyle
 		{
 			public bool Stroke { get; set; }
@@ -167,6 +170,8 @@ namespace AlivieskaGpsClient
 			public enum PointOfInterestType { Other = 1, Town = 2, Service = 4, Work = 8 }
 			public CircleStyle Style { get; }
 			public PointF Location { get; }
+			public float X { get { return Location.X; } }
+			public float Y { get { return Location.Y; } }
 			public string Name { get; }
 			public string ID { get; }
 			public PointOfInterestType Type { get; }
@@ -178,6 +183,18 @@ namespace AlivieskaGpsClient
 				this.Name = name;
 				this.ID = id;
 				this.Type = type;
+			}
+
+			public void Draw(Graphics g, Point center, Size size)
+			{
+				DrawCircle(g, new Point((int)(), (int)(0)), this.Style);
+			}
+
+			public PointOfInterest FromString(string line)
+			{
+				string[] tok = line.Split(',');
+
+				return new PointOfInterest(tok[0].Trim('"'), tok[2].Trim('"'), )
 			}
 
 			public int CompareTo(PointOfInterest other)
@@ -194,18 +211,17 @@ namespace AlivieskaGpsClient
 
 		public static SortedSet<PointOfInterest> PointsOfInterest = new SortedSet<PointOfInterest>
 		{
-			new PointOfInterest("home", "Kesselinperä", new PointF(0.4414f, 0.4581f), new CircleStyle(true, Color.Blue, 2.0f, true, Color.FromArgb(127, Color.Blue), 20.0f), PointOfInterest.PointOfInterestType.Town),
-			new PointOfInterest("perajarvi", "Peräjärvi", new PointF(0.909f, 0.8175f), new CircleStyle(true, Color.Blue, 2.0f, true, Color.FromArgb(127, Color.Blue), 20.0f), PointOfInterest.PointOfInterestType.Town),
-			new PointOfInterest("loppe", "Loppe", new PointF(0.817f, 0.6659f), new CircleStyle(true, Color.Blue, 2.0f, true, Color.FromArgb(127, Color.Blue), 20.0f), PointOfInterest.PointOfInterestType.Town)
+			new PointOfInterest("home", "Kesselinperä", new PointF(0.4414f, 0.4581f), new CircleStyle(true, Color.Blue, 2.0f, true, Color.FromArgb(127, Color.Blue), 20.0f), PointOfInterest.PointOfInterestType.Town)
+			//new PointOfInterest("perajarvi", "Peräjärvi", new PointF(0.909f, 0.8175f), new CircleStyle(true, Color.Blue, 2.0f, true, Color.FromArgb(127, Color.Blue), 20.0f), PointOfInterest.PointOfInterestType.Town),
+			//new PointOfInterest("loppe", "Loppe", new PointF(0.817f, 0.6659f), new CircleStyle(true, Color.Blue, 2.0f, true, Color.FromArgb(127, Color.Blue), 20.0f), PointOfInterest.PointOfInterestType.Town)
 		};
 
-		public static void DrawPointsOfInterest(Graphics g)
+		public static void DrawPointsOfInterest(Graphics g, Point center, Size size)
 		{
-			foreach (var poi in PointsOfInterest)
-			{
-				Point p = new Point();
-				DrawCircle(g, p, poi.Style);
-			}
+			Point p = new Point(center.X, center.Y);
+			DrawCircle(g, p, new CircleStyle());
+			p = new Point((int)(0.3 * size.Width + center.X), (int)(0.3 * size.Height + center.Y));
+			DrawCircle(g, p, new CircleStyle());
 		}
 	}
 }

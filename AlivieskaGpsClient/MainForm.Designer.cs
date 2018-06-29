@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.zoomSlider = new System.Windows.Forms.TrackBar();
 			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -44,6 +45,9 @@
 			this.gpsDataX = new System.Windows.Forms.TextBox();
 			this.gpsConnectButton = new System.Windows.Forms.Button();
 			this.mapImage = new System.Windows.Forms.PictureBox();
+			this.gpsUpdateTimer = new System.Windows.Forms.Timer(this.components);
+			this.zoomMultLabel = new System.Windows.Forms.Label();
+			this.outputName = new System.Windows.Forms.TextBox();
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).BeginInit();
 			this.gpsConnectionBox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.mapImage)).BeginInit();
@@ -53,13 +57,13 @@
 			// 
 			this.zoomSlider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.zoomSlider.LargeChange = 100;
-			this.zoomSlider.Location = new System.Drawing.Point(418, 12);
+			this.zoomSlider.LargeChange = 50;
+			this.zoomSlider.Location = new System.Drawing.Point(418, 39);
 			this.zoomSlider.Maximum = 400;
 			this.zoomSlider.Minimum = 100;
 			this.zoomSlider.Name = "zoomSlider";
 			this.zoomSlider.Orientation = System.Windows.Forms.Orientation.Vertical;
-			this.zoomSlider.Size = new System.Drawing.Size(45, 400);
+			this.zoomSlider.Size = new System.Drawing.Size(45, 373);
 			this.zoomSlider.SmallChange = 25;
 			this.zoomSlider.TabIndex = 1;
 			this.zoomSlider.TickFrequency = 10;
@@ -157,50 +161,50 @@
 			this.gpsDataHeading.Location = new System.Drawing.Point(72, 200);
 			this.gpsDataHeading.Name = "gpsDataHeading";
 			this.gpsDataHeading.ReadOnly = true;
-			this.gpsDataHeading.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.gpsDataHeading.Size = new System.Drawing.Size(92, 20);
 			this.gpsDataHeading.TabIndex = 10;
 			this.gpsDataHeading.Text = "012";
+			this.gpsDataHeading.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// gpsDataSpeed
 			// 
 			this.gpsDataSpeed.Location = new System.Drawing.Point(72, 174);
 			this.gpsDataSpeed.Name = "gpsDataSpeed";
 			this.gpsDataSpeed.ReadOnly = true;
-			this.gpsDataSpeed.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.gpsDataSpeed.Size = new System.Drawing.Size(92, 20);
 			this.gpsDataSpeed.TabIndex = 9;
 			this.gpsDataSpeed.Text = "012";
+			this.gpsDataSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// gpsDataY
 			// 
 			this.gpsDataY.Location = new System.Drawing.Point(72, 148);
 			this.gpsDataY.Name = "gpsDataY";
 			this.gpsDataY.ReadOnly = true;
-			this.gpsDataY.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.gpsDataY.Size = new System.Drawing.Size(92, 20);
 			this.gpsDataY.TabIndex = 8;
 			this.gpsDataY.Text = "012";
+			this.gpsDataY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// gpsDataZ
 			// 
 			this.gpsDataZ.Location = new System.Drawing.Point(72, 122);
 			this.gpsDataZ.Name = "gpsDataZ";
 			this.gpsDataZ.ReadOnly = true;
-			this.gpsDataZ.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.gpsDataZ.Size = new System.Drawing.Size(92, 20);
 			this.gpsDataZ.TabIndex = 7;
 			this.gpsDataZ.Text = "012";
+			this.gpsDataZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// gpsDataX
 			// 
 			this.gpsDataX.Location = new System.Drawing.Point(72, 96);
 			this.gpsDataX.Name = "gpsDataX";
 			this.gpsDataX.ReadOnly = true;
-			this.gpsDataX.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.gpsDataX.Size = new System.Drawing.Size(92, 20);
 			this.gpsDataX.TabIndex = 6;
 			this.gpsDataX.Text = "012";
+			this.gpsDataX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// gpsConnectButton
 			// 
@@ -210,6 +214,7 @@
 			this.gpsConnectButton.TabIndex = 5;
 			this.gpsConnectButton.Text = "button1";
 			this.gpsConnectButton.UseVisualStyleBackColor = true;
+			this.gpsConnectButton.Click += new System.EventHandler(this.gpsConnectButton_Click);
 			// 
 			// mapImage
 			// 
@@ -217,30 +222,57 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.mapImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.mapImage.InitialImage = global::AlivieskaGpsClient.Properties.Resources.map;
 			this.mapImage.Location = new System.Drawing.Point(12, 12);
 			this.mapImage.Name = "mapImage";
 			this.mapImage.Size = new System.Drawing.Size(400, 400);
+			this.mapImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
 			this.mapImage.TabIndex = 5;
 			this.mapImage.TabStop = false;
-			this.mapImage.Click += new System.EventHandler(this.mapImage_Click);
 			this.mapImage.Paint += new System.Windows.Forms.PaintEventHandler(this.mapImage_Paint);
 			this.mapImage.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseDown);
 			this.mapImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseMove);
+			// 
+			// gpsUpdateTimer
+			// 
+			this.gpsUpdateTimer.Interval = 1000;
+			this.gpsUpdateTimer.Tick += new System.EventHandler(this.gpsUpdateTimer_Tick);
+			// 
+			// zoomMultLabel
+			// 
+			this.zoomMultLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.zoomMultLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.zoomMultLabel.Location = new System.Drawing.Point(418, 12);
+			this.zoomMultLabel.Name = "zoomMultLabel";
+			this.zoomMultLabel.Size = new System.Drawing.Size(45, 24);
+			this.zoomMultLabel.TabIndex = 6;
+			this.zoomMultLabel.Text = "100%";
+			this.zoomMultLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
+			// outputName
+			// 
+			this.outputName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.outputName.Location = new System.Drawing.Point(469, 267);
+			this.outputName.Name = "outputName";
+			this.outputName.Size = new System.Drawing.Size(170, 20);
+			this.outputName.TabIndex = 7;
+			this.outputName.Text = "home";
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(651, 424);
+			this.Controls.Add(this.outputName);
+			this.Controls.Add(this.zoomMultLabel);
 			this.Controls.Add(this.mapImage);
 			this.Controls.Add(this.gpsConnectionBox);
 			this.Controls.Add(this.zoomSlider);
+			this.DoubleBuffered = true;
 			this.MinimumSize = new System.Drawing.Size(667, 462);
 			this.Name = "MainForm";
 			this.Text = "Alivieska GPS client";
 			this.Load += new System.EventHandler(this.MainForm_Load);
-			this.Resize += new System.EventHandler(this.MainForm_Resize);
-			this.Validated += new System.EventHandler(this.MainForm_Validated);
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).EndInit();
 			this.gpsConnectionBox.ResumeLayout(false);
 			this.gpsConnectionBox.PerformLayout();
@@ -267,6 +299,9 @@
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.PictureBox mapImage;
+		private System.Windows.Forms.Timer gpsUpdateTimer;
+		private System.Windows.Forms.Label zoomMultLabel;
+		private System.Windows.Forms.TextBox outputName;
 	}
 }
 
