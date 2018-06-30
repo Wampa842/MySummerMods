@@ -23,6 +23,7 @@ using System.Threading;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace AlivieskaGpsServer
 {
@@ -75,7 +76,7 @@ namespace AlivieskaGpsServer
 
 		public WebServer(Func<HttpListenerRequest, string> method, params string[] prefixes) : this(prefixes, method) { }
 
-		public void Run()
+		public void Run(bool useXml = true)
 		{
 			ThreadPool.QueueUserWorkItem(o =>
 			{
@@ -90,7 +91,7 @@ namespace AlivieskaGpsServer
 							{
 								string responseString = responseMethod(ctx.Request);
 								byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-								ctx.Response.ContentType = "application/json";
+								ctx.Response.ContentType = useXml ? "application/xml" : "application/json";
 								ctx.Response.Headers.Add("Access-Control-Allow-Origin", ctx.Request.Headers["Origin"]);
 								ctx.Response.ContentLength64 = buffer.Length;
 								ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
@@ -119,12 +120,13 @@ namespace AlivieskaGpsServer
 		public override string ID => "AlivieskaGpsServer";
 		public override string Name => "Alivieska GPS server";
 		public override string Author => "Wampa842";
-		public override string Version => "1.0.0";
+		public override string Version => "1.1.0";
 		public override bool UseAssetsFolder => false;
 
 		private string _serverConfigPath;
 		private int _port = 8080;
 		private bool _autoStart = true;
+		private bool _outputXml = false;
 
 		private void _loadConfig()
 		{
@@ -140,6 +142,9 @@ namespace AlivieskaGpsServer
 							break;
 						case "autostart":
 							bool.TryParse(tok[1], out _autoStart);
+							break;
+						case "output":
+							_outputXml = tok[1].Trim().ToLowerInvariant() == "xml";
 							break;
 						default:
 							break;
@@ -162,9 +167,47 @@ namespace AlivieskaGpsServer
 
 			return string.Concat("{", string.Format(@"""x"":{0},""y"":{1},""z"":{2},""time"":{3},""speed"":{4},""heading"":{5}", x, y, z, time, speed, heading), "}");
 		}
-		public string GetJsonContent(HttpListenerRequest request)
+		
+		public string GetXmlContent()
 		{
-			return GetJsonContent();
+			XmlDocument doc = new XmlDocument();
+			doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", "no"));
+			doc.AppendChild(doc.CreateElement("GpsData"));
+
+			XmlElement node;
+			node = doc.CreateElement("X");
+			node.InnerText = _car.transform.position.x.ToString();
+			doc.DocumentElement.AppendChild(node);
+
+			node = doc.CreateElement("Y");
+			node.InnerText = _car.transform.position.y.ToString();
+			doc.DocumentElement.AppendChild(node);
+
+			node = doc.CreateElement("Z");
+			node.InnerText = _car.transform.position.z.ToString();
+			doc.DocumentElement.AppendChild(node);
+
+			node = doc.CreateElement("Heading");
+			node.InnerText = _car.transform.eulerAngles.y.ToString();
+			doc.DocumentElement.AppendChild(node);
+
+			node = doc.CreateElement("Speed");
+			node.InnerText = FsmVariables.GlobalVariables.FindFsmFloat("SpeedKMH").Value.ToString();
+			doc.DocumentElement.AppendChild(node);
+
+			node = doc.CreateElement("Time");
+			node.InnerText = FsmVariables.GlobalVariables.FindFsmFloat("GlobalTime").Value.ToString();
+			doc.DocumentElement.AppendChild(node);
+
+			return doc.OuterXml;
+		}
+
+		public string GetContent(HttpListenerRequest request)
+		{
+			if (_outputXml)
+				return this.GetXmlContent();
+			else
+				return this.GetJsonContent();
 		}
 
 		public WebServer Server;
@@ -179,7 +222,7 @@ namespace AlivieskaGpsServer
 			{
 				try
 				{
-					Server = new WebServer(GetJsonContent, $"http://*:{_port}/");
+					Server = new WebServer(GetContent, $"http://*:{_port}/");
 					ModConsole.Print("Creating server...");
 				}
 				catch (HttpListenerException ex)
@@ -187,7 +230,7 @@ namespace AlivieskaGpsServer
 					ModConsole.Print("Could not create server:\n" + ex.ToString());
 				}
 			}
-			Server.Run();
+			Server.Run(_outputXml);
 			ModConsole.Print("Server is running");
 		}
 
