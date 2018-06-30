@@ -47,10 +47,12 @@
 			this.mapImage = new System.Windows.Forms.PictureBox();
 			this.gpsUpdateTimer = new System.Windows.Forms.Timer(this.components);
 			this.zoomMultLabel = new System.Windows.Forms.Label();
-			this.outputName = new System.Windows.Forms.TextBox();
+			this.selectedPoiBox = new System.Windows.Forms.GroupBox();
+			this.selectedPoiNameLabel = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).BeginInit();
 			this.gpsConnectionBox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.mapImage)).BeginInit();
+			this.selectedPoiBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// zoomSlider
@@ -249,21 +251,35 @@
 			this.zoomMultLabel.Text = "100%";
 			this.zoomMultLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
-			// outputName
+			// selectedPoiBox
 			// 
-			this.outputName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.outputName.Location = new System.Drawing.Point(469, 267);
-			this.outputName.Name = "outputName";
-			this.outputName.Size = new System.Drawing.Size(170, 20);
-			this.outputName.TabIndex = 7;
-			this.outputName.Text = "home";
+			this.selectedPoiBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.selectedPoiBox.Controls.Add(this.selectedPoiNameLabel);
+			this.selectedPoiBox.Location = new System.Drawing.Point(469, 248);
+			this.selectedPoiBox.Name = "selectedPoiBox";
+			this.selectedPoiBox.Size = new System.Drawing.Size(170, 164);
+			this.selectedPoiBox.TabIndex = 7;
+			this.selectedPoiBox.TabStop = false;
+			this.selectedPoiBox.Text = "Selected";
+			// 
+			// selectedPoiNameLabel
+			// 
+			this.selectedPoiNameLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.selectedPoiNameLabel.Location = new System.Drawing.Point(6, 16);
+			this.selectedPoiNameLabel.Name = "selectedPoiNameLabel";
+			this.selectedPoiNameLabel.Size = new System.Drawing.Size(158, 18);
+			this.selectedPoiNameLabel.TabIndex = 0;
+			this.selectedPoiNameLabel.Text = "label7";
+			this.selectedPoiNameLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(651, 424);
-			this.Controls.Add(this.outputName);
+			this.Controls.Add(this.selectedPoiBox);
 			this.Controls.Add(this.zoomMultLabel);
 			this.Controls.Add(this.mapImage);
 			this.Controls.Add(this.gpsConnectionBox);
@@ -277,6 +293,7 @@
 			this.gpsConnectionBox.ResumeLayout(false);
 			this.gpsConnectionBox.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.mapImage)).EndInit();
+			this.selectedPoiBox.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -301,7 +318,8 @@
 		private System.Windows.Forms.PictureBox mapImage;
 		private System.Windows.Forms.Timer gpsUpdateTimer;
 		private System.Windows.Forms.Label zoomMultLabel;
-		private System.Windows.Forms.TextBox outputName;
+		private System.Windows.Forms.GroupBox selectedPoiBox;
+		private System.Windows.Forms.Label selectedPoiNameLabel;
 	}
 }
 
