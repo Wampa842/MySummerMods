@@ -28,11 +28,11 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
 			this.zoomSlider = new System.Windows.Forms.TrackBar();
-			this.textBox1 = new System.Windows.Forms.TextBox();
+			this.connectionUrlText = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.gpsConnectionBox = new System.Windows.Forms.GroupBox();
+			this.connectionStatusLabel = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
@@ -45,9 +45,9 @@
 			this.gpsDataX = new System.Windows.Forms.TextBox();
 			this.gpsConnectButton = new System.Windows.Forms.Button();
 			this.mapImage = new System.Windows.Forms.PictureBox();
-			this.gpsUpdateTimer = new System.Windows.Forms.Timer(this.components);
 			this.zoomMultLabel = new System.Windows.Forms.Label();
 			this.selectedPoiBox = new System.Windows.Forms.GroupBox();
+			this.comboBox1 = new System.Windows.Forms.ComboBox();
 			this.selectedPoiNameLabel = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).BeginInit();
 			this.gpsConnectionBox.SuspendLayout();
@@ -73,13 +73,13 @@
 			this.zoomSlider.Value = 100;
 			this.zoomSlider.Scroll += new System.EventHandler(this.zoomSlider_Scroll);
 			// 
-			// textBox1
+			// connectionUrlText
 			// 
-			this.textBox1.Location = new System.Drawing.Point(6, 41);
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(158, 20);
-			this.textBox1.TabIndex = 2;
-			this.textBox1.Text = "http://localhost:8080/";
+			this.connectionUrlText.Location = new System.Drawing.Point(6, 41);
+			this.connectionUrlText.Name = "connectionUrlText";
+			this.connectionUrlText.Size = new System.Drawing.Size(158, 20);
+			this.connectionUrlText.TabIndex = 2;
+			this.connectionUrlText.Text = "http://localhost:8080/";
 			// 
 			// label1
 			// 
@@ -93,6 +93,7 @@
 			// gpsConnectionBox
 			// 
 			this.gpsConnectionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.gpsConnectionBox.Controls.Add(this.connectionStatusLabel);
 			this.gpsConnectionBox.Controls.Add(this.label6);
 			this.gpsConnectionBox.Controls.Add(this.label5);
 			this.gpsConnectionBox.Controls.Add(this.label4);
@@ -105,13 +106,25 @@
 			this.gpsConnectionBox.Controls.Add(this.gpsDataX);
 			this.gpsConnectionBox.Controls.Add(this.gpsConnectButton);
 			this.gpsConnectionBox.Controls.Add(this.label1);
-			this.gpsConnectionBox.Controls.Add(this.textBox1);
+			this.gpsConnectionBox.Controls.Add(this.connectionUrlText);
 			this.gpsConnectionBox.Location = new System.Drawing.Point(469, 12);
 			this.gpsConnectionBox.Name = "gpsConnectionBox";
 			this.gpsConnectionBox.Size = new System.Drawing.Size(170, 230);
 			this.gpsConnectionBox.TabIndex = 4;
 			this.gpsConnectionBox.TabStop = false;
 			this.gpsConnectionBox.Text = "Server connection";
+			// 
+			// connectionStatusLabel
+			// 
+			this.connectionStatusLabel.AutoSize = true;
+			this.connectionStatusLabel.Font = new System.Drawing.Font("Webdings", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
+			this.connectionStatusLabel.ForeColor = System.Drawing.Color.DarkGray;
+			this.connectionStatusLabel.Location = new System.Drawing.Point(145, 70);
+			this.connectionStatusLabel.Name = "connectionStatusLabel";
+			this.connectionStatusLabel.Size = new System.Drawing.Size(19, 17);
+			this.connectionStatusLabel.TabIndex = 1;
+			this.connectionStatusLabel.Text = "n";
+			this.connectionStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label6
 			// 
@@ -212,9 +225,9 @@
 			// 
 			this.gpsConnectButton.Location = new System.Drawing.Point(6, 67);
 			this.gpsConnectButton.Name = "gpsConnectButton";
-			this.gpsConnectButton.Size = new System.Drawing.Size(158, 23);
+			this.gpsConnectButton.Size = new System.Drawing.Size(133, 23);
 			this.gpsConnectButton.TabIndex = 5;
-			this.gpsConnectButton.Text = "button1";
+			this.gpsConnectButton.Text = "Connect";
 			this.gpsConnectButton.UseVisualStyleBackColor = true;
 			this.gpsConnectButton.Click += new System.EventHandler(this.gpsConnectButton_Click);
 			// 
@@ -235,11 +248,6 @@
 			this.mapImage.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseDown);
 			this.mapImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseMove);
 			// 
-			// gpsUpdateTimer
-			// 
-			this.gpsUpdateTimer.Interval = 1000;
-			this.gpsUpdateTimer.Tick += new System.EventHandler(this.gpsUpdateTimer_Tick);
-			// 
 			// zoomMultLabel
 			// 
 			this.zoomMultLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -255,6 +263,7 @@
 			// 
 			this.selectedPoiBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.selectedPoiBox.Controls.Add(this.comboBox1);
 			this.selectedPoiBox.Controls.Add(this.selectedPoiNameLabel);
 			this.selectedPoiBox.Location = new System.Drawing.Point(469, 248);
 			this.selectedPoiBox.Name = "selectedPoiBox";
@@ -262,6 +271,16 @@
 			this.selectedPoiBox.TabIndex = 7;
 			this.selectedPoiBox.TabStop = false;
 			this.selectedPoiBox.Text = "Selected";
+			// 
+			// comboBox1
+			// 
+			this.comboBox1.FormattingEnabled = true;
+			this.comboBox1.Items.AddRange(new object[] {
+            "http://localhost:8080/"});
+			this.comboBox1.Location = new System.Drawing.Point(6, 97);
+			this.comboBox1.Name = "comboBox1";
+			this.comboBox1.Size = new System.Drawing.Size(158, 21);
+			this.comboBox1.TabIndex = 1;
 			// 
 			// selectedPoiNameLabel
 			// 
@@ -301,7 +320,7 @@
 
 		#endregion
 		private System.Windows.Forms.TrackBar zoomSlider;
-		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.TextBox connectionUrlText;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.GroupBox gpsConnectionBox;
 		private System.Windows.Forms.Button gpsConnectButton;
@@ -316,10 +335,11 @@
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.PictureBox mapImage;
-		private System.Windows.Forms.Timer gpsUpdateTimer;
 		private System.Windows.Forms.Label zoomMultLabel;
 		private System.Windows.Forms.GroupBox selectedPoiBox;
 		private System.Windows.Forms.Label selectedPoiNameLabel;
+		private System.Windows.Forms.Label connectionStatusLabel;
+		private System.Windows.Forms.ComboBox comboBox1;
 	}
 }
 

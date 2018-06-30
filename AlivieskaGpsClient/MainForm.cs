@@ -23,7 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Http;
+using System.Net;
 using System.Xml;
 
 namespace AlivieskaGpsClient
@@ -43,9 +43,7 @@ namespace AlivieskaGpsClient
 		private MouseButtons _panButton = MouseButtons.Left;        // The mouse button that grabs and pans the map
 		private MouseButtons _selectButton = MouseButtons.Right;    // The mouse button which selects points of interest on the map
 		private MouseButtons _selectArbitraryButton = MouseButtons.Middle;  // The mouse button which selects an arbitrary point on the map
-
-		private HttpClient _httpClient = null;                      // The HttpClient that gets the data supplied by AlivieskaGpsClient
-
+		
 		public MainForm()
 		{
 			InitializeComponent();
@@ -162,23 +160,7 @@ namespace AlivieskaGpsClient
 		// Connect to or disconnect from the server
 		private void gpsConnectButton_Click(object sender, EventArgs e)
 		{
-			if (_httpClient == null)
-			{
-				((Button)sender).Text = "Disconnect";
-			}
-			else
-			{
-				((Button)sender).Text = "Connect";
-			}
-		}
-
-		// Periodically get positioning data
-		private void gpsUpdateTimer_Tick(object sender, EventArgs e)
-		{
-			if (_httpClient != null)
-			{
-
-			}
+			// TODO
 		}
 	}
 
@@ -377,26 +359,22 @@ namespace AlivieskaGpsClient
 		public static float Heading = 0;    // Angle from north in degrees
 		public static float Speed = 0;      // Displayed speed of the car
 		private static XmlDocument _doc = new XmlDocument();
-		public static void ReadXml(string xml)
+		//<GpsData>
+		//	<X>1009.916</X>
+		//	<Y>-0.8313327</Y>
+		//	<Z>-738.0518</Z>
+		//	<Heading>10</Heading>
+		//	<Speed>30</Speed>
+		//	<Time>0</Time>
+		//</GpsData>
+		public static void ProcessDownloadString(string xmlData)
 		{
-			/*
-			<GpsData>
-				<X>1009.916</X>
-				<Y>-0.8313327</Y>
-				<Z>-738.0518</Z>
-				<Heading>10</Heading>
-				<Speed>30</Speed>
-				<Time>0</Time>
-			</GpsData>
-			*/
-			_doc.LoadXml(xml);
+			_doc.LoadXml(xmlData);
 			float.TryParse(_doc.DocumentElement["X"].InnerText.Trim(), out X);
 			float.TryParse(_doc.DocumentElement["Y"].InnerText.Trim(), out Y);
 			float.TryParse(_doc.DocumentElement["Z"].InnerText.Trim(), out Z);
 			float.TryParse(_doc.DocumentElement["Heading"].InnerText.Trim(), out Heading);
 			float.TryParse(_doc.DocumentElement["Speed"].InnerText.Trim(), out Speed);
-
-			// TODO: update form
 		}
 	}
 }
