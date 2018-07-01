@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
+using System.Net.Http;
 using System.Xml;
 
 namespace AlivieskaGpsClient
@@ -43,10 +44,15 @@ namespace AlivieskaGpsClient
 		private MouseButtons _panButton = MouseButtons.Left;        // The mouse button that grabs and pans the map
 		private MouseButtons _selectButton = MouseButtons.Right;    // The mouse button which selects points of interest on the map
 		private MouseButtons _selectArbitraryButton = MouseButtons.Middle;  // The mouse button which selects an arbitrary point on the map
-		
+
+		private GpsData _gpsData;                                   // Object that handles the connection to the server
+		private System.Timers.Timer _colorResetTimer = new System.Timers.Timer { AutoReset = false, Enabled = false, Interval = 250 };  // Timer that makes the light do the blinky
+
 		public MainForm()
 		{
 			InitializeComponent();
+			_gpsData = new GpsData(this);
+			_colorResetTimer.Elapsed += (o, args) => connectionStatusLabel.ForeColor = Color.ForestGreen;
 		}
 
 		// Load resources; initialize pan and zoom
@@ -77,6 +83,8 @@ namespace AlivieskaGpsClient
 			MapDrawing.DrawPointsOfInterest(e.Graphics, _imageCenter, _imageSize);
 			if (_selectedPoi != null)
 				MapDrawing.DrawCross(e.Graphics, new Pen(Color.Black, 1.0f), _selectedPoi.LocationOnMap(_imageCenter, _imageSize), mapImage.Size);
+			if (_gpsData.Success)
+				MapDrawing.DrawArrow(e.Graphics, _gpsData.MapPosition, _imageCenter, _imageSize);
 		}
 
 		// Set up previous coordinates for panning
@@ -160,7 +168,62 @@ namespace AlivieskaGpsClient
 		// Connect to or disconnect from the server
 		private void gpsConnectButton_Click(object sender, EventArgs e)
 		{
-			// TODO
+			// If the timer is running, stop it and enable editing the URL text box.
+			if (gpsUpdateTimer.Enabled)
+			{
+				gpsUpdateTimer.Stop();
+				connectionUrlText.Enabled = true;
+				gpsConnectButton.Text = "Connect";
+				connectionStatusLabel.ForeColor = Color.DarkGray;
+			}
+			// If not, lock the text box and start the timer.
+			else
+			{
+				gpsUpdateTimer.Start();
+				connectionUrlText.Enabled = false;
+				gpsConnectButton.Text = "Disconnect";
+				connectionStatusLabel.ForeColor = Color.Blue;
+			}
+		}
+
+		// Periodically request data from the server
+		private void gpsUpdateTimer_Tick(object sender, EventArgs e)
+		{
+			_gpsData.Get(connectionUrlText.Text);
+		}
+
+		private void resetMapButton_Click(object sender, EventArgs e)
+		{
+			_imageCenter = new Point(mapImage.Width / 2, mapImage.Height / 2);
+			_imageSize = new Size(mapImage.Width, mapImage.Height);
+			zoomSlider.Value = zoomSlider.Minimum;
+			zoomMultLabel.Text = zoomSlider.Value + "%";
+			mapImage.Invalidate();
+		}
+
+		// Update the form to display whatever data is currently present
+		public void UpdateGpsData()
+		{
+			if (gpsUpdateTimer.Enabled)
+			{
+				selectedPoiNameLabel.Text = _gpsData.ResponseString;
+				if (_gpsData.Success)
+				{
+					gpsDataX.Text = _gpsData.X.ToString();
+					gpsDataY.Text = _gpsData.Y.ToString();
+					gpsDataZ.Text = _gpsData.Z.ToString();
+					gpsDataHeading.Text = _gpsData.Heading.ToString();
+					gpsDataSpeed.Text = _gpsData.Speed.ToString();
+
+					connectionStatusLabel.ForeColor = Color.LimeGreen;
+					_colorResetTimer.Start();
+				}
+				else
+				{
+					connectionStatusLabel.ForeColor = Color.Red;
+				}
+			}
+			mapImage.Invalidate();
 		}
 	}
 
@@ -186,7 +249,11 @@ namespace AlivieskaGpsClient
 			DrawCross(g, pen, intersect.X, intersect.Y, size);
 		}
 
-		// Draw an arrow, rotated 
+		// Draw an arrow, rotated
+		public static void DrawArrow(Graphics g, PointF pos, Point center, Size size)
+		{
+			DrawCircle(g, new Point((int)(pos.X * size.Width + center.X), (int)(pos.Y * size.Width + center.Y)), new CircleStyle());
+		}
 
 		// Properties of the circle to be drawn
 		public class CircleStyle
@@ -350,15 +417,38 @@ namespace AlivieskaGpsClient
 		}
 	}
 
+
 	// Data received from the GPS server
-	public static class GpsData
+	public class GpsData
 	{
-		public static float X = 0;          // West-east position
-		public static float Y = 0;     // Height above lake Peräjärvi
-		public static float Z = 0;          // North-south position
-		public static float Heading = 0;    // Angle from north in degrees
-		public static float Speed = 0;      // Displayed speed of the car
-		private static XmlDocument _doc = new XmlDocument();
+		private readonly MainForm _form;
+
+		public Size Size = new Size(4200, 3350);
+		public PointF Center = new PointF(-0.053f, 0.041f);
+
+		public PointF MapPosition
+		{
+			get
+			{
+				return new PointF(this.X / this.Size.Width + this.Center.X, -this.Z / this.Size.Width + this.Center.Y);
+			}
+		}
+
+		public GpsData(MainForm form)
+		{
+			this._form = form;
+		}
+
+		public float X = 0;         // West-east position
+		public float Y = 0;         // Height above lake Peräjärvi
+		public float Z = 0;         // North-south position
+		public float Heading = 0;   // Angle from north in degrees
+		public float Speed = 0;     // Displayed speed of the car
+		public string ResponseString;   // The raw string received from the server
+		public bool Success = false;    // Indicates whether the request was successful
+		public HttpStatusCode Status;   // The status code of the response
+
+		private XmlDocument _doc = new XmlDocument();
 		//<GpsData>
 		//	<X>1009.916</X>
 		//	<Y>-0.8313327</Y>
@@ -367,14 +457,24 @@ namespace AlivieskaGpsClient
 		//	<Speed>30</Speed>
 		//	<Time>0</Time>
 		//</GpsData>
-		public static void ProcessDownloadString(string xmlData)
+
+		private readonly HttpClient _client = new HttpClient();
+		public async Task Get(string url)
 		{
-			_doc.LoadXml(xmlData);
-			float.TryParse(_doc.DocumentElement["X"].InnerText.Trim(), out X);
-			float.TryParse(_doc.DocumentElement["Y"].InnerText.Trim(), out Y);
-			float.TryParse(_doc.DocumentElement["Z"].InnerText.Trim(), out Z);
-			float.TryParse(_doc.DocumentElement["Heading"].InnerText.Trim(), out Heading);
-			float.TryParse(_doc.DocumentElement["Speed"].InnerText.Trim(), out Speed);
+			HttpResponseMessage response = await _client.GetAsync(url);
+			Success = response.IsSuccessStatusCode;
+			Status = response.StatusCode;
+			if (response.IsSuccessStatusCode)
+			{
+				ResponseString = await response.Content.ReadAsStringAsync();
+				_doc.LoadXml(ResponseString);
+				float.TryParse(_doc.DocumentElement["X"].InnerText.Trim(), out X);
+				float.TryParse(_doc.DocumentElement["Y"].InnerText.Trim(), out Y);
+				float.TryParse(_doc.DocumentElement["Z"].InnerText.Trim(), out Z);
+				float.TryParse(_doc.DocumentElement["Heading"].InnerText.Trim(), out Heading);
+				float.TryParse(_doc.DocumentElement["Speed"].InnerText.Trim(), out Speed);
+			}
+			_form.UpdateGpsData();
 		}
 	}
 }

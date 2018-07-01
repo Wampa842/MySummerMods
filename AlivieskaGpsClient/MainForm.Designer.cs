@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.zoomSlider = new System.Windows.Forms.TrackBar();
 			this.connectionUrlText = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -47,8 +48,9 @@
 			this.mapImage = new System.Windows.Forms.PictureBox();
 			this.zoomMultLabel = new System.Windows.Forms.Label();
 			this.selectedPoiBox = new System.Windows.Forms.GroupBox();
-			this.comboBox1 = new System.Windows.Forms.ComboBox();
 			this.selectedPoiNameLabel = new System.Windows.Forms.Label();
+			this.gpsUpdateTimer = new System.Windows.Forms.Timer(this.components);
+			this.resetMapButton = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).BeginInit();
 			this.gpsConnectionBox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.mapImage)).BeginInit();
@@ -65,11 +67,11 @@
 			this.zoomSlider.Minimum = 100;
 			this.zoomSlider.Name = "zoomSlider";
 			this.zoomSlider.Orientation = System.Windows.Forms.Orientation.Vertical;
-			this.zoomSlider.Size = new System.Drawing.Size(45, 373);
+			this.zoomSlider.Size = new System.Drawing.Size(45, 343);
 			this.zoomSlider.SmallChange = 25;
 			this.zoomSlider.TabIndex = 1;
 			this.zoomSlider.TickFrequency = 10;
-			this.zoomSlider.TickStyle = System.Windows.Forms.TickStyle.TopLeft;
+			this.zoomSlider.TickStyle = System.Windows.Forms.TickStyle.Both;
 			this.zoomSlider.Value = 100;
 			this.zoomSlider.Scroll += new System.EventHandler(this.zoomSlider_Scroll);
 			// 
@@ -79,7 +81,7 @@
 			this.connectionUrlText.Name = "connectionUrlText";
 			this.connectionUrlText.Size = new System.Drawing.Size(158, 20);
 			this.connectionUrlText.TabIndex = 2;
-			this.connectionUrlText.Text = "http://localhost:8080/";
+			this.connectionUrlText.Text = "http://localhost/github/alivieska-gps/data.xml";
 			// 
 			// label1
 			// 
@@ -263,7 +265,6 @@
 			// 
 			this.selectedPoiBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.selectedPoiBox.Controls.Add(this.comboBox1);
 			this.selectedPoiBox.Controls.Add(this.selectedPoiNameLabel);
 			this.selectedPoiBox.Location = new System.Drawing.Point(469, 248);
 			this.selectedPoiBox.Name = "selectedPoiBox";
@@ -272,32 +273,38 @@
 			this.selectedPoiBox.TabStop = false;
 			this.selectedPoiBox.Text = "Selected";
 			// 
-			// comboBox1
-			// 
-			this.comboBox1.FormattingEnabled = true;
-			this.comboBox1.Items.AddRange(new object[] {
-            "http://localhost:8080/"});
-			this.comboBox1.Location = new System.Drawing.Point(6, 97);
-			this.comboBox1.Name = "comboBox1";
-			this.comboBox1.Size = new System.Drawing.Size(158, 21);
-			this.comboBox1.TabIndex = 1;
-			// 
 			// selectedPoiNameLabel
 			// 
 			this.selectedPoiNameLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.selectedPoiNameLabel.Location = new System.Drawing.Point(6, 16);
 			this.selectedPoiNameLabel.Name = "selectedPoiNameLabel";
-			this.selectedPoiNameLabel.Size = new System.Drawing.Size(158, 18);
+			this.selectedPoiNameLabel.Size = new System.Drawing.Size(158, 145);
 			this.selectedPoiNameLabel.TabIndex = 0;
 			this.selectedPoiNameLabel.Text = "label7";
-			this.selectedPoiNameLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+			// 
+			// gpsUpdateTimer
+			// 
+			this.gpsUpdateTimer.Interval = 1000;
+			this.gpsUpdateTimer.Tick += new System.EventHandler(this.gpsUpdateTimer_Tick);
+			// 
+			// resetMapButton
+			// 
+			this.resetMapButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.resetMapButton.Location = new System.Drawing.Point(418, 388);
+			this.resetMapButton.Name = "resetMapButton";
+			this.resetMapButton.Size = new System.Drawing.Size(45, 24);
+			this.resetMapButton.TabIndex = 8;
+			this.resetMapButton.Text = "reset";
+			this.resetMapButton.UseVisualStyleBackColor = true;
+			this.resetMapButton.Click += new System.EventHandler(this.resetMapButton_Click);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(651, 424);
+			this.Controls.Add(this.resetMapButton);
 			this.Controls.Add(this.selectedPoiBox);
 			this.Controls.Add(this.zoomMultLabel);
 			this.Controls.Add(this.mapImage);
@@ -324,11 +331,6 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.GroupBox gpsConnectionBox;
 		private System.Windows.Forms.Button gpsConnectButton;
-		private System.Windows.Forms.TextBox gpsDataHeading;
-		private System.Windows.Forms.TextBox gpsDataSpeed;
-		private System.Windows.Forms.TextBox gpsDataY;
-		private System.Windows.Forms.TextBox gpsDataZ;
-		private System.Windows.Forms.TextBox gpsDataX;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label4;
@@ -339,7 +341,13 @@
 		private System.Windows.Forms.GroupBox selectedPoiBox;
 		private System.Windows.Forms.Label selectedPoiNameLabel;
 		private System.Windows.Forms.Label connectionStatusLabel;
-		private System.Windows.Forms.ComboBox comboBox1;
+		private System.Windows.Forms.Timer gpsUpdateTimer;
+		private System.Windows.Forms.TextBox gpsDataHeading;
+		private System.Windows.Forms.TextBox gpsDataSpeed;
+		private System.Windows.Forms.TextBox gpsDataY;
+		private System.Windows.Forms.TextBox gpsDataZ;
+		private System.Windows.Forms.TextBox gpsDataX;
+		private System.Windows.Forms.Button resetMapButton;
 	}
 }
 
