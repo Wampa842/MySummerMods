@@ -84,10 +84,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Content Include="resources\map.png">
+    <None Include="resources\config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="resources\map.svg">
+    </None>
+    <Content Include="resources\map.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

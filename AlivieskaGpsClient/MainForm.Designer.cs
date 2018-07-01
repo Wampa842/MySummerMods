@@ -33,6 +33,7 @@
 			this.connectionUrlText = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.gpsConnectionBox = new System.Windows.Forms.GroupBox();
+			this.default8080Button = new System.Windows.Forms.Button();
 			this.connectionStatusLabel = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
@@ -51,6 +52,8 @@
 			this.selectedPoiNameLabel = new System.Windows.Forms.Label();
 			this.gpsUpdateTimer = new System.Windows.Forms.Timer(this.components);
 			this.resetMapButton = new System.Windows.Forms.Button();
+			this.followCheck = new System.Windows.Forms.CheckBox();
+			this.default80Button = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).BeginInit();
 			this.gpsConnectionBox.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.mapImage)).BeginInit();
@@ -62,12 +65,12 @@
 			this.zoomSlider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.zoomSlider.LargeChange = 50;
-			this.zoomSlider.Location = new System.Drawing.Point(418, 39);
+			this.zoomSlider.Location = new System.Drawing.Point(418, 64);
 			this.zoomSlider.Maximum = 400;
 			this.zoomSlider.Minimum = 100;
 			this.zoomSlider.Name = "zoomSlider";
 			this.zoomSlider.Orientation = System.Windows.Forms.Orientation.Vertical;
-			this.zoomSlider.Size = new System.Drawing.Size(45, 343);
+			this.zoomSlider.Size = new System.Drawing.Size(45, 318);
 			this.zoomSlider.SmallChange = 25;
 			this.zoomSlider.TabIndex = 1;
 			this.zoomSlider.TickFrequency = 10;
@@ -81,7 +84,7 @@
 			this.connectionUrlText.Name = "connectionUrlText";
 			this.connectionUrlText.Size = new System.Drawing.Size(158, 20);
 			this.connectionUrlText.TabIndex = 2;
-			this.connectionUrlText.Text = "http://localhost/github/alivieska-gps/data.xml";
+			this.connectionUrlText.Text = "http://localhost/gps/";
 			// 
 			// label1
 			// 
@@ -95,6 +98,8 @@
 			// gpsConnectionBox
 			// 
 			this.gpsConnectionBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.gpsConnectionBox.Controls.Add(this.default80Button);
+			this.gpsConnectionBox.Controls.Add(this.default8080Button);
 			this.gpsConnectionBox.Controls.Add(this.connectionStatusLabel);
 			this.gpsConnectionBox.Controls.Add(this.label6);
 			this.gpsConnectionBox.Controls.Add(this.label5);
@@ -115,6 +120,17 @@
 			this.gpsConnectionBox.TabIndex = 4;
 			this.gpsConnectionBox.TabStop = false;
 			this.gpsConnectionBox.Text = "Server connection";
+			// 
+			// default8080Button
+			// 
+			this.default8080Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.default8080Button.Location = new System.Drawing.Point(90, 17);
+			this.default8080Button.Name = "default8080Button";
+			this.default8080Button.Size = new System.Drawing.Size(36, 21);
+			this.default8080Button.TabIndex = 15;
+			this.default8080Button.Text = ":8080";
+			this.default8080Button.UseVisualStyleBackColor = true;
+			this.default8080Button.Click += new System.EventHandler(this.default8080Button_Click);
 			// 
 			// connectionStatusLabel
 			// 
@@ -254,7 +270,7 @@
 			// 
 			this.zoomMultLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.zoomMultLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-			this.zoomMultLabel.Location = new System.Drawing.Point(418, 12);
+			this.zoomMultLabel.Location = new System.Drawing.Point(418, 37);
 			this.zoomMultLabel.Name = "zoomMultLabel";
 			this.zoomMultLabel.Size = new System.Drawing.Size(45, 24);
 			this.zoomMultLabel.TabIndex = 6;
@@ -291,19 +307,43 @@
 			// resetMapButton
 			// 
 			this.resetMapButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.resetMapButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
 			this.resetMapButton.Location = new System.Drawing.Point(418, 388);
 			this.resetMapButton.Name = "resetMapButton";
 			this.resetMapButton.Size = new System.Drawing.Size(45, 24);
 			this.resetMapButton.TabIndex = 8;
 			this.resetMapButton.Text = "reset";
-			this.resetMapButton.UseVisualStyleBackColor = true;
 			this.resetMapButton.Click += new System.EventHandler(this.resetMapButton_Click);
+			// 
+			// followCheck
+			// 
+			this.followCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.followCheck.Appearance = System.Windows.Forms.Appearance.Button;
+			this.followCheck.Location = new System.Drawing.Point(418, 12);
+			this.followCheck.Name = "followCheck";
+			this.followCheck.Size = new System.Drawing.Size(45, 22);
+			this.followCheck.TabIndex = 9;
+			this.followCheck.Text = "Follow";
+			this.followCheck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.followCheck.UseVisualStyleBackColor = true;
+			// 
+			// default80Button
+			// 
+			this.default80Button.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.default80Button.Location = new System.Drawing.Point(128, 17);
+			this.default80Button.Name = "default80Button";
+			this.default80Button.Size = new System.Drawing.Size(36, 21);
+			this.default80Button.TabIndex = 16;
+			this.default80Button.Text = "/gps";
+			this.default80Button.UseVisualStyleBackColor = true;
+			this.default80Button.Click += new System.EventHandler(this.default80Button_Click);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(651, 424);
+			this.Controls.Add(this.followCheck);
 			this.Controls.Add(this.resetMapButton);
 			this.Controls.Add(this.selectedPoiBox);
 			this.Controls.Add(this.zoomMultLabel);
@@ -314,6 +354,7 @@
 			this.MinimumSize = new System.Drawing.Size(667, 462);
 			this.Name = "MainForm";
 			this.Text = "Alivieska GPS client";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.Load += new System.EventHandler(this.MainForm_Load);
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).EndInit();
 			this.gpsConnectionBox.ResumeLayout(false);
@@ -348,6 +389,9 @@
 		private System.Windows.Forms.TextBox gpsDataZ;
 		private System.Windows.Forms.TextBox gpsDataX;
 		private System.Windows.Forms.Button resetMapButton;
+		private System.Windows.Forms.Button default8080Button;
+		private System.Windows.Forms.CheckBox followCheck;
+		private System.Windows.Forms.Button default80Button;
 	}
 }
 

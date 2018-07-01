@@ -26,19 +26,21 @@ using System.Windows.Forms;
 using System.Net;
 using System.Net.Http;
 using System.Xml;
+using System.IO;
 
 namespace AlivieskaGpsClient
 {
 	// Form behaviour
 	public partial class MainForm : Form
 	{
-		private string _locationsPath = "resources\\locations.csv"; // A CSV file containing points of interest
-		private string _mapImagePath = "resources\\map.png";        // The bitmap file
+		private readonly string _locationsPath = "resources\\locations.csv"; // A CSV file containing points of interest
+		private readonly string _mapImagePath = "resources\\map.png";        // The map background image file
+		private readonly string _configPath = "resources\\config";  // Plaintext file containing configuration key-value pairs
 		private Bitmap _baseImage = null;                           // The image to display on the form
 		private Point _imageCenter;                                 // The center coordinates of the image
 		private int _prevX, _prevY;                                 // Used in calculating the delta position while panning the image
 		private Size _imageSize;                                    // The magnification of the image
-		private MapDrawing.PointOfInterest _hoverPoi = MapDrawing.PointOfInterest.Empty;        // The point of interest the mouse cursor is over
+		private MapDrawing.PointOfInterest _hoverPoi = null;        // The point of interest the mouse cursor is over
 		private MapDrawing.PointOfInterest _selectedPoi = null;     // A point of interest selected by clicking
 
 		private MouseButtons _panButton = MouseButtons.Left;        // The mouse button that grabs and pans the map
@@ -48,11 +50,48 @@ namespace AlivieskaGpsClient
 		private GpsData _gpsData;                                   // Object that handles the connection to the server
 		private System.Timers.Timer _colorResetTimer = new System.Timers.Timer { AutoReset = false, Enabled = false, Interval = 250 };  // Timer that makes the light do the blinky
 
+		private void _loadConfig()
+		{
+			if (!File.Exists(_configPath))
+				return;
+			using (StreamReader reader = new StreamReader(_configPath))
+			{
+				string line;
+				string[] tok;
+				while (!reader.EndOfStream)
+				{
+					line = reader.ReadLine();
+					tok = line.Trim().Split(' ');
+					switch (tok[0].Trim().ToLowerInvariant())
+					{
+						case "url":
+							connectionUrlText.Text = string.Join("", tok, 1, tok.Length - 1);
+							break;
+						case "follow":
+							bool check = false;
+							bool.TryParse(tok[1], out check);
+							followCheck.Checked = check;
+							break;
+					}
+				}
+			}
+		}
+
+		private void _saveConfig()
+		{
+			using (StreamWriter writer = new StreamWriter(_configPath))
+			{
+				writer.WriteLine($"url {connectionUrlText.Text}");
+				writer.WriteLine($"follow {followCheck.Checked.ToString().ToLowerInvariant()}");
+			}
+		}
+
 		public MainForm()
 		{
 			InitializeComponent();
 			_gpsData = new GpsData(this);
 			_colorResetTimer.Elapsed += (o, args) => connectionStatusLabel.ForeColor = Color.ForestGreen;
+			_loadConfig();
 		}
 
 		// Load resources; initialize pan and zoom
@@ -82,9 +121,9 @@ namespace AlivieskaGpsClient
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
 			MapDrawing.DrawPointsOfInterest(e.Graphics, _imageCenter, _imageSize);
 			if (_selectedPoi != null)
-				MapDrawing.DrawCross(e.Graphics, new Pen(Color.Black, 1.0f), _selectedPoi.LocationOnMap(_imageCenter, _imageSize), mapImage.Size);
+				MapDrawing.DrawCross(e.Graphics, new Pen(Color.Black, 1.0f), _selectedPoi.MapLocation(_imageCenter, _imageSize), mapImage.Size);
 			if (_gpsData.Success)
-				MapDrawing.DrawArrow(e.Graphics, _gpsData.MapPosition, _imageCenter, _imageSize);
+				MapDrawing.DrawArrow(e.Graphics, _gpsData.MapPosition, _gpsData.Heading, _imageCenter, _imageSize);
 		}
 
 		// Set up previous coordinates for panning
@@ -201,6 +240,23 @@ namespace AlivieskaGpsClient
 			mapImage.Invalidate();
 		}
 
+		private void default8080Button_Click(object sender, EventArgs e)
+		{
+			if (connectionUrlText.Enabled)
+				connectionUrlText.Text = "http://localhost:8080/";
+		}
+
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			_saveConfig();
+		}
+
+		private void default80Button_Click(object sender, EventArgs e)
+		{
+			if (connectionUrlText.Enabled)
+				connectionUrlText.Text = "http://localhost/gps/";
+		}
+
 		// Update the form to display whatever data is currently present
 		public void UpdateGpsData()
 		{
@@ -222,6 +278,13 @@ namespace AlivieskaGpsClient
 				{
 					connectionStatusLabel.ForeColor = Color.Red;
 				}
+			}
+			if (followCheck.Checked)
+			{
+				PointF p = _gpsData.MapPosition;
+				_imageCenter.X = (int)(-p.X * _imageSize.Width + mapImage.Width / 2);
+				_imageCenter.Y = (int)(-p.Y * _imageSize.Height + mapImage.Height / 2);
+				selectedPoiNameLabel.Text = _imageCenter.ToString();
 			}
 			mapImage.Invalidate();
 		}
@@ -249,10 +312,34 @@ namespace AlivieskaGpsClient
 			DrawCross(g, pen, intersect.X, intersect.Y, size);
 		}
 
-		// Draw an arrow, rotated
-		public static void DrawArrow(Graphics g, PointF pos, Point center, Size size)
+		// Vertices of the arrow polygon
+		private static PointF[] _arrowPoints =
 		{
-			DrawCircle(g, new Point((int)(pos.X * size.Width + center.X), (int)(pos.Y * size.Width + center.Y)), new CircleStyle());
+			new Point(0, -10),
+			new Point(7, 10),
+			new Point(0, 5),
+			new Point(-7, 10)
+		};
+
+		private static PointF[] _arrowPointsTransformed = new PointF[4];
+
+		// Draw an arrow, rotated
+		public static void DrawArrow(Graphics g, PointF position, double angle, Point center, Size size)
+		{
+			double rad = angle * Math.PI / 180.0;
+			float cos = (float)Math.Cos(rad);
+			float sin = (float)Math.Sin(rad);
+
+			for (int i = 0; i < _arrowPoints.Length; ++i)
+			{
+				float vx = _arrowPoints[i].X * cos - _arrowPoints[i].Y * sin;
+				float vy = _arrowPoints[i].X * sin + _arrowPoints[i].Y * cos;
+				_arrowPointsTransformed[i].X = vx + (position.X * size.Width + center.X);
+				_arrowPointsTransformed[i].Y = vy + (position.Y * size.Height + center.Y);
+			}
+
+			g.FillPolygon(new SolidBrush(Color.Orange), _arrowPointsTransformed);
+			g.DrawPolygon(new Pen(Color.Red, 1.75f), _arrowPointsTransformed);
 		}
 
 		// Properties of the circle to be drawn
@@ -310,22 +397,60 @@ namespace AlivieskaGpsClient
 			DrawCircle(g, center.X, center.Y, style);
 		}
 
+		// A point on the map
+		public abstract class MapPoint
+		{
+			public PointF Location { get; }	// X, Y location within the -0.5..0.5 boundaries
+			public float X => Location.X;	// X coordinate between the -0.5..0.5 boundaries
+			public float Y => Location.Y;   // Y coordinate between the -0.5..0.5 boundaries
+
+			// Point on the map defined by a point
+			protected MapPoint(PointF location)
+			{
+				this.Location = location;
+			}
+
+			// Point on the map defined by a pair of coordinates
+			protected MapPoint(float x, float y)
+			{
+				this.Location = new PointF(x, y);
+			}
+
+			// X coordinate mapped to center and size
+			public int MapX(Point center, Size size)
+			{
+				return (int)(this.X * size.Width + center.X);
+			}
+
+			// Y coordinate mapped to center and size
+			public int MapY(Point center, Size size)
+			{
+				return (int)(this.Y * size.Height + center.Y);
+			}
+
+			// Point mapped to center and size
+			public Point MapLocation(Point center, Size size)
+			{
+				return new Point(MapX(center, size), MapY(center, size));
+			}
+		}
+
 		// A point of interest on the map
-		public class PointOfInterest : IComparable<PointOfInterest>, IEquatable<PointOfInterest>
+		public class PointOfInterest : MapPoint, IComparable<PointOfInterest>, IEquatable<PointOfInterest>
 		{
 			public enum PointOfInterestType { Other = 0, Town = 1, Service = 2, Work = 3 }
 			public CircleStyle Style { get; }
-			public PointF Location { get; }                 // The location of the circle on the map, from -0.5 to +0.5
-			public float X { get { return Location.X; } }
-			public float Y { get { return Location.Y; } }
+			//public PointF Location { get; }                 // The location of the circle on the map, from -0.5 to +0.5
+			//public float X { get { return Location.X; } }
+			//public float Y { get { return Location.Y; } }
 			public string Name { get; }
 			public string ID { get; }
 			public PointOfInterestType Type { get; }
 
-			public PointOfInterest(string id, string name, PointF location, CircleStyle style, PointOfInterestType type)
+			public PointOfInterest(string id, string name, PointF location, CircleStyle style, PointOfInterestType type) : base(location)
 			{
 				this.Style = style;
-				this.Location = location;
+				//this.Location = location;
 				this.Name = name;
 				this.ID = id;
 				this.Type = type;
@@ -335,10 +460,10 @@ namespace AlivieskaGpsClient
 			public static PointOfInterest Empty => new PointOfInterest("empty", "Nothing", new PointF(), new CircleStyle(), PointOfInterestType.Other);
 
 			// The location of the point of interest after panning and zooming
-			public Point LocationOnMap(Point center, Size size)
-			{
-				return new Point((int)(this.X * size.Width + center.X), (int)(this.Y * size.Height + center.Y));
-			}
+			//public Point MapLocation(Point center, Size size)
+			//{
+			//	return new Point((int)(this.X * size.Width + center.X), (int)(this.Y * size.Height + center.Y));
+			//}
 
 			// Draw a circle on an area defined by its center point and size
 			public void Draw(Graphics g, Point center, Size size)
@@ -415,8 +540,29 @@ namespace AlivieskaGpsClient
 					poi.Draw(g, center, size);
 				}
 		}
-	}
 
+		// A class representing a road hazard. TBD: create an abstract class to be inherited by this and PointOfInterest?
+		public class RoadHazard
+		{
+			private static Bitmap[] _icons =
+			{
+				new Bitmap("resources\\hazard_other.png"),
+				new Bitmap("resources\\hazard_road.png"),
+				new Bitmap("resources\\hazard_traffic.png"),
+				new Bitmap("resources\\hazard_railway.png"),
+				new Bitmap("resources\\hazard_police.png")
+			};
+			public enum RoadHazardType { Other = 0, Topography = 1, Traffic = 2, Railway = 3, Police = 4 }
+			public PointF Location { get; }
+			public float X { get { return Location.X; } }
+			public float Y { get { return Location.Y; } }
+			public int ID { get; }
+			public string Name { get; }
+			public string Description { get; }
+			RoadHazardType Type { get; }
+			public Bitmap Image { get { return _icons[(int)Type]; } }
+		}
+	}
 
 	// Data received from the GPS server
 	public class GpsData
@@ -430,7 +576,7 @@ namespace AlivieskaGpsClient
 		{
 			get
 			{
-				return new PointF(this.X / this.Size.Width + this.Center.X, -this.Z / this.Size.Width + this.Center.Y);
+				return new PointF(this.X / this.Size.Width + this.Center.X, -this.Z / this.Size.Height + this.Center.Y);
 			}
 		}
 
