@@ -87,6 +87,9 @@
     <None Include="resources\config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="resources\hazard_other.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="resources\map.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -124,6 +124,7 @@ namespace AlivieskaGpsClient
 				MapDrawing.DrawCross(e.Graphics, new Pen(Color.Black, 1.0f), _selectedPoi.MapLocation(_imageCenter, _imageSize), mapImage.Size);
 			if (_gpsData.Success)
 				MapDrawing.DrawArrow(e.Graphics, _gpsData.MapPosition, _gpsData.Heading, _imageCenter, _imageSize);
+			MapDrawing.testHazard.Draw(e.Graphics, _imageCenter, _imageSize);
 		}
 
 		// Set up previous coordinates for panning
@@ -404,6 +405,12 @@ namespace AlivieskaGpsClient
 			public float X => Location.X;	// X coordinate between the -0.5..0.5 boundaries
 			public float Y => Location.Y;   // Y coordinate between the -0.5..0.5 boundaries
 
+			// Point on the map at origin
+			public MapPoint()
+			{
+
+			}
+
 			// Point on the map defined by a point
 			protected MapPoint(PointF location)
 			{
@@ -440,9 +447,6 @@ namespace AlivieskaGpsClient
 		{
 			public enum PointOfInterestType { Other = 0, Town = 1, Service = 2, Work = 3 }
 			public CircleStyle Style { get; }
-			//public PointF Location { get; }                 // The location of the circle on the map, from -0.5 to +0.5
-			//public float X { get { return Location.X; } }
-			//public float Y { get { return Location.Y; } }
 			public string Name { get; }
 			public string ID { get; }
 			public PointOfInterestType Type { get; }
@@ -459,17 +463,11 @@ namespace AlivieskaGpsClient
 			// A point of no interest
 			public static PointOfInterest Empty => new PointOfInterest("empty", "Nothing", new PointF(), new CircleStyle(), PointOfInterestType.Other);
 
-			// The location of the point of interest after panning and zooming
-			//public Point MapLocation(Point center, Size size)
-			//{
-			//	return new Point((int)(this.X * size.Width + center.X), (int)(this.Y * size.Height + center.Y));
-			//}
-
 			// Draw a circle on an area defined by its center point and size
 			public void Draw(Graphics g, Point center, Size size)
 			{
 				//DrawCircle(g, (int)(this.X * size.Width + center.X), (int)(this.Y * size.Height + center.Y), this.Style);
-				Rectangle rect = new Rectangle((int)((this.X * size.Width + center.X) - this.Style.Radius), (int)((this.Y * size.Height + center.Y) - this.Style.Radius), (int)(2 * this.Style.Radius), (int)(2 * this.Style.Radius));
+				Rectangle rect = new Rectangle((int)(MapX(center, size) - this.Style.Radius), (int)(MapY(center, size) - this.Style.Radius), (int)(2 * this.Style.Radius), (int)(2 * this.Style.Radius));
 				if (this.Style.Fill)
 				{
 					g.FillEllipse(new SolidBrush(this.Style.FillColor), rect);
@@ -483,8 +481,8 @@ namespace AlivieskaGpsClient
 			// Check if a point is within the circle's radius
 			public bool InRange(PointF point, Point center, Size size)
 			{
-				double x = (this.X * size.Width + center.X) - point.X;
-				double y = (this.Y * size.Height + center.Y) - point.Y;
+				double x = MapX(center, size) - point.X;
+				double y = MapY(center, size) - point.Y;
 				double distSq = Math.Pow(x, 2) + Math.Pow(y, 2);
 
 				return distSq <= Math.Pow(this.Style.Radius, 2);
@@ -542,26 +540,41 @@ namespace AlivieskaGpsClient
 		}
 
 		// A class representing a road hazard. TBD: create an abstract class to be inherited by this and PointOfInterest?
-		public class RoadHazard
+		public class RoadHazard : MapPoint
 		{
-			private static Bitmap[] _icons =
+			private static Bitmap[] _icons = new Bitmap[]
 			{
 				new Bitmap("resources\\hazard_other.png"),
-				new Bitmap("resources\\hazard_road.png"),
-				new Bitmap("resources\\hazard_traffic.png"),
-				new Bitmap("resources\\hazard_railway.png"),
-				new Bitmap("resources\\hazard_police.png")
+				new Bitmap("resources\\hazard_other.png"),
+				new Bitmap("resources\\hazard_other.png"),
+				new Bitmap("resources\\hazard_other.png"),
+				new Bitmap("resources\\hazard_other.png")
 			};
+			public static Size IconSize = new Size(20, 20);
+			public static Size HalfSize = new Size(IconSize.Width / 2, IconSize.Height / 2);
+
 			public enum RoadHazardType { Other = 0, Topography = 1, Traffic = 2, Railway = 3, Police = 4 }
-			public PointF Location { get; }
-			public float X { get { return Location.X; } }
-			public float Y { get { return Location.Y; } }
 			public int ID { get; }
 			public string Name { get; }
 			public string Description { get; }
 			RoadHazardType Type { get; }
 			public Bitmap Image { get { return _icons[(int)Type]; } }
+
+			public RoadHazard(int id, string name, string description, PointF location, RoadHazardType type) : base(location)
+			{
+				this.ID = id;
+				this.Name = name;
+				this.Description = description;
+				this.Type = type;
+			}
+
+			public void Draw(Graphics g, Point center, Size size)
+			{
+				g.DrawImage(Image, new Rectangle(Point.Subtract(MapLocation(center, size), HalfSize), IconSize));
+			}
 		}
+
+		public static RoadHazard testHazard = new RoadHazard(0, "Test hazard", "A hazard of the testing the hazardousness", new PointF(), RoadHazard.RoadHazardType.Topography);
 	}
 
 	// Data received from the GPS server
