@@ -47,6 +47,16 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
+			this.label8 = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
+			this.poiXLabel = new System.Windows.Forms.Label();
+			this.poiYLabel = new System.Windows.Forms.Label();
+			this.lockPoiPositionCheck = new System.Windows.Forms.CheckBox();
+			this.lockHazardPositionCheck = new System.Windows.Forms.CheckBox();
+			this.hazardYLabel = new System.Windows.Forms.Label();
+			this.hazardXLabel = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
 			this.mainTabs.SuspendLayout();
 			this.recordPoiTab.SuspendLayout();
 			this.recordHazardTab.SuspendLayout();
@@ -65,6 +75,11 @@
 			// 
 			// recordPoiTab
 			// 
+			this.recordPoiTab.Controls.Add(this.lockPoiPositionCheck);
+			this.recordPoiTab.Controls.Add(this.poiYLabel);
+			this.recordPoiTab.Controls.Add(this.poiXLabel);
+			this.recordPoiTab.Controls.Add(this.label9);
+			this.recordPoiTab.Controls.Add(this.label8);
 			this.recordPoiTab.Controls.Add(this.writePoiButton);
 			this.recordPoiTab.Controls.Add(this.poiTypeSelect);
 			this.recordPoiTab.Controls.Add(this.poiNameText);
@@ -146,6 +161,11 @@
 			// 
 			// recordHazardTab
 			// 
+			this.recordHazardTab.Controls.Add(this.lockHazardPositionCheck);
+			this.recordHazardTab.Controls.Add(this.hazardYLabel);
+			this.recordHazardTab.Controls.Add(this.hazardXLabel);
+			this.recordHazardTab.Controls.Add(this.label12);
+			this.recordHazardTab.Controls.Add(this.label13);
 			this.recordHazardTab.Controls.Add(this.writeHazardButton);
 			this.recordHazardTab.Controls.Add(this.label7);
 			this.recordHazardTab.Controls.Add(this.hazardDescriptionText);
@@ -244,6 +264,108 @@
 			this.label6.TabIndex = 6;
 			this.label6.Text = "Unique ID:";
 			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.label8.Location = new System.Drawing.Point(280, 42);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(15, 13);
+			this.label8.TabIndex = 5;
+			this.label8.Text = "X";
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.label9.Location = new System.Drawing.Point(280, 68);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(15, 13);
+			this.label9.TabIndex = 6;
+			this.label9.Text = "Y";
+			// 
+			// poiXLabel
+			// 
+			this.poiXLabel.AutoSize = true;
+			this.poiXLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.poiXLabel.Location = new System.Drawing.Point(329, 42);
+			this.poiXLabel.Name = "poiXLabel";
+			this.poiXLabel.Size = new System.Drawing.Size(14, 13);
+			this.poiXLabel.TabIndex = 5;
+			this.poiXLabel.Text = "0";
+			// 
+			// poiYLabel
+			// 
+			this.poiYLabel.AutoSize = true;
+			this.poiYLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.poiYLabel.Location = new System.Drawing.Point(329, 68);
+			this.poiYLabel.Name = "poiYLabel";
+			this.poiYLabel.Size = new System.Drawing.Size(14, 13);
+			this.poiYLabel.TabIndex = 6;
+			this.poiYLabel.Text = "0";
+			// 
+			// lockPoiPositionCheck
+			// 
+			this.lockPoiPositionCheck.Appearance = System.Windows.Forms.Appearance.Button;
+			this.lockPoiPositionCheck.Location = new System.Drawing.Point(499, 65);
+			this.lockPoiPositionCheck.Name = "lockPoiPositionCheck";
+			this.lockPoiPositionCheck.Size = new System.Drawing.Size(136, 24);
+			this.lockPoiPositionCheck.TabIndex = 7;
+			this.lockPoiPositionCheck.Text = "Lock position";
+			this.lockPoiPositionCheck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.lockPoiPositionCheck.UseVisualStyleBackColor = true;
+			// 
+			// lockHazardPositionCheck
+			// 
+			this.lockHazardPositionCheck.Appearance = System.Windows.Forms.Appearance.Button;
+			this.lockHazardPositionCheck.Location = new System.Drawing.Point(499, 65);
+			this.lockHazardPositionCheck.Name = "lockHazardPositionCheck";
+			this.lockHazardPositionCheck.Size = new System.Drawing.Size(136, 24);
+			this.lockHazardPositionCheck.TabIndex = 17;
+			this.lockHazardPositionCheck.Text = "Lock position";
+			this.lockHazardPositionCheck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.lockHazardPositionCheck.UseVisualStyleBackColor = true;
+			// 
+			// hazardYLabel
+			// 
+			this.hazardYLabel.AutoSize = true;
+			this.hazardYLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.hazardYLabel.Location = new System.Drawing.Point(329, 68);
+			this.hazardYLabel.Name = "hazardYLabel";
+			this.hazardYLabel.Size = new System.Drawing.Size(14, 13);
+			this.hazardYLabel.TabIndex = 15;
+			this.hazardYLabel.Text = "0";
+			// 
+			// hazardXLabel
+			// 
+			this.hazardXLabel.AutoSize = true;
+			this.hazardXLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.hazardXLabel.Location = new System.Drawing.Point(329, 42);
+			this.hazardXLabel.Name = "hazardXLabel";
+			this.hazardXLabel.Size = new System.Drawing.Size(14, 13);
+			this.hazardXLabel.TabIndex = 13;
+			this.hazardXLabel.Text = "0";
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.label12.Location = new System.Drawing.Point(280, 68);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(15, 13);
+			this.label12.TabIndex = 16;
+			this.label12.Text = "Y";
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.label13.Location = new System.Drawing.Point(280, 42);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(15, 13);
+			this.label13.TabIndex = 14;
+			this.label13.Text = "X";
+			// 
 			// RecordLocationForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -289,5 +411,15 @@
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.TextBox hazardDescriptionText;
 		private System.Windows.Forms.Button writeHazardButton;
+		private System.Windows.Forms.Label label9;
+		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.Label poiYLabel;
+		private System.Windows.Forms.Label poiXLabel;
+		private System.Windows.Forms.CheckBox lockPoiPositionCheck;
+		private System.Windows.Forms.CheckBox lockHazardPositionCheck;
+		private System.Windows.Forms.Label hazardYLabel;
+		private System.Windows.Forms.Label hazardXLabel;
+		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Label label13;
 	}
 }

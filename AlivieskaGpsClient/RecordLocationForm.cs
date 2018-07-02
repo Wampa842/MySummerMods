@@ -32,12 +32,30 @@ namespace AlivieskaGpsClient
 		private readonly string _poiOutPath = "resources\\locations_custom.csv";
 		private readonly string _hazardOutPath = "resources\\hazards_custom.csv";
 		public GpsData Data { get; set; }
+		PointF _poiPos = new PointF();
+		PointF _hazardPos = new PointF();
 		public RecordLocationForm(GpsData data)
 		{
 			InitializeComponent();
 			Data = data;
 			poiTypeSelect.SelectedIndex = 0;
 			hazardTypeSelect.SelectedIndex = 0;
+		}
+
+		public void UpdateDisplay()
+		{
+			if(!lockPoiPositionCheck.Checked)
+			{
+				_poiPos = Data.MapPosition;
+			}
+			if(!lockHazardPositionCheck.Checked)
+			{
+				_hazardPos = Data.MapPosition;
+			}
+			poiXLabel.Text = _poiPos.X.ToString();
+			poiYLabel.Text = _poiPos.Y.ToString();
+			hazardXLabel.Text = _hazardPos.X.ToString();
+			hazardYLabel.Text = _hazardPos.Y.ToString();
 		}
 
 		private void writePoiButton_Click(object sender, EventArgs e)
@@ -52,7 +70,7 @@ namespace AlivieskaGpsClient
 			}
 			using (StreamWriter writer = new StreamWriter(_poiOutPath, true))
 			{
-				writer.WriteLine($"\"{id}\";{poiTypeSelect.SelectedIndex};\"{poiNameText.Text.Trim()}\";{Data.MapPosition.X};{Data.MapPosition.Y}");
+				writer.WriteLine($"\"{id}\";{poiTypeSelect.SelectedIndex};\"{poiNameText.Text.Trim()}\";{_poiPos.X};{_poiPos.Y}");
 			}
 		}
 
@@ -68,7 +86,7 @@ namespace AlivieskaGpsClient
 			}
 			using (StreamWriter writer = new StreamWriter(_hazardOutPath))
 			{
-				writer.WriteLine($"\"{id}\",{hazardTypeSelect.SelectedIndex},\"{hazardNameText.Text.Trim()}\",\"{hazardDescriptionText.Text.Trim()}\",{Data.MapPosition.X},{Data.MapPosition.Y}");
+				writer.WriteLine($"\"{id}\",{hazardTypeSelect.SelectedIndex},\"{hazardNameText.Text.Trim()}\",\"{hazardDescriptionText.Text.Trim()}\",{_hazardPos.X},{_hazardPos.Y}");
 			}
 		}
 
