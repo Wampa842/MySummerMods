@@ -451,6 +451,7 @@
 			// 
 			// showDetailsButton
 			// 
+			this.showDetailsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.showDetailsButton.Location = new System.Drawing.Point(549, 388);
 			this.showDetailsButton.Name = "showDetailsButton";
 			this.showDetailsButton.Size = new System.Drawing.Size(90, 23);
@@ -461,6 +462,7 @@
 			// 
 			// showRecordButton
 			// 
+			this.showRecordButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.showRecordButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
 			this.showRecordButton.Location = new System.Drawing.Point(470, 388);
 			this.showRecordButton.Name = "showRecordButton";

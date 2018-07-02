@@ -120,7 +120,7 @@ namespace AlivieskaGpsServer
 		public override string ID => "AlivieskaGpsServer";
 		public override string Name => "Alivieska GPS server";
 		public override string Author => "Wampa842";
-		public override string Version => "1.1.0";
+		public override string Version => "1.1.2";
 		public override bool UseAssetsFolder => false;
 
 		private string _serverConfigPath;
@@ -253,7 +253,7 @@ namespace AlivieskaGpsServer
 
 			AlivieskaGpsServer _mod;
 
-			private readonly string _usageString = "Usage: gps [-p <port>] start|stop|restart|write|help";
+			private readonly string _usageString = "Usage: gps [-p <port>] start|stop|restart|write [xml] [json]|help";
 			private readonly string _helpString = "gps - controls a web server that provides positioning information on 'http://localhost:8080/'.";
 
 			public GpsCommand(AlivieskaGpsServer sender)
@@ -316,9 +316,30 @@ namespace AlivieskaGpsServer
 				// Write to file
 				if(Array.Exists(args, e => e.ToLowerInvariant() == "write"))
 				{
-					using (StreamWriter writer = new StreamWriter(Path.Combine(ModLoader.GetModConfigFolder(_mod), "out.json")))
+					if (Array.Exists(args, e => e.ToLowerInvariant() == "json"))
 					{
-						writer.Write(_mod.GetJsonContent());
+						using (StreamWriter writer = new StreamWriter(Path.Combine(ModLoader.GetModConfigFolder(_mod), "out.json")))
+						{
+							writer.Write(_mod.GetJsonContent());
+						}
+					}
+					else if(Array.Exists(args, e => e.ToLowerInvariant() == "xml"))
+					{
+						using (StreamWriter writer = new StreamWriter(Path.Combine(ModLoader.GetModConfigFolder(_mod), "out.xml")))
+						{
+							writer.Write(_mod.GetXmlContent());
+						}
+					}
+					else
+					{
+						using (StreamWriter writer = new StreamWriter(Path.Combine(ModLoader.GetModConfigFolder(_mod), "out.json")))
+						{
+							writer.Write(_mod.GetJsonContent());
+						}
+						using (StreamWriter writer = new StreamWriter(Path.Combine(ModLoader.GetModConfigFolder(_mod), "out.xml")))
+						{
+							writer.Write(_mod.GetXmlContent());
+						}
 					}
 				}
 			}

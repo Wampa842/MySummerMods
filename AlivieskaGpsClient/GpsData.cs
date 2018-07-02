@@ -28,7 +28,7 @@ namespace AlivieskaGpsClient
 		private readonly MainForm _form;
 
 		public Size Size = new Size(4200, 3350);
-		public PointF Center = new PointF(-0.053f, 0.041f);
+		public PointF Center = new PointF(-0.0585f, 0.041f);
 
 		public PointF MapPosition
 		{
