@@ -276,7 +276,6 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.mapImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.mapImage.InitialImage = global::AlivieskaGpsClient.Properties.Resources.map;
 			this.mapImage.Location = new System.Drawing.Point(12, 12);
 			this.mapImage.Name = "mapImage";
 			this.mapImage.Size = new System.Drawing.Size(400, 400);
