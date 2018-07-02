@@ -52,7 +52,7 @@ namespace AlivieskaGpsClient
 			}
 			using (StreamWriter writer = new StreamWriter(_poiOutPath, true))
 			{
-				writer.WriteLine($"\"{id}\",{poiTypeSelect.SelectedIndex},\"{poiNameText.Text.Trim()}\",{Data.MapPosition.X},{Data.MapPosition.Y}");
+				writer.WriteLine($"\"{id}\";{poiTypeSelect.SelectedIndex};\"{poiNameText.Text.Trim()}\";{Data.MapPosition.X};{Data.MapPosition.Y}");
 			}
 		}
 

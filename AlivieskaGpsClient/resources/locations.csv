@@ -1,18 +1,18 @@
-"home",1,"Kesselinperä",-0.05875,0.041875
-"perajarvi",1,"Peräjärvi",-0.410625,-0.315625
-"loppe",1,"Loppe",0.3185714,-0.1592857
-"rykipohja",1,"Rykipohja",-0.3197115,0.2439904
-"cottage",1,"Island cottage",-0.2662455,-0.1055957
-"teimoshop",2,"Teimo's shop",-0.426875,-0.3125
-"inspection",2,"Car inspection",-0.42625,-0.33875
-"repair",2,"Fleetari repair shop",0.316875,-0.175625
-"sewageplant",3,"Sewage treatment plant",-0.4175,-0.3675
-"strawberry",3,"Strawberry field",-0.361875,0.2425
-"firewood",3,"Log pile",-0.045625,0.06625
-"kilju",3,"Jokke",0.411875,0.10875
-"woodbuyer",3,"Firewood guy",0.4025,0.17125
-"shit0",3,"Sewage",0.393125,0.276875
-"shit1",3,"Sewage",0.330625,-0.138125
-"shit2",3,"Sewage",0.310625,-0.169375
-"shit3",3,"Sewage",-0.3875,-0.314375
-"shit4",3,"Sewage",-0.370625,-0.2975
+"home";1;"Kesselinperä";-0.05875;0.041875
+"perajarvi";1;"Peräjärvi";-0.410625;-0.315625
+"loppe";1;"Loppe";0.3185714;-0.1592857
+"rykipohja";1;"Rykipohja";-0.3197115;0.2439904
+"cottage";1;"Island cottage";-0.2662455;-0.1055957
+"teimoshop";2;"Teimo's shop";-0.426875;-0.3125
+"inspection";2;"Car inspection";-0.42625;-0.33875
+"repair";2;"Fleetari repair shop";0.316875;-0.175625
+"sewageplant";3;"Sewage treatment plant";-0.4175;-0.3675
+"strawberry";3;"Strawberry field";-0.361875;0.2425
+"firewood";3;"Log pile";-0.045625;0.06625
+"kilju";3;"Jokke";0.411875;0.10875
+"woodbuyer";3;"Firewood guy";0.4025;0.17125
+"shit0";3;"Sewage";0.393125;0.276875
+"shit1";3;"Sewage";0.330625;-0.138125
+"shit2";3;"Sewage";0.310625;-0.169375
+"shit3";3;"Sewage";-0.3875;-0.314375
+"shit4";3;"Sewage";-0.370625;-0.2975

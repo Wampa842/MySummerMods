@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using Microsoft.VisualBasic.FileIO;
 
 namespace AlivieskaGpsClient
 {
@@ -53,7 +54,7 @@ namespace AlivieskaGpsClient
 			new Point(-7, 10)
 		};
 
-		private static PointF[] _arrowPointsTransformed = new PointF[4];
+		private static readonly PointF[] _arrowPointsTransformed = new PointF[4];
 
 		// Draw an arrow, rotated
 		public static void DrawArrow(Graphics g, PointF position, double angle, Point center, Size size)
@@ -219,23 +220,15 @@ namespace AlivieskaGpsClient
 				return distSq <= Math.Pow(this.Style.Radius, 2);
 			}
 
-			// Parse a CSV line and return a new PointOfInterest object
-			public static PointOfInterest FromCsvString(string line)
-			{
-				string[] tok = line.Split(',');
-				return new PointOfInterest(tok[0].Trim('"'), tok[2].Trim('"'), new PointF(float.Parse(tok[3]), float.Parse(tok[4])), CircleStyle.Presets[int.Parse(tok[1])], (PointOfInterestType)int.Parse(tok[1]));
-			}
-
-			// Read all points of interest from a CSV file
 			public static SortedSet<PointOfInterest> ReadFromCsv(string path)
 			{
 				SortedSet<PointOfInterest> set = new SortedSet<PointOfInterest>();
-				using (System.IO.StreamReader reader = new System.IO.StreamReader(path))
+				TextFieldParser parser = new TextFieldParser(path);
+				parser.SetDelimiters(";");
+				while(!parser.EndOfData)
 				{
-					while (!reader.EndOfStream)
-					{
-						set.Add(FromCsvString(reader.ReadLine().Trim()));
-					}
+					string[] tok = parser.ReadFields();
+					set.Add(new PointOfInterest(tok[0].Trim(), tok[2].Trim(), new PointF(float.Parse(tok[3]), float.Parse(tok[4])), CircleStyle.Presets[int.Parse(tok[1])], (PointOfInterestType)int.Parse(tok[1])));
 				}
 				return set;
 			}
@@ -276,7 +269,7 @@ namespace AlivieskaGpsClient
 		// A class representing a road hazard. TBD: create an abstract class to be inherited by this and PointOfInterest?
 		public class RoadHazard : MapPoint, IComparable<RoadHazard>, IEquatable<RoadHazard>
 		{
-			private static Bitmap[] _icons = new Bitmap[]
+			private static readonly Bitmap[] _icons = new Bitmap[]
 			{
 				new Bitmap("resources\\hazard_other.png"),
 				new Bitmap("resources\\hazard_road.png"),
@@ -301,37 +294,36 @@ namespace AlivieskaGpsClient
 				this.Description = description;
 				this.Type = type;
 			}
-
+			
+			// Draw the hazard's icon at its center location
 			public void Draw(Graphics g, Point center, Size size)
 			{
 				g.DrawImage(Image, new Rectangle(Point.Subtract(MapLocation(center, size), HalfSize), IconSize));
 			}
-
-			public static RoadHazard FromCsvString(string line)
-			{
-				// "id",type,"name","desc",x,y
-				string[] tok = line.Split(',');
-				return new RoadHazard(tok[0].Trim('"').Trim(), tok[2].Trim('"').Trim(), tok[3].Trim('"').Trim(), new PointF(float.Parse(tok[4].Trim()), float.Parse(tok[5].Trim())), (RoadHazardType)int.Parse(tok[1].Trim()));
-			}
-
+			
+			// Read all road hazards from a CSV file
 			public static SortedSet<RoadHazard> ReadFromCsv(string path)
 			{
 				SortedSet<RoadHazard> set = new SortedSet<RoadHazard>();
-				using (StreamReader reader = new StreamReader(path))
+				TextFieldParser parser = new TextFieldParser(path);
+				parser.SetDelimiters(";");
+				while(!parser.EndOfData)
 				{
-					while (!reader.EndOfStream)
-					{
-						set.Add(FromCsvString(reader.ReadLine().Trim()));
-					}
+					string[] tok = parser.ReadFields();
+					set.Add(new RoadHazard(tok[0].Trim(), tok[2].Trim(), tok[3].Trim(), new PointF(float.Parse(tok[4]), float.Parse(tok[5])), (RoadHazardType)int.Parse(tok[1])));
 				}
 				return set;
 			}
 
+			// Compare by type (reverse), then by ID
 			public int CompareTo(RoadHazard other)
 			{
+				if (this.Type != other.Type)
+					return ((int)other.Type).CompareTo((int)this.Type);
 				return this.ID.CompareTo(other.ID);
 			}
 
+			// Make sure IDs are unique
 			public bool Equals(RoadHazard other)
 			{
 				if (this.ID == other.ID)
