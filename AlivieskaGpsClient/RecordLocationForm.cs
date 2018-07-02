@@ -84,7 +84,7 @@ namespace AlivieskaGpsClient
 				MessageBox.Show($"The identifier '{hazardIDText.Text}' already exists.");
 				return;
 			}
-			using (StreamWriter writer = new StreamWriter(_hazardOutPath))
+			using (StreamWriter writer = new StreamWriter(_hazardOutPath, true))
 			{
 				writer.WriteLine($"\"{id}\",{hazardTypeSelect.SelectedIndex},\"{hazardNameText.Text.Trim()}\",\"{hazardDescriptionText.Text.Trim()}\",{_hazardPos.X},{_hazardPos.Y}");
 			}

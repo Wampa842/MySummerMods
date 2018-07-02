@@ -396,6 +396,7 @@ namespace AlivieskaGpsClient
 				_imageCenter.Y = (int)(-p.Y * _imageSize.Height + mapImage.Height / 2);
 			}
 			mapImage.Invalidate();
+			_recordForm.UpdateDisplay();
 		}
 	}
 }
