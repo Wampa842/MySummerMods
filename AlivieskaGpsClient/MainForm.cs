@@ -47,7 +47,8 @@ namespace AlivieskaGpsClient
 		private System.Timers.Timer _colorResetTimer = new System.Timers.Timer { AutoReset = false, Enabled = false, Interval = 250 };  // Timer that makes the light do the blinky
 
 		private DetailsForm _detailsForm = new DetailsForm();		// Shows info about a selected location
-		private RecordLocationForm _recordForm;						// Allows the user to record their own locations
+		private RecordLocationForm _recordForm;                     // Allows the user to record their own locations
+		private AboutForm _aboutForm = new AboutForm();				// Shows license and version information
 
 		private void _loadConfig()
 		{
@@ -358,6 +359,11 @@ namespace AlivieskaGpsClient
 		private void MainForm_Move(object sender, EventArgs e)
 		{
 			_recordForm.Location = Point.Add(this.Location, new Size(0, this.Height));
+		}
+
+		private void aboutButton_Click(object sender, EventArgs e)
+		{
+			_aboutForm.ShowDialog();
 		}
 
 		// Update the form to display whatever data is currently present

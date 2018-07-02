@@ -48,7 +48,6 @@
 			this.gpsDataZ = new System.Windows.Forms.TextBox();
 			this.gpsDataX = new System.Windows.Forms.TextBox();
 			this.gpsConnectButton = new System.Windows.Forms.Button();
-			this.mapImage = new System.Windows.Forms.PictureBox();
 			this.zoomMultLabel = new System.Windows.Forms.Label();
 			this.viewSettingsBox = new System.Windows.Forms.GroupBox();
 			this.displayHazardsCheck = new System.Windows.Forms.CheckBox();
@@ -64,10 +63,12 @@
 			this.followCheck = new System.Windows.Forms.CheckBox();
 			this.showDetailsButton = new System.Windows.Forms.Button();
 			this.showRecordButton = new System.Windows.Forms.Button();
+			this.mapImage = new System.Windows.Forms.PictureBox();
+			this.aboutButton = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).BeginInit();
 			this.gpsConnectionBox.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.mapImage)).BeginInit();
 			this.viewSettingsBox.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.mapImage)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// zoomSlider
@@ -270,22 +271,6 @@
 			this.gpsConnectButton.UseVisualStyleBackColor = true;
 			this.gpsConnectButton.Click += new System.EventHandler(this.gpsConnectButton_Click);
 			// 
-			// mapImage
-			// 
-			this.mapImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.mapImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.mapImage.Location = new System.Drawing.Point(12, 12);
-			this.mapImage.Name = "mapImage";
-			this.mapImage.Size = new System.Drawing.Size(400, 400);
-			this.mapImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-			this.mapImage.TabIndex = 5;
-			this.mapImage.TabStop = false;
-			this.mapImage.Paint += new System.Windows.Forms.PaintEventHandler(this.mapImage_Paint);
-			this.mapImage.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseDown);
-			this.mapImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseMove);
-			// 
 			// zoomMultLabel
 			// 
 			this.zoomMultLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -471,11 +456,40 @@
 			this.showRecordButton.UseVisualStyleBackColor = true;
 			this.showRecordButton.Click += new System.EventHandler(this.showRecordButton_Click);
 			// 
+			// mapImage
+			// 
+			this.mapImage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.mapImage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.mapImage.Location = new System.Drawing.Point(12, 12);
+			this.mapImage.Name = "mapImage";
+			this.mapImage.Size = new System.Drawing.Size(400, 400);
+			this.mapImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+			this.mapImage.TabIndex = 5;
+			this.mapImage.TabStop = false;
+			this.mapImage.Paint += new System.Windows.Forms.PaintEventHandler(this.mapImage_Paint);
+			this.mapImage.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseDown);
+			this.mapImage.MouseMove += new System.Windows.Forms.MouseEventHandler(this.mapImage_MouseMove);
+			// 
+			// aboutButton
+			// 
+			this.aboutButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.aboutButton.Location = new System.Drawing.Point(588, 1);
+			this.aboutButton.Name = "aboutButton";
+			this.aboutButton.Size = new System.Drawing.Size(51, 15);
+			this.aboutButton.TabIndex = 17;
+			this.aboutButton.Text = "about";
+			this.aboutButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+			this.aboutButton.UseVisualStyleBackColor = true;
+			this.aboutButton.Click += new System.EventHandler(this.aboutButton_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(651, 424);
+			this.Controls.Add(this.aboutButton);
 			this.Controls.Add(this.showRecordButton);
 			this.Controls.Add(this.showDetailsButton);
 			this.Controls.Add(this.followCheck);
@@ -496,9 +510,9 @@
 			((System.ComponentModel.ISupportInitialize)(this.zoomSlider)).EndInit();
 			this.gpsConnectionBox.ResumeLayout(false);
 			this.gpsConnectionBox.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.mapImage)).EndInit();
 			this.viewSettingsBox.ResumeLayout(false);
 			this.viewSettingsBox.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.mapImage)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -539,6 +553,7 @@
 		private System.Windows.Forms.CheckBox displayTrafficHazardsCheck;
 		private System.Windows.Forms.Button showDetailsButton;
 		private System.Windows.Forms.Button showRecordButton;
+		private System.Windows.Forms.Button aboutButton;
 	}
 }
 
