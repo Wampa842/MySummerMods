@@ -62,7 +62,7 @@ namespace AlivieskaGpsClient
 		{
 			if (string.IsNullOrWhiteSpace(poiIDText.Text))
 				return;
-			string id = poiIDText.Text.Trim().Replace(' ', '_').Replace(',', ';');
+			string id = poiIDText.Text.Trim().Replace(' ', '_').Replace(';', ',');
 			if(MapDrawing.PointsOfInterest.Any(poi => poi.ID == id))
 			{
 				MessageBox.Show($"The identifier '{poiIDText.Text}' already exists.");
@@ -78,7 +78,7 @@ namespace AlivieskaGpsClient
 		{
 			if (string.IsNullOrWhiteSpace(hazardIDText.Text))
 				return;
-			string id = hazardIDText.Text.Trim().Replace(' ', '_').Replace(',', ';');
+			string id = hazardIDText.Text.Trim().Replace(' ', '_').Replace(';', ',');
 			if (MapDrawing.Hazards.Any(poi => poi.ID == id))
 			{
 				MessageBox.Show($"The identifier '{hazardIDText.Text}' already exists.");
@@ -86,7 +86,7 @@ namespace AlivieskaGpsClient
 			}
 			using (StreamWriter writer = new StreamWriter(_hazardOutPath, true))
 			{
-				writer.WriteLine($"\"{id}\",{hazardTypeSelect.SelectedIndex},\"{hazardNameText.Text.Trim()}\",\"{hazardDescriptionText.Text.Trim()}\",{_hazardPos.X},{_hazardPos.Y}");
+				writer.WriteLine($"\"{id}\";{hazardTypeSelect.SelectedIndex};\"{hazardNameText.Text.Trim()}\";\"{hazardDescriptionText.Text.Trim()}\";{_hazardPos.X};{_hazardPos.Y}");
 			}
 		}
 
