@@ -21,10 +21,9 @@ namespace AlivieskaGpsClient
 				Size = new Size(400, 300),
 				StartPosition = FormStartPosition.Manual,
 				FormBorderStyle = FormBorderStyle.FixedToolWindow,
-				Location = new Point(this.Location.X + this.Width, this.Location.Y),
 				ShowInTaskbar = false,
 				ShowIcon = false,
-				Text = "Copyright notice"
+				Text = "GNU General Public License 3.0-or-later - Copyright notice"
 			};
 			_notice.Controls.Add(new Label()
 			{
@@ -49,6 +48,7 @@ namespace AlivieskaGpsClient
 
 		private void showCopyrightNoticeButton_Click(object sender, EventArgs e)
 		{
+			_notice.Location = new Point(this.Location.X + this.Width, this.Location.Y);
 			_notice.ShowDialog();
 		}
 
@@ -56,6 +56,19 @@ namespace AlivieskaGpsClient
 		{
 			Hide();
 			e.Cancel = true;
+		}
+
+		private void showLicenseButton_Click(object sender, EventArgs e)
+		{
+			if(System.IO.File.Exists("COPYING.TXT"))
+			{
+				System.Diagnostics.Process.Start("COPYING.TXT");
+			}
+			else
+			{
+				((Button)sender).Text = "File not found";
+				((Button)sender).Enabled = false;
+			}
 		}
 	}
 }

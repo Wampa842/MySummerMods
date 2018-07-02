@@ -74,9 +74,7 @@ namespace AlivieskaGpsClient
 			g.FillPolygon(new SolidBrush(Color.Orange), _arrowPointsTransformed);
 			g.DrawPolygon(new Pen(Color.Red, 1.75f), _arrowPointsTransformed);
 		}
-		#endregion
 
-		#region POI
 		// Properties of the circle to be drawn
 		public class CircleStyle
 		{
@@ -176,7 +174,9 @@ namespace AlivieskaGpsClient
 				return new Point(MapX(center, size), MapY(center, size));
 			}
 		}
+		#endregion
 
+		#region POI
 		// A point of interest on the map
 		public class PointOfInterest : MapPoint, IComparable<PointOfInterest>, IEquatable<PointOfInterest>
 		{
@@ -223,6 +223,15 @@ namespace AlivieskaGpsClient
 			public static SortedSet<PointOfInterest> ReadFromCsv(string path)
 			{
 				SortedSet<PointOfInterest> set = new SortedSet<PointOfInterest>();
+				if (!File.Exists(path))
+				{
+					try
+					{
+						File.Create(path);
+					}
+					catch { }
+					return set;
+				}
 				TextFieldParser parser = new TextFieldParser(path);
 				parser.SetDelimiters(";");
 				while(!parser.EndOfData)
@@ -305,6 +314,15 @@ namespace AlivieskaGpsClient
 			public static SortedSet<RoadHazard> ReadFromCsv(string path)
 			{
 				SortedSet<RoadHazard> set = new SortedSet<RoadHazard>();
+				if (!File.Exists(path))
+				{
+					try
+					{
+						File.Create(path);
+					}
+					catch { }
+					return set;
+				}
 				TextFieldParser parser = new TextFieldParser(path);
 				parser.SetDelimiters(";");
 				while(!parser.EndOfData)

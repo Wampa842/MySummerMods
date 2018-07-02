@@ -436,6 +436,7 @@
 			// showDetailsButton
 			// 
 			this.showDetailsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.showDetailsButton.Enabled = false;
 			this.showDetailsButton.Location = new System.Drawing.Point(549, 388);
 			this.showDetailsButton.Name = "showDetailsButton";
 			this.showDetailsButton.Size = new System.Drawing.Size(90, 23);
@@ -474,6 +475,7 @@
 			// 
 			// aboutButton
 			// 
+			this.aboutButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.aboutButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
 			this.aboutButton.Location = new System.Drawing.Point(588, 1);
 			this.aboutButton.Name = "aboutButton";
