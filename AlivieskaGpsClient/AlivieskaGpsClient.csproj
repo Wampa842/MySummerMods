@@ -142,6 +142,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(SolutionDir)\COPYING.TXT" "$(TargetDir)" /R /Y</PostBuildEvent>
+    <PostBuildEvent>echo D|xcopy "$(SolutionDir)COPYING.TXT" "$(TargetDir)" /R /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -61,7 +61,7 @@ namespace AlivieskaGpsClient
 				while (!reader.EndOfStream)
 				{
 					line = reader.ReadLine();
-					tok = line.Trim().Split(' ');
+					tok = line.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 					switch (tok[0].Trim().ToLowerInvariant())
 					{
 						case "url":
@@ -95,7 +95,9 @@ namespace AlivieskaGpsClient
 			{
 				writer.WriteLine($"url {connectionUrlText.Text}");
 				writer.WriteLine($"follow {followCheck.Checked.ToString().ToLowerInvariant()}");
-				writer.WriteLine($"hide{(displayLocationsCheck.Checked ? "" : " locations")}{(displayHazardsCheck.Checked ? "" : " hazards")}{(displayTownsCheck.Checked ? "" : " towns")}{(displayShopsCheck.Checked ? "" : " shops")}{(displayJobsCheck.Checked ? "" : " jobs")}{(displayRoadHazardsCheck.Checked ? "" : " roadhazards")}{(displayTrafficHazardsCheck.Checked ? "" : " traffic")}{(displayRailwayHazardsCheck.Checked ? "" : " railcrossing")}");
+				string hideString = $"{(displayLocationsCheck.Checked ? "" : " locations")}{(displayHazardsCheck.Checked ? "" : " hazards")}{(displayTownsCheck.Checked ? "" : " towns")}{(displayShopsCheck.Checked ? "" : " shops")}{(displayJobsCheck.Checked ? "" : " jobs")}{(displayRoadHazardsCheck.Checked ? "" : " roadhazards")}{(displayTrafficHazardsCheck.Checked ? "" : " traffic")}{(displayRailwayHazardsCheck.Checked ? "" : " railcrossing")}";
+				if(!string.IsNullOrWhiteSpace(hideString))
+					writer.WriteLine("hide" + hideString);
 			}
 		}
 
