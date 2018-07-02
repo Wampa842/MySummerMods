@@ -30,6 +30,11 @@
 		{
 			this.mainTabs = new System.Windows.Forms.TabControl();
 			this.recordPoiTab = new System.Windows.Forms.TabPage();
+			this.lockPoiPositionCheck = new System.Windows.Forms.CheckBox();
+			this.poiYLabel = new System.Windows.Forms.Label();
+			this.poiXLabel = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
+			this.label8 = new System.Windows.Forms.Label();
 			this.writePoiButton = new System.Windows.Forms.Button();
 			this.poiTypeSelect = new System.Windows.Forms.ComboBox();
 			this.poiNameText = new System.Windows.Forms.TextBox();
@@ -38,6 +43,11 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.recordHazardTab = new System.Windows.Forms.TabPage();
+			this.lockHazardPositionCheck = new System.Windows.Forms.CheckBox();
+			this.hazardYLabel = new System.Windows.Forms.Label();
+			this.hazardXLabel = new System.Windows.Forms.Label();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
 			this.writeHazardButton = new System.Windows.Forms.Button();
 			this.label7 = new System.Windows.Forms.Label();
 			this.hazardDescriptionText = new System.Windows.Forms.TextBox();
@@ -47,16 +57,6 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
-			this.label8 = new System.Windows.Forms.Label();
-			this.label9 = new System.Windows.Forms.Label();
-			this.poiXLabel = new System.Windows.Forms.Label();
-			this.poiYLabel = new System.Windows.Forms.Label();
-			this.lockPoiPositionCheck = new System.Windows.Forms.CheckBox();
-			this.lockHazardPositionCheck = new System.Windows.Forms.CheckBox();
-			this.hazardYLabel = new System.Windows.Forms.Label();
-			this.hazardXLabel = new System.Windows.Forms.Label();
-			this.label12 = new System.Windows.Forms.Label();
-			this.label13 = new System.Windows.Forms.Label();
 			this.mainTabs.SuspendLayout();
 			this.recordPoiTab.SuspendLayout();
 			this.recordHazardTab.SuspendLayout();
@@ -95,6 +95,57 @@
 			this.recordPoiTab.Text = "Point of interest";
 			this.recordPoiTab.UseVisualStyleBackColor = true;
 			// 
+			// lockPoiPositionCheck
+			// 
+			this.lockPoiPositionCheck.Appearance = System.Windows.Forms.Appearance.Button;
+			this.lockPoiPositionCheck.Location = new System.Drawing.Point(499, 65);
+			this.lockPoiPositionCheck.Name = "lockPoiPositionCheck";
+			this.lockPoiPositionCheck.Size = new System.Drawing.Size(136, 24);
+			this.lockPoiPositionCheck.TabIndex = 3;
+			this.lockPoiPositionCheck.Text = "Lock position";
+			this.lockPoiPositionCheck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			this.lockPoiPositionCheck.UseVisualStyleBackColor = true;
+			// 
+			// poiYLabel
+			// 
+			this.poiYLabel.AutoSize = true;
+			this.poiYLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.poiYLabel.Location = new System.Drawing.Point(329, 68);
+			this.poiYLabel.Name = "poiYLabel";
+			this.poiYLabel.Size = new System.Drawing.Size(14, 13);
+			this.poiYLabel.TabIndex = 6;
+			this.poiYLabel.Text = "0";
+			// 
+			// poiXLabel
+			// 
+			this.poiXLabel.AutoSize = true;
+			this.poiXLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.poiXLabel.Location = new System.Drawing.Point(329, 42);
+			this.poiXLabel.Name = "poiXLabel";
+			this.poiXLabel.Size = new System.Drawing.Size(14, 13);
+			this.poiXLabel.TabIndex = 5;
+			this.poiXLabel.Text = "0";
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.label9.Location = new System.Drawing.Point(280, 68);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(15, 13);
+			this.label9.TabIndex = 6;
+			this.label9.Text = "Y";
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+			this.label8.Location = new System.Drawing.Point(280, 42);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(15, 13);
+			this.label8.TabIndex = 5;
+			this.label8.Text = "X";
+			// 
 			// writePoiButton
 			// 
 			this.writePoiButton.Location = new System.Drawing.Point(499, 95);
@@ -116,7 +167,7 @@
 			this.poiTypeSelect.Location = new System.Drawing.Point(92, 65);
 			this.poiTypeSelect.Name = "poiTypeSelect";
 			this.poiTypeSelect.Size = new System.Drawing.Size(130, 21);
-			this.poiTypeSelect.TabIndex = 3;
+			this.poiTypeSelect.TabIndex = 2;
 			// 
 			// poiNameText
 			// 
@@ -130,7 +181,7 @@
 			this.poiIDText.Location = new System.Drawing.Point(92, 13);
 			this.poiIDText.Name = "poiIDText";
 			this.poiIDText.Size = new System.Drawing.Size(130, 20);
-			this.poiIDText.TabIndex = 1;
+			this.poiIDText.TabIndex = 0;
 			// 
 			// label3
 			// 
@@ -183,145 +234,13 @@
 			this.recordHazardTab.Text = "Hazard";
 			this.recordHazardTab.UseVisualStyleBackColor = true;
 			// 
-			// writeHazardButton
-			// 
-			this.writeHazardButton.Location = new System.Drawing.Point(499, 95);
-			this.writeHazardButton.Name = "writeHazardButton";
-			this.writeHazardButton.Size = new System.Drawing.Size(138, 23);
-			this.writeHazardButton.TabIndex = 12;
-			this.writeHazardButton.Text = "Record";
-			this.writeHazardButton.UseVisualStyleBackColor = true;
-			this.writeHazardButton.Click += new System.EventHandler(this.writeHazardButton_Click);
-			// 
-			// label7
-			// 
-			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(234, 16);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(63, 13);
-			this.label7.TabIndex = 11;
-			this.label7.Text = "Description:";
-			// 
-			// hazardDescriptionText
-			// 
-			this.hazardDescriptionText.Location = new System.Drawing.Point(306, 13);
-			this.hazardDescriptionText.Name = "hazardDescriptionText";
-			this.hazardDescriptionText.Size = new System.Drawing.Size(331, 20);
-			this.hazardDescriptionText.TabIndex = 10;
-			// 
-			// hazardTypeSelect
-			// 
-			this.hazardTypeSelect.FormattingEnabled = true;
-			this.hazardTypeSelect.Items.AddRange(new object[] {
-            "Other",
-            "Road and topography",
-            "Traffic",
-            "Railway",
-            "Police"});
-			this.hazardTypeSelect.Location = new System.Drawing.Point(92, 65);
-			this.hazardTypeSelect.Name = "hazardTypeSelect";
-			this.hazardTypeSelect.Size = new System.Drawing.Size(130, 21);
-			this.hazardTypeSelect.TabIndex = 9;
-			// 
-			// hazardNameText
-			// 
-			this.hazardNameText.Location = new System.Drawing.Point(92, 39);
-			this.hazardNameText.Name = "hazardNameText";
-			this.hazardNameText.Size = new System.Drawing.Size(130, 20);
-			this.hazardNameText.TabIndex = 7;
-			// 
-			// hazardIDText
-			// 
-			this.hazardIDText.Location = new System.Drawing.Point(92, 13);
-			this.hazardIDText.Name = "hazardIDText";
-			this.hazardIDText.Size = new System.Drawing.Size(130, 20);
-			this.hazardIDText.TabIndex = 8;
-			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(8, 68);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(34, 13);
-			this.label4.TabIndex = 4;
-			this.label4.Text = "Type:";
-			// 
-			// label5
-			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(8, 42);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(38, 13);
-			this.label5.TabIndex = 5;
-			this.label5.Text = "Name:";
-			// 
-			// label6
-			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(8, 16);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(58, 13);
-			this.label6.TabIndex = 6;
-			this.label6.Text = "Unique ID:";
-			// 
-			// label8
-			// 
-			this.label8.AutoSize = true;
-			this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-			this.label8.Location = new System.Drawing.Point(280, 42);
-			this.label8.Name = "label8";
-			this.label8.Size = new System.Drawing.Size(15, 13);
-			this.label8.TabIndex = 5;
-			this.label8.Text = "X";
-			// 
-			// label9
-			// 
-			this.label9.AutoSize = true;
-			this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-			this.label9.Location = new System.Drawing.Point(280, 68);
-			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(15, 13);
-			this.label9.TabIndex = 6;
-			this.label9.Text = "Y";
-			// 
-			// poiXLabel
-			// 
-			this.poiXLabel.AutoSize = true;
-			this.poiXLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-			this.poiXLabel.Location = new System.Drawing.Point(329, 42);
-			this.poiXLabel.Name = "poiXLabel";
-			this.poiXLabel.Size = new System.Drawing.Size(14, 13);
-			this.poiXLabel.TabIndex = 5;
-			this.poiXLabel.Text = "0";
-			// 
-			// poiYLabel
-			// 
-			this.poiYLabel.AutoSize = true;
-			this.poiYLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-			this.poiYLabel.Location = new System.Drawing.Point(329, 68);
-			this.poiYLabel.Name = "poiYLabel";
-			this.poiYLabel.Size = new System.Drawing.Size(14, 13);
-			this.poiYLabel.TabIndex = 6;
-			this.poiYLabel.Text = "0";
-			// 
-			// lockPoiPositionCheck
-			// 
-			this.lockPoiPositionCheck.Appearance = System.Windows.Forms.Appearance.Button;
-			this.lockPoiPositionCheck.Location = new System.Drawing.Point(499, 65);
-			this.lockPoiPositionCheck.Name = "lockPoiPositionCheck";
-			this.lockPoiPositionCheck.Size = new System.Drawing.Size(136, 24);
-			this.lockPoiPositionCheck.TabIndex = 7;
-			this.lockPoiPositionCheck.Text = "Lock position";
-			this.lockPoiPositionCheck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			this.lockPoiPositionCheck.UseVisualStyleBackColor = true;
-			// 
 			// lockHazardPositionCheck
 			// 
 			this.lockHazardPositionCheck.Appearance = System.Windows.Forms.Appearance.Button;
 			this.lockHazardPositionCheck.Location = new System.Drawing.Point(499, 65);
 			this.lockHazardPositionCheck.Name = "lockHazardPositionCheck";
 			this.lockHazardPositionCheck.Size = new System.Drawing.Size(136, 24);
-			this.lockHazardPositionCheck.TabIndex = 17;
+			this.lockHazardPositionCheck.TabIndex = 4;
 			this.lockHazardPositionCheck.Text = "Lock position";
 			this.lockHazardPositionCheck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.lockHazardPositionCheck.UseVisualStyleBackColor = true;
@@ -365,6 +284,87 @@
 			this.label13.Size = new System.Drawing.Size(15, 13);
 			this.label13.TabIndex = 14;
 			this.label13.Text = "X";
+			// 
+			// writeHazardButton
+			// 
+			this.writeHazardButton.Location = new System.Drawing.Point(499, 95);
+			this.writeHazardButton.Name = "writeHazardButton";
+			this.writeHazardButton.Size = new System.Drawing.Size(138, 23);
+			this.writeHazardButton.TabIndex = 5;
+			this.writeHazardButton.Text = "Record";
+			this.writeHazardButton.UseVisualStyleBackColor = true;
+			this.writeHazardButton.Click += new System.EventHandler(this.writeHazardButton_Click);
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(234, 16);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(63, 13);
+			this.label7.TabIndex = 11;
+			this.label7.Text = "Description:";
+			// 
+			// hazardDescriptionText
+			// 
+			this.hazardDescriptionText.Location = new System.Drawing.Point(306, 13);
+			this.hazardDescriptionText.Name = "hazardDescriptionText";
+			this.hazardDescriptionText.Size = new System.Drawing.Size(331, 20);
+			this.hazardDescriptionText.TabIndex = 3;
+			// 
+			// hazardTypeSelect
+			// 
+			this.hazardTypeSelect.FormattingEnabled = true;
+			this.hazardTypeSelect.Items.AddRange(new object[] {
+            "Other",
+            "Road and topography",
+            "Traffic",
+            "Railway",
+            "Police"});
+			this.hazardTypeSelect.Location = new System.Drawing.Point(92, 65);
+			this.hazardTypeSelect.Name = "hazardTypeSelect";
+			this.hazardTypeSelect.Size = new System.Drawing.Size(130, 21);
+			this.hazardTypeSelect.TabIndex = 2;
+			// 
+			// hazardNameText
+			// 
+			this.hazardNameText.Location = new System.Drawing.Point(92, 39);
+			this.hazardNameText.Name = "hazardNameText";
+			this.hazardNameText.Size = new System.Drawing.Size(130, 20);
+			this.hazardNameText.TabIndex = 1;
+			// 
+			// hazardIDText
+			// 
+			this.hazardIDText.Location = new System.Drawing.Point(92, 13);
+			this.hazardIDText.Name = "hazardIDText";
+			this.hazardIDText.Size = new System.Drawing.Size(130, 20);
+			this.hazardIDText.TabIndex = 0;
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(8, 68);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(34, 13);
+			this.label4.TabIndex = 4;
+			this.label4.Text = "Type:";
+			// 
+			// label5
+			// 
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(8, 42);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(38, 13);
+			this.label5.TabIndex = 5;
+			this.label5.Text = "Name:";
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(8, 16);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(58, 13);
+			this.label6.TabIndex = 6;
+			this.label6.Text = "Unique ID:";
 			// 
 			// RecordLocationForm
 			// 

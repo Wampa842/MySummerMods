@@ -94,7 +94,7 @@
 			this.connectionUrlText.Location = new System.Drawing.Point(6, 41);
 			this.connectionUrlText.Name = "connectionUrlText";
 			this.connectionUrlText.Size = new System.Drawing.Size(158, 20);
-			this.connectionUrlText.TabIndex = 2;
+			this.connectionUrlText.TabIndex = 1;
 			this.connectionUrlText.Text = "http://localhost/gps/";
 			// 
 			// label1
@@ -138,7 +138,7 @@
 			this.default80Button.Location = new System.Drawing.Point(128, 17);
 			this.default80Button.Name = "default80Button";
 			this.default80Button.Size = new System.Drawing.Size(36, 21);
-			this.default80Button.TabIndex = 16;
+			this.default80Button.TabIndex = 4;
 			this.default80Button.Text = "/gps";
 			this.default80Button.UseVisualStyleBackColor = true;
 			this.default80Button.Click += new System.EventHandler(this.default80Button_Click);
@@ -149,7 +149,7 @@
 			this.default8080Button.Location = new System.Drawing.Point(90, 17);
 			this.default8080Button.Name = "default8080Button";
 			this.default8080Button.Size = new System.Drawing.Size(36, 21);
-			this.default8080Button.TabIndex = 15;
+			this.default8080Button.TabIndex = 3;
 			this.default8080Button.Text = ":8080";
 			this.default8080Button.UseVisualStyleBackColor = true;
 			this.default8080Button.Click += new System.EventHandler(this.default8080Button_Click);
@@ -217,7 +217,7 @@
 			this.gpsDataHeading.Name = "gpsDataHeading";
 			this.gpsDataHeading.ReadOnly = true;
 			this.gpsDataHeading.Size = new System.Drawing.Size(92, 20);
-			this.gpsDataHeading.TabIndex = 10;
+			this.gpsDataHeading.TabIndex = 9;
 			this.gpsDataHeading.Text = "012";
 			this.gpsDataHeading.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -227,7 +227,7 @@
 			this.gpsDataSpeed.Name = "gpsDataSpeed";
 			this.gpsDataSpeed.ReadOnly = true;
 			this.gpsDataSpeed.Size = new System.Drawing.Size(92, 20);
-			this.gpsDataSpeed.TabIndex = 9;
+			this.gpsDataSpeed.TabIndex = 8;
 			this.gpsDataSpeed.Text = "012";
 			this.gpsDataSpeed.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -237,7 +237,7 @@
 			this.gpsDataY.Name = "gpsDataY";
 			this.gpsDataY.ReadOnly = true;
 			this.gpsDataY.Size = new System.Drawing.Size(92, 20);
-			this.gpsDataY.TabIndex = 8;
+			this.gpsDataY.TabIndex = 7;
 			this.gpsDataY.Text = "012";
 			this.gpsDataY.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -247,7 +247,7 @@
 			this.gpsDataZ.Name = "gpsDataZ";
 			this.gpsDataZ.ReadOnly = true;
 			this.gpsDataZ.Size = new System.Drawing.Size(92, 20);
-			this.gpsDataZ.TabIndex = 7;
+			this.gpsDataZ.TabIndex = 6;
 			this.gpsDataZ.Text = "012";
 			this.gpsDataZ.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -257,7 +257,7 @@
 			this.gpsDataX.Name = "gpsDataX";
 			this.gpsDataX.ReadOnly = true;
 			this.gpsDataX.Size = new System.Drawing.Size(92, 20);
-			this.gpsDataX.TabIndex = 6;
+			this.gpsDataX.TabIndex = 5;
 			this.gpsDataX.Text = "012";
 			this.gpsDataX.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
@@ -266,7 +266,7 @@
 			this.gpsConnectButton.Location = new System.Drawing.Point(6, 67);
 			this.gpsConnectButton.Name = "gpsConnectButton";
 			this.gpsConnectButton.Size = new System.Drawing.Size(133, 23);
-			this.gpsConnectButton.TabIndex = 5;
+			this.gpsConnectButton.TabIndex = 2;
 			this.gpsConnectButton.Text = "Connect";
 			this.gpsConnectButton.UseVisualStyleBackColor = true;
 			this.gpsConnectButton.Click += new System.EventHandler(this.gpsConnectButton_Click);
@@ -297,7 +297,7 @@
 			this.viewSettingsBox.Location = new System.Drawing.Point(469, 248);
 			this.viewSettingsBox.Name = "viewSettingsBox";
 			this.viewSettingsBox.Size = new System.Drawing.Size(170, 134);
-			this.viewSettingsBox.TabIndex = 7;
+			this.viewSettingsBox.TabIndex = 5;
 			this.viewSettingsBox.TabStop = false;
 			this.viewSettingsBox.Text = "View settings";
 			// 
@@ -309,7 +309,7 @@
 			this.displayHazardsCheck.Location = new System.Drawing.Point(9, 75);
 			this.displayHazardsCheck.Name = "displayHazardsCheck";
 			this.displayHazardsCheck.Size = new System.Drawing.Size(65, 17);
-			this.displayHazardsCheck.TabIndex = 7;
+			this.displayHazardsCheck.TabIndex = 5;
 			this.displayHazardsCheck.Text = "Hazards";
 			this.displayHazardsCheck.UseVisualStyleBackColor = true;
 			this.displayHazardsCheck.CheckedChanged += new System.EventHandler(this.displayHazardsCheck_CheckedChanged);
@@ -335,7 +335,7 @@
 			this.displayRailwayHazardsCheck.Location = new System.Drawing.Point(90, 98);
 			this.displayRailwayHazardsCheck.Name = "displayRailwayHazardsCheck";
 			this.displayRailwayHazardsCheck.Size = new System.Drawing.Size(63, 17);
-			this.displayRailwayHazardsCheck.TabIndex = 5;
+			this.displayRailwayHazardsCheck.TabIndex = 8;
 			this.displayRailwayHazardsCheck.Text = "Railway";
 			this.displayRailwayHazardsCheck.UseVisualStyleBackColor = true;
 			this.displayRailwayHazardsCheck.CheckedChanged += new System.EventHandler(this.poiDisplayCheck_CheckedChanged);
@@ -348,7 +348,7 @@
 			this.displayTrafficHazardsCheck.Location = new System.Drawing.Point(9, 98);
 			this.displayTrafficHazardsCheck.Name = "displayTrafficHazardsCheck";
 			this.displayTrafficHazardsCheck.Size = new System.Drawing.Size(56, 17);
-			this.displayTrafficHazardsCheck.TabIndex = 4;
+			this.displayTrafficHazardsCheck.TabIndex = 7;
 			this.displayTrafficHazardsCheck.Text = "Traffic";
 			this.displayTrafficHazardsCheck.UseVisualStyleBackColor = true;
 			this.displayTrafficHazardsCheck.CheckedChanged += new System.EventHandler(this.poiDisplayCheck_CheckedChanged);
@@ -361,7 +361,7 @@
 			this.displayLocationsCheck.Location = new System.Drawing.Point(9, 19);
 			this.displayLocationsCheck.Name = "displayLocationsCheck";
 			this.displayLocationsCheck.Size = new System.Drawing.Size(72, 17);
-			this.displayLocationsCheck.TabIndex = 3;
+			this.displayLocationsCheck.TabIndex = 1;
 			this.displayLocationsCheck.Text = "Locations";
 			this.displayLocationsCheck.UseVisualStyleBackColor = true;
 			this.displayLocationsCheck.CheckedChanged += new System.EventHandler(this.displayLocationsCheck_CheckedChanged);
@@ -387,7 +387,7 @@
 			this.displayJobsCheck.Location = new System.Drawing.Point(90, 42);
 			this.displayJobsCheck.Name = "displayJobsCheck";
 			this.displayJobsCheck.Size = new System.Drawing.Size(48, 17);
-			this.displayJobsCheck.TabIndex = 1;
+			this.displayJobsCheck.TabIndex = 4;
 			this.displayJobsCheck.Text = "Jobs";
 			this.displayJobsCheck.UseVisualStyleBackColor = true;
 			this.displayJobsCheck.CheckedChanged += new System.EventHandler(this.poiDisplayCheck_CheckedChanged);
@@ -400,7 +400,7 @@
 			this.displayTownsCheck.Location = new System.Drawing.Point(9, 42);
 			this.displayTownsCheck.Name = "displayTownsCheck";
 			this.displayTownsCheck.Size = new System.Drawing.Size(58, 17);
-			this.displayTownsCheck.TabIndex = 0;
+			this.displayTownsCheck.TabIndex = 3;
 			this.displayTownsCheck.Text = "Towns";
 			this.displayTownsCheck.UseVisualStyleBackColor = true;
 			this.displayTownsCheck.CheckedChanged += new System.EventHandler(this.poiDisplayCheck_CheckedChanged);
@@ -417,7 +417,7 @@
 			this.resetMapButton.Location = new System.Drawing.Point(418, 388);
 			this.resetMapButton.Name = "resetMapButton";
 			this.resetMapButton.Size = new System.Drawing.Size(45, 24);
-			this.resetMapButton.TabIndex = 8;
+			this.resetMapButton.TabIndex = 3;
 			this.resetMapButton.Text = "reset";
 			this.resetMapButton.Click += new System.EventHandler(this.resetMapButton_Click);
 			// 
@@ -428,7 +428,7 @@
 			this.followCheck.Location = new System.Drawing.Point(418, 12);
 			this.followCheck.Name = "followCheck";
 			this.followCheck.Size = new System.Drawing.Size(45, 22);
-			this.followCheck.TabIndex = 9;
+			this.followCheck.TabIndex = 2;
 			this.followCheck.Text = "Follow";
 			this.followCheck.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			this.followCheck.UseVisualStyleBackColor = true;
@@ -440,7 +440,7 @@
 			this.showDetailsButton.Location = new System.Drawing.Point(549, 388);
 			this.showDetailsButton.Name = "showDetailsButton";
 			this.showDetailsButton.Size = new System.Drawing.Size(90, 23);
-			this.showDetailsButton.TabIndex = 10;
+			this.showDetailsButton.TabIndex = 7;
 			this.showDetailsButton.Text = "Details >>";
 			this.showDetailsButton.UseVisualStyleBackColor = true;
 			this.showDetailsButton.Click += new System.EventHandler(this.showDetailsButton_Click);
@@ -452,7 +452,7 @@
 			this.showRecordButton.Location = new System.Drawing.Point(470, 388);
 			this.showRecordButton.Name = "showRecordButton";
 			this.showRecordButton.Size = new System.Drawing.Size(73, 23);
-			this.showRecordButton.TabIndex = 11;
+			this.showRecordButton.TabIndex = 6;
 			this.showRecordButton.Text = "Waypoint...";
 			this.showRecordButton.UseVisualStyleBackColor = true;
 			this.showRecordButton.Click += new System.EventHandler(this.showRecordButton_Click);
@@ -480,7 +480,7 @@
 			this.aboutButton.Location = new System.Drawing.Point(588, 1);
 			this.aboutButton.Name = "aboutButton";
 			this.aboutButton.Size = new System.Drawing.Size(51, 15);
-			this.aboutButton.TabIndex = 17;
+			this.aboutButton.TabIndex = 8;
 			this.aboutButton.Text = "about";
 			this.aboutButton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
 			this.aboutButton.UseVisualStyleBackColor = true;

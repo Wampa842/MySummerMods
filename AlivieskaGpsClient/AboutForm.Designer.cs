@@ -30,12 +30,12 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.showLicenseButton = new System.Windows.Forms.Button();
 			this.showCopyrightNoticeButton = new System.Windows.Forms.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
-			this.showLicenseButton = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
@@ -76,12 +76,22 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "License";
 			// 
+			// showLicenseButton
+			// 
+			this.showLicenseButton.Location = new System.Drawing.Point(155, 64);
+			this.showLicenseButton.Name = "showLicenseButton";
+			this.showLicenseButton.Size = new System.Drawing.Size(101, 23);
+			this.showLicenseButton.TabIndex = 1;
+			this.showLicenseButton.Text = "Open license";
+			this.showLicenseButton.UseVisualStyleBackColor = true;
+			this.showLicenseButton.Click += new System.EventHandler(this.showLicenseButton_Click);
+			// 
 			// showCopyrightNoticeButton
 			// 
 			this.showCopyrightNoticeButton.Location = new System.Drawing.Point(13, 64);
 			this.showCopyrightNoticeButton.Name = "showCopyrightNoticeButton";
 			this.showCopyrightNoticeButton.Size = new System.Drawing.Size(136, 23);
-			this.showCopyrightNoticeButton.TabIndex = 3;
+			this.showCopyrightNoticeButton.TabIndex = 0;
 			this.showCopyrightNoticeButton.Text = "Show copyright notice";
 			this.showCopyrightNoticeButton.UseVisualStyleBackColor = true;
 			this.showCopyrightNoticeButton.Click += new System.EventHandler(this.showCopyrightNoticeButton_Click);
@@ -122,16 +132,6 @@
 			this.label5.Size = new System.Drawing.Size(68, 13);
 			this.label5.TabIndex = 27;
 			this.label5.Text = "version 1.0.0";
-			// 
-			// showLicenseButton
-			// 
-			this.showLicenseButton.Location = new System.Drawing.Point(155, 64);
-			this.showLicenseButton.Name = "showLicenseButton";
-			this.showLicenseButton.Size = new System.Drawing.Size(101, 23);
-			this.showLicenseButton.TabIndex = 4;
-			this.showLicenseButton.Text = "Open license";
-			this.showLicenseButton.UseVisualStyleBackColor = true;
-			this.showLicenseButton.Click += new System.EventHandler(this.showLicenseButton_Click);
 			// 
 			// AboutForm
 			// 
