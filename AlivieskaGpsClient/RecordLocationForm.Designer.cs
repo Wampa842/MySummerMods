@@ -38,15 +38,15 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.recordHazardTab = new System.Windows.Forms.TabPage();
+			this.writeHazardButton = new System.Windows.Forms.Button();
+			this.label7 = new System.Windows.Forms.Label();
+			this.hazardDescriptionText = new System.Windows.Forms.TextBox();
 			this.hazardTypeSelect = new System.Windows.Forms.ComboBox();
 			this.hazardNameText = new System.Windows.Forms.TextBox();
 			this.hazardIDText = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
-			this.hazardDescriptionText = new System.Windows.Forms.TextBox();
-			this.label7 = new System.Windows.Forms.Label();
-			this.writeHazardButton = new System.Windows.Forms.Button();
 			this.mainTabs.SuspendLayout();
 			this.recordPoiTab.SuspendLayout();
 			this.recordHazardTab.SuspendLayout();
@@ -163,6 +163,32 @@
 			this.recordHazardTab.Text = "Hazard";
 			this.recordHazardTab.UseVisualStyleBackColor = true;
 			// 
+			// writeHazardButton
+			// 
+			this.writeHazardButton.Location = new System.Drawing.Point(499, 95);
+			this.writeHazardButton.Name = "writeHazardButton";
+			this.writeHazardButton.Size = new System.Drawing.Size(138, 23);
+			this.writeHazardButton.TabIndex = 12;
+			this.writeHazardButton.Text = "Record";
+			this.writeHazardButton.UseVisualStyleBackColor = true;
+			this.writeHazardButton.Click += new System.EventHandler(this.writeHazardButton_Click);
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(234, 16);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(63, 13);
+			this.label7.TabIndex = 11;
+			this.label7.Text = "Description:";
+			// 
+			// hazardDescriptionText
+			// 
+			this.hazardDescriptionText.Location = new System.Drawing.Point(306, 13);
+			this.hazardDescriptionText.Name = "hazardDescriptionText";
+			this.hazardDescriptionText.Size = new System.Drawing.Size(331, 20);
+			this.hazardDescriptionText.TabIndex = 10;
+			// 
 			// hazardTypeSelect
 			// 
 			this.hazardTypeSelect.FormattingEnabled = true;
@@ -218,32 +244,6 @@
 			this.label6.TabIndex = 6;
 			this.label6.Text = "Unique ID:";
 			// 
-			// hazardDescriptionText
-			// 
-			this.hazardDescriptionText.Location = new System.Drawing.Point(306, 13);
-			this.hazardDescriptionText.Name = "hazardDescriptionText";
-			this.hazardDescriptionText.Size = new System.Drawing.Size(331, 20);
-			this.hazardDescriptionText.TabIndex = 10;
-			// 
-			// label7
-			// 
-			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(234, 16);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(63, 13);
-			this.label7.TabIndex = 11;
-			this.label7.Text = "Description:";
-			// 
-			// writeHazardButton
-			// 
-			this.writeHazardButton.Location = new System.Drawing.Point(499, 95);
-			this.writeHazardButton.Name = "writeHazardButton";
-			this.writeHazardButton.Size = new System.Drawing.Size(138, 23);
-			this.writeHazardButton.TabIndex = 12;
-			this.writeHazardButton.Text = "Record";
-			this.writeHazardButton.UseVisualStyleBackColor = true;
-			this.writeHazardButton.Click += new System.EventHandler(this.writeHazardButton_Click);
-			// 
 			// RecordLocationForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -251,9 +251,14 @@
 			this.ClientSize = new System.Drawing.Size(651, 150);
 			this.Controls.Add(this.mainTabs);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "RecordLocationForm";
+			this.ShowIcon = false;
+			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
 			this.Text = "Record current position";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.RecordLocationForm_FormClosing);
 			this.mainTabs.ResumeLayout(false);
 			this.recordPoiTab.ResumeLayout(false);
 			this.recordPoiTab.PerformLayout();

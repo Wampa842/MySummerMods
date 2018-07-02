@@ -29,6 +29,7 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.zoomSlider = new System.Windows.Forms.TrackBar();
 			this.connectionUrlText = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -484,6 +485,7 @@
 			this.Controls.Add(this.gpsConnectionBox);
 			this.Controls.Add(this.zoomSlider);
 			this.DoubleBuffered = true;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(667, 462);
 			this.Name = "MainForm";
 			this.Text = "Alivieska GPS client";

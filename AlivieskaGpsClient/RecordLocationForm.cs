@@ -55,5 +55,11 @@ namespace AlivieskaGpsClient
 				writer.WriteLine($"\"{id}\",{hazardTypeSelect.SelectedIndex},\"{hazardNameText.Text.Trim()}\",\"{hazardDescriptionText.Text.Trim()}\",{Data.MapPosition.X},{Data.MapPosition.Y}");
 			}
 		}
+
+		private void RecordLocationForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			e.Cancel = true;
+			this.Hide();
+		}
 	}
 }

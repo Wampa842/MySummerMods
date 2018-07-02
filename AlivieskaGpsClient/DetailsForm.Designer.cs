@@ -59,9 +59,14 @@
 			this.ClientSize = new System.Drawing.Size(270, 450);
 			this.Controls.Add(this.titleLabel);
 			this.Controls.Add(this.label1);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+			this.MaximizeBox = false;
+			this.MinimizeBox = false;
 			this.Name = "DetailsForm";
 			this.ShowIcon = false;
+			this.ShowInTaskbar = false;
 			this.Text = "Details";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DetailsForm_FormClosing);
 			this.ResumeLayout(false);
 
 		}

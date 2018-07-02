@@ -21,5 +21,11 @@ namespace AlivieskaGpsClient
 		{
 			titleLabel.Text = poi.Name;
 		}
+
+		private void DetailsForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			e.Cancel = true;
+			this.Hide();
+		}
 	}
 }
