@@ -33,8 +33,9 @@ namespace AlivieskaGpsClient
 	// Form behaviour
 	public partial class MainForm : Form
 	{
-		private readonly string _locationsPath = "resources\\locations.csv"; // A CSV file containing points of interest
-		private readonly string _mapImagePath = "resources\\map.png";        // The map background image file
+		private readonly string _locationsPath = "resources\\locations.csv";    // A CSV file containing points of interest
+		private readonly string _hazardsPath = "resources\\hazards.csv";        // A CSV file containing information about road hazards
+		private readonly string _mapImagePath = "resources\\map.png";           // The map background image file
 		private readonly string _configPath = "resources\\config";  // Plaintext file containing configuration key-value pairs
 		private Bitmap _baseImage = null;                           // The image to display on the form
 		private Point _imageCenter;                                 // The center coordinates of the image
@@ -49,6 +50,9 @@ namespace AlivieskaGpsClient
 
 		private GpsData _gpsData;                                   // Object that handles the connection to the server
 		private System.Timers.Timer _colorResetTimer = new System.Timers.Timer { AutoReset = false, Enabled = false, Interval = 250 };  // Timer that makes the light do the blinky
+
+		private DetailsForm _detailsForm = new DetailsForm();                           // Shows info about a selected location
+		private RecordLocationForm _recordForm;
 
 		private void _loadConfig()
 		{
@@ -90,6 +94,8 @@ namespace AlivieskaGpsClient
 		{
 			InitializeComponent();
 			_gpsData = new GpsData(this);
+			//_recordForm.Data = _gpsData
+			_recordForm = new RecordLocationForm(_gpsData);
 			_colorResetTimer.Elapsed += (o, args) => connectionStatusLabel.ForeColor = Color.ForestGreen;
 			_loadConfig();
 		}
@@ -101,7 +107,8 @@ namespace AlivieskaGpsClient
 			_imageCenter = new Point(mapImage.Width / 2, mapImage.Height / 2);
 			_imageSize = new Size(mapImage.Width, mapImage.Height);
 
-			MapDrawing.PointsOfInterest = MapDrawing.ReadPointsOfInterestFromCsv(_locationsPath);
+			MapDrawing.PointsOfInterest = MapDrawing.PointOfInterest.ReadFromCsv(_locationsPath);
+			MapDrawing.Hazards = MapDrawing.RoadHazard.ReadFromCsv(_hazardsPath);
 
 			mapImage.Invalidate();
 		}
@@ -119,15 +126,15 @@ namespace AlivieskaGpsClient
 		{
 			MapDrawing.DrawImageCenter(e.Graphics, _baseImage, _imageCenter, _imageSize);
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-			MapDrawing.DrawPointsOfInterest(e.Graphics, _imageCenter, _imageSize);
+			MapDrawing.DrawPointsOfInterest(e.Graphics, _imageCenter, _imageSize, displayTownsCheck.Checked, displayJobsCheck.Checked, displayShopsCheck.Checked, displayLocationsCheck.Checked);
+			MapDrawing.DrawRoadHazards(e.Graphics, _imageCenter, _imageSize, displayRoadHazardsCheck.Checked, displayTrafficHazardsCheck.Checked, displayRailwayHazardsCheck.Checked, displayHazardsCheck.Checked, displayHazardsCheck.Checked);
 			if (_selectedPoi != null)
 				MapDrawing.DrawCross(e.Graphics, new Pen(Color.Black, 1.0f), _selectedPoi.MapLocation(_imageCenter, _imageSize), mapImage.Size);
 			if (_gpsData.Success)
 				MapDrawing.DrawArrow(e.Graphics, _gpsData.MapPosition, _gpsData.Heading, _imageCenter, _imageSize);
-			MapDrawing.testHazard.Draw(e.Graphics, _imageCenter, _imageSize);
 		}
 
-		// Set up previous coordinates for panning
+		// Set up previous coordinates for panning and handle point selection
 		private void mapImage_MouseDown(object sender, MouseEventArgs e)
 		{
 			if (e.Button == _panButton)
@@ -142,10 +149,11 @@ namespace AlivieskaGpsClient
 				{
 					foreach (var poi in MapDrawing.PointsOfInterest.Reverse())
 					{
-						if (poi.InRange(e.Location, _imageCenter, _imageSize))
+						if (poi.Enabled && poi.InRange(e.Location, _imageCenter, _imageSize))
 						{
 							inRange = true;
 							_selectedPoi = poi;
+							_detailsForm.UpdateDetails(poi);
 							break;
 						}
 					}
@@ -153,11 +161,10 @@ namespace AlivieskaGpsClient
 				if (!inRange)
 				{
 					_selectedPoi = null;
-					selectedPoiNameLabel.Text = "";
 				}
 				else
 				{
-					selectedPoiNameLabel.Text = _selectedPoi.Name;
+
 				}
 			}
 			if (e.Button == _selectArbitraryButton)
@@ -172,7 +179,7 @@ namespace AlivieskaGpsClient
 			((PictureBox)sender).Invalidate();
 		}
 
-		// Pan the image
+		// Pan the image and handle hovering
 		private void mapImage_MouseMove(object sender, MouseEventArgs e)
 		{
 			if (e.Button == _panButton)
@@ -190,7 +197,7 @@ namespace AlivieskaGpsClient
 			{
 				foreach (var poi in MapDrawing.PointsOfInterest.Reverse())
 				{
-					if (poi.InRange(e.Location, _imageCenter, _imageSize))
+					if (poi.Enabled && poi.InRange(e.Location, _imageCenter, _imageSize))
 					{
 						_hoverPoi = poi;
 						inRange = true;
@@ -201,7 +208,7 @@ namespace AlivieskaGpsClient
 			((PictureBox)sender).Cursor = inRange ? Cursors.Hand : Cursors.SizeAll;
 			if (!inRange)
 			{
-				_hoverPoi = MapDrawing.PointOfInterest.Empty;
+				_hoverPoi = null;
 			}
 		}
 
@@ -232,6 +239,7 @@ namespace AlivieskaGpsClient
 			_gpsData.Get(connectionUrlText.Text);
 		}
 
+		// Reset pan and zoom
 		private void resetMapButton_Click(object sender, EventArgs e)
 		{
 			_imageCenter = new Point(mapImage.Width / 2, mapImage.Height / 2);
@@ -241,21 +249,103 @@ namespace AlivieskaGpsClient
 			mapImage.Invalidate();
 		}
 
+		// Set URL to http://localhost:8080/
 		private void default8080Button_Click(object sender, EventArgs e)
 		{
 			if (connectionUrlText.Enabled)
 				connectionUrlText.Text = "http://localhost:8080/";
 		}
 
+		// Save config and close other forms when the window is closed
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			_saveConfig();
+			_detailsForm.Close();
+			_recordForm.Close();
 		}
 
+		// Set URL to http://localhost/gps/
 		private void default80Button_Click(object sender, EventArgs e)
 		{
 			if (connectionUrlText.Enabled)
 				connectionUrlText.Text = "http://localhost/gps/";
+		}
+
+		// Open/close Details form
+		private void showDetailsButton_Click(object sender, EventArgs e)
+		{
+			if (_detailsForm.Visible)
+			{
+				_detailsForm.Hide();
+				((Button)sender).Text = "Hide <<";
+			}
+			else
+			{
+				_detailsForm.Show();
+				((Button)sender).Text = "Details >>";
+			}
+		}
+
+		// Update location visibility
+		private void poiDisplayCheck_CheckedChanged(object sender, EventArgs e)
+		{
+			foreach(var poi in MapDrawing.PointsOfInterest)
+			{
+				if (poi.Type == MapDrawing.PointOfInterest.PointOfInterestType.Town)
+					poi.Enabled = displayTownsCheck.Checked;
+				if (poi.Type == MapDrawing.PointOfInterest.PointOfInterestType.Service)
+					poi.Enabled = displayShopsCheck.Checked;
+				if (poi.Type == MapDrawing.PointOfInterest.PointOfInterestType.Work)
+					poi.Enabled = displayJobsCheck.Checked;
+			}
+			foreach(var poi in MapDrawing.Hazards)
+			{
+				if (poi.Type == MapDrawing.RoadHazard.RoadHazardType.Topography)
+					poi.Enabled = displayRoadHazardsCheck.Checked;
+				if (poi.Type == MapDrawing.RoadHazard.RoadHazardType.Traffic)
+					poi.Enabled = displayTrafficHazardsCheck.Checked;
+				if (poi.Type == MapDrawing.RoadHazard.RoadHazardType.Railway)
+					poi.Enabled = displayRailwayHazardsCheck.Checked;
+			}
+			mapImage.Invalidate();
+		}
+
+		// Uncheck/check all points of interest
+		private void displayLocationsCheck_CheckedChanged(object sender, EventArgs e)
+		{
+			displayTownsCheck.Checked = displayTownsCheck.Enabled = ((CheckBox)sender).Checked;
+			displayShopsCheck.Checked = displayShopsCheck.Enabled = ((CheckBox)sender).Checked;
+			displayJobsCheck.Checked = displayJobsCheck.Enabled = ((CheckBox)sender).Checked;
+			poiDisplayCheck_CheckedChanged(sender, e);
+		}
+
+		// Uncheck/check all hazards
+		private void displayHazardsCheck_CheckedChanged(object sender, EventArgs e)
+		{
+			displayRoadHazardsCheck.Checked = displayRoadHazardsCheck.Enabled = ((CheckBox)sender).Checked;
+			displayTrafficHazardsCheck.Checked = displayTrafficHazardsCheck.Enabled = ((CheckBox)sender).Checked;
+			displayRailwayHazardsCheck.Checked = displayRailwayHazardsCheck.Enabled = ((CheckBox)sender).Checked;
+			poiDisplayCheck_CheckedChanged(sender, e);
+		}
+
+		// Open/close the location recorder window
+		private void showRecordButton_Click(object sender, EventArgs e)
+		{
+			if(_recordForm.Visible)
+			{
+				_recordForm.Hide();
+			}
+			else
+			{
+				_recordForm.Location = Point.Add(this.Location, new Size(0, this.Height));
+				_recordForm.Show();
+			}
+		}
+
+		// Keep sub-forms aligned
+		private void MainForm_Move(object sender, EventArgs e)
+		{
+			_recordForm.Location = Point.Add(this.Location, new Size(0, this.Height));
 		}
 
 		// Update the form to display whatever data is currently present
@@ -263,7 +353,6 @@ namespace AlivieskaGpsClient
 		{
 			if (gpsUpdateTimer.Enabled)
 			{
-				selectedPoiNameLabel.Text = _gpsData.ResponseString;
 				if (_gpsData.Success)
 				{
 					gpsDataX.Text = _gpsData.X.ToString();
@@ -285,7 +374,6 @@ namespace AlivieskaGpsClient
 				PointF p = _gpsData.MapPosition;
 				_imageCenter.X = (int)(-p.X * _imageSize.Width + mapImage.Width / 2);
 				_imageCenter.Y = (int)(-p.Y * _imageSize.Height + mapImage.Height / 2);
-				selectedPoiNameLabel.Text = _imageCenter.ToString();
 			}
 			mapImage.Invalidate();
 		}
@@ -294,6 +382,7 @@ namespace AlivieskaGpsClient
 	// Drawing classes and methods
 	public static class MapDrawing
 	{
+		#region DRAWING_GENERIC
 		// Draw an image around its center
 		public static void DrawImageCenter(Graphics g, Image image, Point center, Size size)
 		{
@@ -342,7 +431,9 @@ namespace AlivieskaGpsClient
 			g.FillPolygon(new SolidBrush(Color.Orange), _arrowPointsTransformed);
 			g.DrawPolygon(new Pen(Color.Red, 1.75f), _arrowPointsTransformed);
 		}
+		#endregion
 
+		#region POI
 		// Properties of the circle to be drawn
 		public class CircleStyle
 		{
@@ -401,9 +492,10 @@ namespace AlivieskaGpsClient
 		// A point on the map
 		public abstract class MapPoint
 		{
-			public PointF Location { get; }	// X, Y location within the -0.5..0.5 boundaries
-			public float X => Location.X;	// X coordinate between the -0.5..0.5 boundaries
+			public PointF Location { get; } // X, Y location within the -0.5..0.5 boundaries
+			public float X => Location.X;   // X coordinate between the -0.5..0.5 boundaries
 			public float Y => Location.Y;   // Y coordinate between the -0.5..0.5 boundaries
+			public bool Enabled { get; set; } = true;   // Indicates whether the point should be visible and selectable
 
 			// Point on the map at origin
 			public MapPoint()
@@ -460,9 +552,6 @@ namespace AlivieskaGpsClient
 				this.Type = type;
 			}
 
-			// A point of no interest
-			public static PointOfInterest Empty => new PointOfInterest("empty", "Nothing", new PointF(), new CircleStyle(), PointOfInterestType.Other);
-
 			// Draw a circle on an area defined by its center point and size
 			public void Draw(Graphics g, Point center, Size size)
 			{
@@ -495,6 +584,20 @@ namespace AlivieskaGpsClient
 				return new PointOfInterest(tok[0].Trim('"'), tok[2].Trim('"'), new PointF(float.Parse(tok[3]), float.Parse(tok[4])), CircleStyle.Presets[int.Parse(tok[1])], (PointOfInterestType)int.Parse(tok[1]));
 			}
 
+			// Read all points of interest from a CSV file
+			public static SortedSet<PointOfInterest> ReadFromCsv(string path)
+			{
+				SortedSet<PointOfInterest> set = new SortedSet<PointOfInterest>();
+				using (System.IO.StreamReader reader = new System.IO.StreamReader(path))
+				{
+					while (!reader.EndOfStream)
+					{
+						set.Add(FromCsvString(reader.ReadLine().Trim()));
+					}
+				}
+				return set;
+			}
+
 			// Sort by type, then by ID
 			public int CompareTo(PointOfInterest other)
 			{
@@ -515,52 +618,41 @@ namespace AlivieskaGpsClient
 		// Set of points of interest, sorted by their type.
 		public static SortedSet<PointOfInterest> PointsOfInterest;
 
-		// Read all points of interest from a CSV file
-		public static SortedSet<PointOfInterest> ReadPointsOfInterestFromCsv(string path)
-		{
-			SortedSet<PointOfInterest> set = new SortedSet<PointOfInterest>();
-			using (System.IO.StreamReader reader = new System.IO.StreamReader(path))
-			{
-				while (!reader.EndOfStream)
-				{
-					set.Add(PointOfInterest.FromCsvString(reader.ReadLine().Trim()));
-				}
-			}
-			return set;
-		}
-
 		// Draw all points of interest
-		public static void DrawPointsOfInterest(Graphics g, Point center, Size size)
+		public static void DrawPointsOfInterest(Graphics g, Point center, Size size, bool drawTowns, bool drawJobs, bool drawShops, bool drawOthers)
 		{
 			if (PointsOfInterest != null)
 				foreach (var poi in PointsOfInterest)
 				{
-					poi.Draw(g, center, size);
+					if ((poi.Type == PointOfInterest.PointOfInterestType.Town && drawTowns) || (poi.Type == PointOfInterest.PointOfInterestType.Work && drawJobs) || (poi.Type == PointOfInterest.PointOfInterestType.Service && drawShops) || (poi.Type == PointOfInterest.PointOfInterestType.Other && drawOthers))
+						poi.Draw(g, center, size);
 				}
 		}
+#endregion
 
+		#region HAZARD
 		// A class representing a road hazard. TBD: create an abstract class to be inherited by this and PointOfInterest?
-		public class RoadHazard : MapPoint
+		public class RoadHazard : MapPoint, IComparable<RoadHazard>, IEquatable<RoadHazard>
 		{
 			private static Bitmap[] _icons = new Bitmap[]
 			{
 				new Bitmap("resources\\hazard_other.png"),
-				new Bitmap("resources\\hazard_other.png"),
-				new Bitmap("resources\\hazard_other.png"),
-				new Bitmap("resources\\hazard_other.png"),
+				new Bitmap("resources\\hazard_road.png"),
+				new Bitmap("resources\\hazard_traffic.png"),
+				new Bitmap("resources\\hazard_train_b.png"),
 				new Bitmap("resources\\hazard_other.png")
 			};
-			public static Size IconSize = new Size(20, 20);
+			public static Size IconSize = new Size(26, 26);
 			public static Size HalfSize = new Size(IconSize.Width / 2, IconSize.Height / 2);
 
 			public enum RoadHazardType { Other = 0, Topography = 1, Traffic = 2, Railway = 3, Police = 4 }
-			public int ID { get; }
+			public string ID { get; }
 			public string Name { get; }
 			public string Description { get; }
-			RoadHazardType Type { get; }
+			public RoadHazardType Type { get; }
 			public Bitmap Image { get { return _icons[(int)Type]; } }
 
-			public RoadHazard(int id, string name, string description, PointF location, RoadHazardType type) : base(location)
+			public RoadHazard(string id, string name, string description, PointF location, RoadHazardType type) : base(location)
 			{
 				this.ID = id;
 				this.Name = name;
@@ -572,9 +664,58 @@ namespace AlivieskaGpsClient
 			{
 				g.DrawImage(Image, new Rectangle(Point.Subtract(MapLocation(center, size), HalfSize), IconSize));
 			}
+
+			public static RoadHazard FromCsvString(string line)
+			{
+				// "id",type,"name","desc",x,y
+				string[] tok = line.Split(',');
+				return new RoadHazard(tok[0].Trim('"').Trim(), tok[2].Trim('"').Trim(), tok[3].Trim('"').Trim(), new PointF(float.Parse(tok[4].Trim()), float.Parse(tok[5].Trim())), (RoadHazardType)int.Parse(tok[1].Trim()));
+			}
+
+			public static SortedSet<RoadHazard> ReadFromCsv(string path)
+			{
+				SortedSet<RoadHazard> set = new SortedSet<RoadHazard>();
+				using (StreamReader reader = new StreamReader(path))
+				{
+					while (!reader.EndOfStream)
+					{
+						set.Add(FromCsvString(reader.ReadLine().Trim()));
+					}
+				}
+				return set;
+			}
+
+			public int CompareTo(RoadHazard other)
+			{
+				return this.ID.CompareTo(other.ID);
+			}
+
+			public bool Equals(RoadHazard other)
+			{
+				if (this.ID == other.ID)
+					return true;
+				return object.Equals(this, other);
+			}
 		}
 
-		public static RoadHazard testHazard = new RoadHazard(0, "Test hazard", "A hazard of the testing the hazardousness", new PointF(), RoadHazard.RoadHazardType.Topography);
+		public static SortedSet<RoadHazard> Hazards;
+
+		public static void DrawRoadHazards(Graphics g, Point center, Size size, bool drawTopography, bool drawTraffic, bool drawRailway, bool drawPolice, bool drawOthers)
+		{
+			if (Hazards != null)
+			{
+				foreach (var h in Hazards)
+				{
+					//if ((h.Type == RoadHazard.RoadHazardType.Topography && drawTopography) || (h.Type == RoadHazard.RoadHazardType.Traffic && drawTraffic) || (h.Type == RoadHazard.RoadHazardType.Railway && drawRailway) || (h.Type == RoadHazard.RoadHazardType.Police && drawPolice) || (h.Type == RoadHazard.RoadHazardType.Other && drawOthers))
+					if (h.Enabled)
+					{
+						h.Draw(g, center, size);
+					}
+				}
+			}
+		}
+
+		#endregion
 	}
 
 	// Data received from the GPS server
