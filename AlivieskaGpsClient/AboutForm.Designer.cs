@@ -30,10 +30,11 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.showCopyrightNoticeButton = new System.Windows.Forms.Button();
+			this.label4 = new System.Windows.Forms.Label();
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.label3 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
-			this.showCopyrightNoticeButton = new System.Windows.Forms.Button();
+			this.label5 = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
@@ -73,6 +74,25 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "License";
 			// 
+			// showCopyrightNoticeButton
+			// 
+			this.showCopyrightNoticeButton.Location = new System.Drawing.Point(13, 64);
+			this.showCopyrightNoticeButton.Name = "showCopyrightNoticeButton";
+			this.showCopyrightNoticeButton.Size = new System.Drawing.Size(152, 23);
+			this.showCopyrightNoticeButton.TabIndex = 3;
+			this.showCopyrightNoticeButton.Text = "Show copyright notice";
+			this.showCopyrightNoticeButton.UseVisualStyleBackColor = true;
+			this.showCopyrightNoticeButton.Click += new System.EventHandler(this.showCopyrightNoticeButton_Click);
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(14, 45);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(151, 13);
+			this.label4.TabIndex = 2;
+			this.label4.Text = "License: GNU GPL-3.0-or-later";
+			// 
 			// pictureBox1
 			// 
 			this.pictureBox1.Image = global::AlivieskaGpsClient.Properties.Resources.gplv3_127x51;
@@ -92,30 +112,21 @@
 			this.label3.TabIndex = 1;
 			this.label3.Text = "Copyright (C) 2018 Wampa842";
 			// 
-			// label4
+			// label5
 			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(14, 45);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(151, 13);
-			this.label4.TabIndex = 2;
-			this.label4.Text = "License: GNU GPL-3.0-or-later";
-			// 
-			// showCopyrightNoticeButton
-			// 
-			this.showCopyrightNoticeButton.Location = new System.Drawing.Point(13, 64);
-			this.showCopyrightNoticeButton.Name = "showCopyrightNoticeButton";
-			this.showCopyrightNoticeButton.Size = new System.Drawing.Size(152, 23);
-			this.showCopyrightNoticeButton.TabIndex = 3;
-			this.showCopyrightNoticeButton.Text = "Show copyright notice";
-			this.showCopyrightNoticeButton.UseVisualStyleBackColor = true;
-			this.showCopyrightNoticeButton.Click += new System.EventHandler(this.showCopyrightNoticeButton_Click);
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(330, 14);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(68, 13);
+			this.label5.TabIndex = 27;
+			this.label5.Text = "version 1.0.0";
 			// 
 			// AboutForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(410, 170);
+			this.Controls.Add(this.label5);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
@@ -145,5 +156,6 @@
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Button showCopyrightNoticeButton;
+		private System.Windows.Forms.Label label5;
 	}
 }
