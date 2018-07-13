@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AlivieskaGpsClient" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Url" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:8080/</Value>
+    </Setting>
+    <Setting Name="Follow" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
