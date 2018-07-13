@@ -77,6 +77,11 @@
     <Compile Include="RecordLocationForm.Designer.cs">
       <DependentUpon>RecordLocationForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="AboutForm.resx">
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -99,6 +104,7 @@
     <EmbeddedResource Include="RecordLocationForm.resx">
       <DependentUpon>RecordLocationForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="README.MD" />
     <None Include="resources\hazards.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -106,12 +112,13 @@
     <None Include="resources\locations.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="resources\config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <Content Include="icon.ico" />
     <Content Include="resources\hazard_other.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

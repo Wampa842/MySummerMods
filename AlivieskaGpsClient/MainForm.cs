@@ -31,7 +31,6 @@ namespace AlivieskaGpsClient
 		private readonly string _locationsPath = "resources\\locations.csv";    // A CSV file containing points of interest
 		private readonly string _hazardsPath = "resources\\hazards.csv";        // A CSV file containing information about road hazards
 		private readonly string _mapImagePath = "resources\\map.png";           // The map background image file
-		private readonly string _configPath = "resources\\config";  // Plaintext file containing configuration key-value pairs
 		private Bitmap _baseImage = null;                           // The image to display on the form
 		private Point _imageCenter;                                 // The center coordinates of the image
 		private int _prevX, _prevY;                                 // Used in calculating the delta position while panning the image
@@ -49,57 +48,6 @@ namespace AlivieskaGpsClient
 		private DetailsForm _detailsForm = new DetailsForm();		// Shows info about a selected location
 		private RecordLocationForm _recordForm;                     // Allows the user to record their own locations
 		private AboutForm _aboutForm = new AboutForm();				// Shows license and version information
-
-		private void _loadConfig()
-		{
-			if (!File.Exists(_configPath))
-				return;
-			using (StreamReader reader = new StreamReader(_configPath))
-			{
-				string line;
-				string[] tok;
-				while (!reader.EndOfStream)
-				{
-					line = reader.ReadLine();
-					tok = line.Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-					switch (tok[0].Trim().ToLowerInvariant())
-					{
-						case "url":
-							connectionUrlText.Text = string.Join("", tok, 1, tok.Length - 1);
-							break;
-						case "follow":
-							bool check = false;
-							bool.TryParse(tok[1], out check);
-							followCheck.Checked = check;
-							break;
-						case "hide":
-							displayLocationsCheck.Checked = !tok.Contains("locations");
-							displayHazardsCheck.Checked = !tok.Contains("hazards");
-
-							displayTownsCheck.Checked = !tok.Contains("towns");
-							displayJobsCheck.Checked = !tok.Contains("jobs");
-							displayShopsCheck.Checked = !tok.Contains("shops");
-
-							displayRoadHazardsCheck.Checked = !tok.Contains("roadhazards");
-							displayTrafficHazardsCheck.Checked = !tok.Contains("traffic");
-							displayRailwayHazardsCheck.Checked = !tok.Contains("railcrossing");
-							break;
-					}
-				}
-			}
-		}
-
-		private void _saveConfig()
-		{
-			using (StreamWriter writer = new StreamWriter(_configPath))
-			{
-				writer.WriteLine($"url {connectionUrlText.Text}");
-				writer.WriteLine($"follow {followCheck.Checked.ToString().ToLowerInvariant()}");
-				string hideString = $"{(displayLocationsCheck.Checked ? "" : " locations")}{(displayHazardsCheck.Checked ? "" : " hazards")}{(displayTownsCheck.Checked ? "" : " towns")}{(displayShopsCheck.Checked ? "" : " shops")}{(displayJobsCheck.Checked ? "" : " jobs")}{(displayRoadHazardsCheck.Checked ? "" : " roadhazards")}{(displayTrafficHazardsCheck.Checked ? "" : " traffic")}{(displayRailwayHazardsCheck.Checked ? "" : " railcrossing")}";
-				if(!string.IsNullOrWhiteSpace(hideString))
-					writer.WriteLine("hide" + hideString);
-			}
-		}
 
 		public MainForm()
 		{
@@ -120,7 +68,8 @@ namespace AlivieskaGpsClient
 			MapDrawing.PointsOfInterest = MapDrawing.PointOfInterest.ReadFromCsv(_locationsPath);
 			MapDrawing.Hazards = MapDrawing.RoadHazard.ReadFromCsv(_hazardsPath);
 
-			_loadConfig();
+			connectionUrlText.Text = Settings.Default.Url;
+			followCheck.Checked = Settings.Default.Follow;
 			mapImage.Invalidate();
 		}
 
@@ -270,7 +219,9 @@ namespace AlivieskaGpsClient
 		// Save config and close other forms when the window is closed
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			_saveConfig();
+			Settings.Default.Follow = followCheck.Checked;
+			Settings.Default.Url = connectionUrlText.Text;
+			Settings.Default.Save();
 			_detailsForm.Close();
 			_recordForm.Close();
 		}
