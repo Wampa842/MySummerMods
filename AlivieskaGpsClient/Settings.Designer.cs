@@ -46,5 +46,16 @@ namespace AlivieskaGpsClient {
                 this["Follow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection Hide {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Hide"]));
+            }
+            set {
+                this["Hide"] = value;
+            }
+        }
     }
 }
