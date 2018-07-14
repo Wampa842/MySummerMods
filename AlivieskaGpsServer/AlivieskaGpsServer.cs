@@ -54,12 +54,12 @@ namespace AlivieskaGpsServer
 		*/
 
 		private readonly HttpListener listener = new HttpListener();
-		private readonly Func<HttpListenerRequest, string> responseMethod;
+		private readonly Action<HttpListenerRequest, HttpListenerResponse> responseMethod;
 
 		public bool IsClosed { get; private set; } = false;
 		public HttpListenerPrefixCollection Prefixes => listener.Prefixes;
 
-		public WebServer(string[] prefixes, Func<HttpListenerRequest, string> method)
+		public WebServer(string[] prefixes, Action<HttpListenerRequest, HttpListenerResponse> method)
 		{
 			if (!HttpListener.IsSupported)
 				throw new NotSupportedException("HttpListener is not supported");
@@ -74,9 +74,9 @@ namespace AlivieskaGpsServer
 			ModConsole.Print("Server created");
 		}
 
-		public WebServer(Func<HttpListenerRequest, string> method, params string[] prefixes) : this(prefixes, method) { }
+		public WebServer(Action<HttpListenerRequest, HttpListenerResponse> method, params string[] prefixes) : this(prefixes, method) { }
 
-		public void Run(bool useXml = true)
+		public void Run()
 		{
 			ThreadPool.QueueUserWorkItem(o =>
 			{
@@ -89,12 +89,7 @@ namespace AlivieskaGpsServer
 							var ctx = c as HttpListenerContext;
 							try
 							{
-								string responseString = responseMethod(ctx.Request);
-								byte[] buffer = Encoding.UTF8.GetBytes(responseString);
-								ctx.Response.ContentType = useXml ? "application/xml" : "application/json";
-								ctx.Response.Headers.Add("Access-Control-Allow-Origin", ctx.Request.Headers["Origin"]);
-								ctx.Response.ContentLength64 = buffer.Length;
-								ctx.Response.OutputStream.Write(buffer, 0, buffer.Length);
+								responseMethod(ctx.Request, ctx.Response);
 							}
 							catch { }
 							finally
@@ -126,7 +121,9 @@ namespace AlivieskaGpsServer
 		private string _serverConfigPath;
 		private int _port = 8080;
 		private bool _autoStart = true;
-		private bool _outputXml = false;
+		private bool _outputJson = false;
+
+		private GameObject _car;    // The Satsuma or whatever other GameObject needs to be tracked
 
 		private void _loadConfig()
 		{
@@ -135,26 +132,34 @@ namespace AlivieskaGpsServer
 				while (!reader.EndOfStream)
 				{
 					string[] tok = reader.ReadLine().Split(' ');
-					switch (tok[0])
-					{
-						case "port":
-							int.TryParse(tok[1], out _port);
-							break;
-						case "autostart":
-							bool.TryParse(tok[1], out _autoStart);
-							break;
-						case "output":
-							_outputXml = tok[1].Trim().ToLowerInvariant() == "xml";
-							break;
-						default:
-							break;
-					}
+					if (tok.Length > 1)
+						switch (tok[0])
+						{
+							case "port":
+								int.TryParse(tok[1], out _port);
+								break;
+							case "autostart":
+								bool.TryParse(tok[1], out _autoStart);
+								break;
+							case "output":
+								_outputJson = tok[1].Trim().ToLowerInvariant() == "json";
+								break;
+							default:
+								break;
+						}
 				}
 			}
 		}
 
-		// The Satsuma or whatever other GameObject needs to be tracked
-		private GameObject _car;
+		private void _saveConfig()
+		{
+			using (StreamWriter writer = new StreamWriter(_serverConfigPath))
+			{
+				writer.WriteLine("port " + _port.ToString());
+				writer.WriteLine("autostart " + _autoStart.ToString().ToLowerInvariant());
+				writer.WriteLine("output " + (_outputJson ? "json" : "xml"));
+			}
+		}
 
 		public string GetJsonContent()
 		{
@@ -167,7 +172,7 @@ namespace AlivieskaGpsServer
 
 			return string.Concat("{", string.Format(@"""x"":{0},""y"":{1},""z"":{2},""time"":{3},""speed"":{4},""heading"":{5}", x, y, z, time, speed, heading), "}");
 		}
-		
+
 		public string GetXmlContent()
 		{
 			XmlDocument doc = new XmlDocument();
@@ -202,19 +207,43 @@ namespace AlivieskaGpsServer
 			return doc.OuterXml;
 		}
 
-		public string GetContent(HttpListenerRequest request)
+		public void GetContent(HttpListenerRequest request, HttpListenerResponse response)
 		{
-			if (_outputXml)
-				return this.GetXmlContent();
+			string responseString;
+			if(Array.Exists(request.Url.Segments, e => e.ToLowerInvariant().Contains("json")))
+			{
+				responseString = GetJsonContent();
+				response.ContentType = "application/json";
+			}
+			else if(Array.Exists(request.Url.Segments, e => e.ToLowerInvariant().Contains("xml")))
+			{
+				responseString = GetXmlContent();
+				response.ContentType = "application/xml";
+			}
 			else
-				return this.GetJsonContent();
+			{
+				if(_outputJson)
+				{
+					responseString = GetJsonContent();
+					response.ContentType = "application/json";
+				}
+				else
+				{
+					responseString = GetXmlContent();
+					response.ContentType = "application/xml";
+				}
+			}
+			byte[] buffer = Encoding.UTF8.GetBytes(responseString);
+			response.Headers.Add("Access-Control-Allow-Origin", request.Headers["Origin"]);
+			response.ContentLength64 = buffer.Length;
+			response.OutputStream.Write(buffer, 0, buffer.Length);
 		}
 
 		public WebServer Server;
 
 		public void StartServer(bool loadConfigFile = true)
 		{
-			if(loadConfigFile)
+			if (loadConfigFile)
 			{
 				_loadConfig();
 			}
@@ -222,28 +251,35 @@ namespace AlivieskaGpsServer
 			{
 				try
 				{
-					Server = new WebServer(GetContent, $"http://*:{_port}/");
 					ModConsole.Print("Creating server...");
+					Server = new WebServer(GetContent, $"http://*:{_port}/");
+					Server.Run();
 				}
 				catch (HttpListenerException ex)
 				{
-					ModConsole.Print("Could not create server:\n" + ex.ToString());
+					ModConsole.Error("Could not create server:\n" + ex.ToString());
 				}
 			}
-			Server.Run(_outputXml);
 			ModConsole.Print("Server is running");
 		}
 
 		public void StopServer()
 		{
-			ModConsole.Print("Stopping server");
-			if (Server != null)
+			try
 			{
-				Server.Stop();
-				Server = null;
-				ModConsole.Print("Server stopped");
+				ModConsole.Print("Stopping server");
+				if (Server != null)
+				{
+					Server.Stop();
+					Server = null;
+				}
+				ModConsole.Print("Server is not running");
 			}
-			ModConsole.Print("Server is not running");
+			catch (Exception ex)
+			{
+				ModConsole.Error("Could not stop server:\n" + ex.ToString());
+			}
+			ModConsole.Print("Server stopped");
 		}
 
 		private class GpsCommand : ConsoleCommand
@@ -251,10 +287,21 @@ namespace AlivieskaGpsServer
 			public override string Name => "gps";
 			public override string Help => "GPS server - see 'gps help' for details";
 
-			AlivieskaGpsServer _mod;
+			private AlivieskaGpsServer _mod;
 
-			private readonly string _usageString = "Usage: gps [-p <port>] start|stop|restart|write [xml] [json]|help";
-			private readonly string _helpString = "gps - controls a web server that provides positioning information on 'http://localhost:8080/'.";
+			private readonly string _helpString =
+				"AlivieskaGpsServer\n" +
+				"Copyright (c) Wampa842 2018 (github.com/wampa842)\n\n" +
+				"Usage:\n" +
+				"  gps [-p <port>|--port <port>] <command>\n" +
+				"where <command> is:" +
+				"  start: starts listening on the default or specified port\n" +
+				"  stop: halts the server\n" +
+				"  restart: stops and then starts the server while reloading the configuration file\n" +
+				"  write [xml] [json]: writes the response string to a file, in XML or JSON format\n" +
+				"  help: displays this message\n\n" +
+				"This mod runs a small HTTP web server that displays the current position and heading of the Satsuma, either in XML or in JSON format.\n" +
+				"The data is served on localhost's specified port, or 8080 by default.";
 
 			public GpsCommand(AlivieskaGpsServer sender)
 			{
@@ -266,7 +313,7 @@ namespace AlivieskaGpsServer
 				// Make sure the command is executed with arguments.
 				if (args.Length < 1)
 				{
-					ModConsole.Print(_usageString);
+					ModConsole.Error("Incorrect number of arguments. See 'gps help' for details.");
 					return;
 				}
 
@@ -281,18 +328,18 @@ namespace AlivieskaGpsServer
 				if (Array.Exists(args, e => e.ToLowerInvariant() == "start" || e.ToLowerInvariant() == "restart"))
 				{
 					int p;
-					if ((p = Array.IndexOf(args, "-p")) >= 0)
+					if ((p = Array.IndexOf(args, "-p")) >= 0 || (p = Array.IndexOf(args, "--port")) >= 0)
 					{
 						if (args.Length >= p + 1 && int.TryParse(args[p + 1], out int portNumber) && portNumber <= 65535 && portNumber >= 1024)
 						{
 							_mod._port = portNumber;
 						}
-						else ModConsole.Print(_usageString);
+						else ModConsole.Print(_helpString);
 					}
 				}
 
 				// Restart
-				if(Array.Exists(args, e => e.ToLowerInvariant() == "restart"))
+				if (Array.Exists(args, e => e.ToLowerInvariant() == "restart"))
 				{
 					_mod.StopServer();
 					_mod.StartServer();
@@ -300,21 +347,21 @@ namespace AlivieskaGpsServer
 				}
 
 				// Start
-				if(Array.Exists(args, e => e.ToLowerInvariant() == "start"))
+				if (Array.Exists(args, e => e.ToLowerInvariant() == "start"))
 				{
 					_mod.StartServer();
 					return;
 				}
 
 				// Stop
-				if(Array.Exists(args, e => e.ToLowerInvariant() == "stop"))
+				if (Array.Exists(args, e => e.ToLowerInvariant() == "stop"))
 				{
 					_mod.StopServer();
 					return;
 				}
 
 				// Write to file
-				if(Array.Exists(args, e => e.ToLowerInvariant() == "write"))
+				if (Array.Exists(args, e => e.ToLowerInvariant() == "write"))
 				{
 					if (Array.Exists(args, e => e.ToLowerInvariant() == "json"))
 					{
@@ -323,7 +370,7 @@ namespace AlivieskaGpsServer
 							writer.Write(_mod.GetJsonContent());
 						}
 					}
-					else if(Array.Exists(args, e => e.ToLowerInvariant() == "xml"))
+					else if (Array.Exists(args, e => e.ToLowerInvariant() == "xml"))
 					{
 						using (StreamWriter writer = new StreamWriter(Path.Combine(ModLoader.GetModConfigFolder(_mod), "out.xml")))
 						{
@@ -341,7 +388,12 @@ namespace AlivieskaGpsServer
 							writer.Write(_mod.GetXmlContent());
 						}
 					}
+					ModConsole.Print("Completed writing - check the mod's config folder.");
+					return;
 				}
+
+				// If this point is reached, there were no valid commands to execute.
+				ModConsole.Error("Invalid arguments. See 'gps help' for details.");
 			}
 		}
 
