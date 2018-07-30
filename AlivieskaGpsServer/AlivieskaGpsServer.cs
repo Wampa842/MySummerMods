@@ -127,26 +127,36 @@ namespace AlivieskaGpsServer
 
 		private void _loadConfig()
 		{
-			using (StreamReader reader = new StreamReader(_serverConfigPath))
+			if (!File.Exists(_serverConfigPath))
 			{
-				while (!reader.EndOfStream)
+				File.CreateText(_serverConfigPath);
+				_saveConfig();
+			}
+			else
+			{
+				using (StreamReader reader = new StreamReader(_serverConfigPath))
 				{
-					string[] tok = reader.ReadLine().Split(' ');
-					if (tok.Length > 1)
-						switch (tok[0])
+					while (!reader.EndOfStream)
+					{
+						string[] tok = reader.ReadLine().Split(' ');
+						if (tok.Length > 1)
 						{
-							case "port":
-								int.TryParse(tok[1], out _port);
-								break;
-							case "autostart":
-								bool.TryParse(tok[1], out _autoStart);
-								break;
-							case "output":
-								_outputJson = tok[1].Trim().ToLowerInvariant() == "json";
-								break;
-							default:
-								break;
+							switch (tok[0])
+							{
+								case "port":
+									int.TryParse(tok[1], out _port);
+									break;
+								case "autostart":
+									bool.TryParse(tok[1], out _autoStart);
+									break;
+								case "output":
+									_outputJson = tok[1].Trim().ToLowerInvariant() == "json";
+									break;
+								default:
+									break;
+							}
 						}
+					}
 				}
 			}
 		}
