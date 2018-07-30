@@ -1,4 +1,7 @@
 # Some mods for My Summer Car
+### Carry More
+ An alternative to the Backpack mod. Pick up items with `E`. Drop the last item with `Y`. Set a button to drop all items in the mod settings.
+
 ### Unflip your ride
 A console command to deal with heavy vehicles that went tits-up. Kind of a cheat. Also kind of shit since it simply resets the car's rotation and places it 1m higher. It won't get you out of a ditch or lake.
 

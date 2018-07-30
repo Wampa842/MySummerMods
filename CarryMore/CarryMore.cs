@@ -25,7 +25,7 @@ namespace CarryMore
 {
 	public class ItemList
 	{
-		public static string[] Blacklist = new string[1]
+		public static string[] Blacklist = new string[]
 		{
 			"JONNEZ ES(Clone)"
 		};
@@ -175,7 +175,7 @@ namespace CarryMore
 		public CarryMore()
 		{
 			_pickUpKey = new Keybind("PickUp", "Pick up targeted item", KeyCode.E);
-			_dropAllKey = new Keybind("DropAll", "Drop all items", KeyCode.None);
+			_dropAllKey = new Keybind("DropAll", "Drop all items", KeyCode.Y, KeyCode.LeftControl);
 			_dropLastKey = new Keybind("DropLast", "Drop last item", KeyCode.Y);
 
 			MaxItems = new Settings("MaxItems", "Max items", 10, () =>
