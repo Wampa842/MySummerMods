@@ -35,8 +35,7 @@ namespace ListGameObjects
 			public override string Name => "writeobjects";
 			public override string Help => "write GameObjects and FSM stuff into files";
 			private ListGameObjects sender;
-
-			string objectPath, varPath, eventPath;
+			private string objectPath, varPath, eventPath, compPath;
 
 
 			public ListStuffCommand(ListGameObjects sender)
@@ -45,19 +44,22 @@ namespace ListGameObjects
 				this.objectPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "GameObjects.csv");
 				this.varPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "FsmVars.csv");
 				this.eventPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "FsmEvents.csv");
+				this.compPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "FsmComponents.csv");
 
 			}
 
 			public override void Run(string[] args)
 			{
 				StreamWriter writer = null;
+
+				// List GameObjects
 				try
 				{
 					writer = new StreamWriter(objectPath);
 
 					foreach (GameObject o in GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[])
 					{
-						writer.WriteLine($"\"{o.name}\",\"{o.tag}\"");
+						writer.WriteLine($"\"{o.name}\",\"{o.tag}\",{o.layer}");
 					}
 				}
 				catch (IOException ex)
@@ -69,6 +71,8 @@ namespace ListGameObjects
 					if (writer != null)
 						writer.Dispose();
 				}
+
+				// List FSM variables
 				try
 				{
 					writer = new StreamWriter(varPath);
@@ -99,16 +103,53 @@ namespace ListGameObjects
 					if (writer != null)
 						writer.Dispose();
 				}
+
+				// List FSM events
 				try
 				{
 					writer = new StreamWriter(eventPath);
 
-					foreach (var v in FsmEvent.EventList)
-					{
-						writer.WriteLine($"\"{v.Name}\",\"{v.Path}\"");
-					}
 				}
 				catch(IOException ex)
+				{
+					ModConsole.Print("Couldn't write FSM components:\n" + ex.ToString());
+				}
+				finally
+				{
+					if (writer != null)
+						writer.Dispose();
+				}
+
+				//List FSM components per GameObject
+				try
+				{
+					writer = new StreamWriter(compPath);
+					writer.WriteLine("\"GameObject\",\"Layer\",\"Component\",\"Variable\",\"Type\",\"Value\"");
+
+					foreach (GameObject o in GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[])
+					{
+						foreach(PlayMakerFSM fsm in o.GetComponents<PlayMakerFSM>())
+						{
+							foreach (var v in fsm.FsmVariables.IntVariables)
+							{
+								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
+							}
+							foreach (var v in fsm.FsmVariables.FloatVariables)
+							{
+								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
+							}
+							foreach (var v in fsm.FsmVariables.BoolVariables)
+							{
+								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
+							}
+							foreach (var v in fsm.FsmVariables.StringVariables)
+							{
+								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
+							}
+						}
+					}
+				}
+				catch (IOException ex)
 				{
 					ModConsole.Print("Couldn't write FSM events:\n" + ex.ToString());
 				}
