@@ -31,12 +31,20 @@ namespace CarryMore
 		};
 
 		private List<GameObject> _list;
-		public CarryMore Mod;
+		private CarryMore _mod;
+
+		public GameObject this[int index] => _list[index];
+		public IEnumerator<GameObject> GetEnumerator()
+		{
+			return _list.GetEnumerator();
+		}
+		public int Count => _list.Count;
+		public int SelectedIndex { get; private set; } = 0;
 
 		public ItemList(int max, CarryMore mod)
 		{
 			_list = new List<GameObject>(max);
-			this.Mod = mod;
+			this._mod = mod;
 		}
 
 		// Test if the GameObject can be picked up
@@ -45,28 +53,28 @@ namespace CarryMore
 			// List is full
 			if (_list.Count >= _list.Capacity)
 			{
-				if ((bool)Mod.FullLogging.Value) ModConsole.Print($"List is full");
+				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"List is full");
 				return false;
 			}
 
 			// Object is not a part or item
 			if (!(o.layer == 16 || o.layer == 19))
 			{
-				if ((bool)Mod.FullLogging.Value) ModConsole.Print($"{o.name} is on layer {o.layer}");
+				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} is on layer {o.layer}");
 				return false;
 			}
 
 			// Item doesn't have a rigid body
 			if (o.GetComponent<Rigidbody>() == null)
 			{
-				if ((bool)Mod.FullLogging.Value) ModConsole.Print($"{o.name} doesn't have a rigid body");
+				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} doesn't have a rigid body");
 				return false;
 			}
 
 			// Item is in the blacklist
-			if(Array.Exists(Blacklist, e => e == o.name))
+			if (Array.Exists(Blacklist, e => e == o.name))
 			{
-				if ((bool)Mod.FullLogging.Value) ModConsole.Print($"{o.name} is blacklisted");
+				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} is blacklisted");
 				return false;
 			}
 
@@ -109,12 +117,18 @@ namespace CarryMore
 				o.GetComponent<Rigidbody>().isKinematic = true;
 				o.transform.position = new Vector3(0.0f, -1000.0f, 0.0f);
 
-				if ((bool)Mod.SomeLogging.Value || (bool)Mod.FullLogging.Value) ModConsole.Print($"{o.name} added ({_list.Count} / {_list.Capacity})");
+				if ((bool)_mod.SomeLogging.Value || (bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} added ({_list.Count} / {_list.Capacity})");
 			}
 			else
 			{
-				if ((bool)Mod.FullLogging.Value) ModConsole.Print($"{o.name} already on the list");
+				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} already on the list");
 			}
+
+			// Keep selected index inside limits - can cause issues on first pickup
+			if (SelectedIndex >= _list.Count)
+				SelectedIndex = _list.Count - 1;
+			if (SelectedIndex < 0)
+				SelectedIndex = 0;
 
 			return true;
 		}
@@ -132,11 +146,11 @@ namespace CarryMore
 				// If successful, remove it from the list
 				_list.Remove(item);
 
-				if ((bool)Mod.SomeLogging.Value || (bool)Mod.FullLogging.Value) ModConsole.Print($"Dropped #{index} {item.name} ({_list.Count} / {_list.Capacity})");
+				if ((bool)_mod.SomeLogging.Value || (bool)_mod.FullLogging.Value) ModConsole.Print($"Dropped #{index} {item.name} ({_list.Count} / {_list.Capacity})");
 			}
 			catch
 			{
-				if ((bool)Mod.FullLogging.Value) ModConsole.Print($"Can't drop #{index}");
+				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"Can't drop #{index}");
 			}
 		}
 
@@ -149,11 +163,39 @@ namespace CarryMore
 		// Drop all items
 		public void DropAll()
 		{
-			if ((bool)Mod.SomeLogging.Value || (bool)Mod.FullLogging.Value) ModConsole.Print($"Dropping {_list.Count} items");
+			if ((bool)_mod.SomeLogging.Value || (bool)_mod.FullLogging.Value) ModConsole.Print($"Dropping {_list.Count} items");
 			for (int i = _list.Count - 1; i >= 0; --i)
 			{
 				DropAt(i);
 			}
+		}
+
+		// Drop selected item
+		public void DropSelected()
+		{
+			DropAt(SelectedIndex);
+			--SelectedIndex;
+
+			if (SelectedIndex < 0)
+				SelectedIndex = 0;
+			if (SelectedIndex >= _list.Count)
+				SelectedIndex = _list.Count - 1;
+		}
+
+		// Scroll the list
+		internal void MoveSelection(float scroll)
+		{
+			// Move selected index
+			if (scroll > 0)
+				--SelectedIndex;
+			else if (scroll < 0)
+				++SelectedIndex;
+
+			// Loop around
+			if (SelectedIndex < 0)
+				SelectedIndex = _list.Count - 1;
+			if (SelectedIndex >= _list.Count)
+				SelectedIndex = 0;
 		}
 	}
 
@@ -161,24 +203,37 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Carry more stuff";
-		public override string Version => "1.1.1";
+		public override string Version => "1.2.0";
 		public override string Author => "Wampa842";
 
 		private Keybind _pickUpKey;
 		private Keybind _dropAllKey;
-		private Keybind _dropLastKey;
+		private Keybind _dropSelectedKey;
+		private Keybind _toggleGuiKey;
 		public Settings MaxItems;
 		public Settings SomeLogging;    // Log only pick-up and drop events
 		public Settings FullLogging;    // Log pick-up rejection events
+		public Settings DropIfListVisible;
+		public Settings PickUpIfListVisible;
+
+		private bool _guiVisible;
+		private GUIStyle _guiStyle;
+		private const float _guiPosLeft = 150.0f;
+		private const float _guiPosBottom = 50.0f;
+		private const float _guiHeight = 20.0f;
+
 
 		public ItemList Items;
 
 		public CarryMore()
 		{
+			// Add keybinds
 			_pickUpKey = new Keybind("PickUp", "Pick up targeted item", KeyCode.E);
 			_dropAllKey = new Keybind("DropAll", "Drop all items", KeyCode.Y, KeyCode.LeftControl);
-			_dropLastKey = new Keybind("DropLast", "Drop last item", KeyCode.Y);
+			_dropSelectedKey = new Keybind("DropSelected", "Drop selected item (or last item if the list is hidden)", KeyCode.Y);
+			_toggleGuiKey = new Keybind("ToggleGUI", "Toggle inventory list", KeyCode.X);
 
+			// Add settings
 			MaxItems = new Settings("MaxItems", "Max items", 10, () =>
 			{
 				Items.DropAll();
@@ -186,15 +241,25 @@ namespace CarryMore
 			});
 			SomeLogging = new Settings("LogSome", "Log pick-up/drop events", true);
 			FullLogging = new Settings("LogEverything", "Log everything", false);
+			DropIfListVisible = new Settings("DropIfListVisible", "Only drop items if the list is visible", false);
+			PickUpIfListVisible = new Settings("PickUpIfListVisible", "Only pick up items if the list is visible", false);
 
+			// Initialize the item list
 			Items = new ItemList((int)MaxItems.Value, this);
+
+			// Initialize GUI
+			_guiVisible = false;
+			_guiStyle = new GUIStyle();
+			_guiStyle.fontSize = 12;
+			_guiStyle.normal.textColor = Color.white;
 		}
 
 		public override void OnLoad()
 		{
 			Keybind.Add(this, _pickUpKey);
 			Keybind.Add(this, _dropAllKey);
-			Keybind.Add(this, _dropLastKey);
+			Keybind.Add(this, _dropSelectedKey);
+			Keybind.Add(this, _toggleGuiKey);
 		}
 
 		public override void ModSettings()
@@ -202,6 +267,8 @@ namespace CarryMore
 			Settings.AddSlider(this, MaxItems, 1, 50);
 			Settings.AddCheckBox(this, SomeLogging);
 			Settings.AddCheckBox(this, FullLogging);
+			Settings.AddCheckBox(this, DropIfListVisible);
+			Settings.AddCheckBox(this, PickUpIfListVisible);
 		}
 
 		public override void OnSave()
@@ -214,14 +281,22 @@ namespace CarryMore
 		{
 			if (Application.loadedLevelName == "GAME")
 			{
+				// Drop everything
 				if (_dropAllKey.IsDown())
 				{
 					Items.DropAll();
 				}
-				if (_dropLastKey.IsDown())
+
+				// Drop the last thing
+				if (_dropSelectedKey.IsDown())
 				{
-					Items.DropLast();
+					if (_guiVisible)
+						Items.DropSelected();
+					else
+						Items.DropLast();
 				}
+
+				// Pick up
 				if (_pickUpKey.IsDown())
 				{
 					RaycastHit[] raycastHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 1.0f);
@@ -233,6 +308,42 @@ namespace CarryMore
 							break;
 						}
 					}
+				}
+
+				// Toggle GUI
+				if (_toggleGuiKey.IsDown())
+				{
+					_guiVisible = !_guiVisible;
+				}
+
+				// Scroll GUI
+				if (_guiVisible)
+				{
+					float scroll = Input.GetAxis("Mouse ScrollWheel");
+					if (scroll != 0.0f)
+						Items.MoveSelection(scroll);
+				}
+			}
+		}
+
+		public override void OnGUI()
+		{
+			if (_guiVisible)
+			{
+				if (Items.Count > 0)
+				{
+					for (int i = 0; i < Items.Count; ++i)
+					{
+						float top = Screen.height - _guiPosBottom - (_guiHeight * (Items.Count - i));
+						string name = Items[i].name.Replace("(Clone)", "").Replace("(itemx)", "");
+						if (i == Items.SelectedIndex)
+							GUI.Label(new Rect(_guiPosLeft - 20.0f, top, 20.0f, _guiHeight), ">");
+						GUI.Label(new Rect(_guiPosLeft, top, Screen.width, _guiHeight), name);
+					}
+				}
+				else
+				{
+					GUI.Label(new Rect(_guiPosLeft, Screen.height - _guiPosBottom - _guiHeight, Screen.width, _guiHeight), "Backpack is empty");
 				}
 			}
 		}
