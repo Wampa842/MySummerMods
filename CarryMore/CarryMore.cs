@@ -104,8 +104,11 @@ namespace CarryMore
 
 			if (!_list.Contains(o))
 			{
+				PlayMakerFSM.BroadcastEvent("PROCEED Drop");
 				_list.Add(o);
-				o.SetActive(false);
+				o.GetComponent<Rigidbody>().isKinematic = true;
+				o.transform.position = new Vector3(0.0f, -1000.0f, 0.0f);
+
 				if ((bool)Mod.SomeLogging.Value || (bool)Mod.FullLogging.Value) ModConsole.Print($"{o.name} added ({_list.Count} / {_list.Capacity})");
 			}
 			else
@@ -123,10 +126,8 @@ namespace CarryMore
 			{
 				GameObject item = _list[index];
 
-				// Enable the item and place it in front of the player
-				item.SetActive(true);
+				item.GetComponent<Rigidbody>().isKinematic = false;
 				item.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * 1.0f);
-				item.transform.eulerAngles = Camera.main.transform.eulerAngles;
 
 				// If successful, remove it from the list
 				_list.Remove(item);
@@ -160,7 +161,7 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Carry more stuff";
-		public override string Version => "1.1.0";
+		public override string Version => "1.1.1";
 		public override string Author => "Wampa842";
 
 		private Keybind _pickUpKey;
