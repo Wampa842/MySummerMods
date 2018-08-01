@@ -15,7 +15,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Linq;
 
 using MSCLoader;
 using UnityEngine;
@@ -33,11 +36,15 @@ namespace CarryMore
 		private List<GameObject> _list;
 		private CarryMore _mod;
 
-		public GameObject this[int index] => _list[index];
 		public IEnumerator<GameObject> GetEnumerator()
 		{
 			return _list.GetEnumerator();
 		}
+		public bool Contains(GameObject o)
+		{
+			return _list.Contains(o);
+		}
+		public GameObject this[int index] => _list[index];
 		public int Count => _list.Count;
 		public int SelectedIndex { get; private set; } = 0;
 
@@ -114,8 +121,9 @@ namespace CarryMore
 			{
 				PlayMakerFSM.BroadcastEvent("PROCEED Drop");
 				_list.Add(o);
+				o.transform.parent = null;
 				o.GetComponent<Rigidbody>().isKinematic = true;
-				o.transform.position = new Vector3(0.0f, -1000.0f, 0.0f);
+				o.transform.position = CarryMore.TempPosition;
 
 				if ((bool)_mod.SomeLogging.Value || (bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} added ({_list.Count} / {_list.Capacity})");
 			}
@@ -133,12 +141,13 @@ namespace CarryMore
 			return true;
 		}
 
-		// Attempt to drop the item at the specified index
-		public void DropAt(int index)
+		// Attempt to drop the item at the specified index, then return the GameObject or null
+		public GameObject DropAt(int index)
 		{
+			GameObject item = null;
 			try
 			{
-				GameObject item = _list[index];
+				item = _list[index];
 
 				item.GetComponent<Rigidbody>().isKinematic = false;
 				item.transform.position = Camera.main.transform.position + (Camera.main.transform.forward * 1.0f);
@@ -151,13 +160,15 @@ namespace CarryMore
 			catch
 			{
 				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"Can't drop #{index}");
+				return null;
 			}
+			return item;
 		}
 
-		// Drop the last item
-		public void DropLast()
+		// Drop the last item, then return the GameObject or null
+		public GameObject DropLast()
 		{
-			DropAt(_list.Count - 1);
+			return DropAt(_list.Count - 1);
 		}
 
 		// Drop all items
@@ -170,16 +181,18 @@ namespace CarryMore
 			}
 		}
 
-		// Drop selected item
-		public void DropSelected()
+		// Drop selected item, then return the GameObject or null
+		public GameObject DropSelected()
 		{
-			DropAt(SelectedIndex);
+			GameObject item = DropAt(SelectedIndex);
 			--SelectedIndex;
 
 			if (SelectedIndex < 0)
 				SelectedIndex = 0;
 			if (SelectedIndex >= _list.Count)
 				SelectedIndex = _list.Count - 1;
+
+			return item;
 		}
 
 		// Scroll the list
@@ -213,7 +226,7 @@ namespace CarryMore
 				int val = int.Parse(_mod.MaxItems.GetValue().ToString());   // what the fuck
 				Realloc(val);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				ModConsole.Error(ex.Message);
 			}
@@ -224,8 +237,12 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Carry more stuff";
-		public override string Version => "1.2.1";
+		public override string Version => "1.3.0-beta-1";
 		public override string Author => "Wampa842";
+
+		public readonly string SaveFilePath;
+
+		public static readonly Vector3 TempPosition = new Vector3(0.0f, -1000.0f, 0.0f);    // The place where objects are moved when they're "in" the backpack
 
 		private Keybind _pickUpKey;
 		private Keybind _dropAllKey;
@@ -237,6 +254,7 @@ namespace CarryMore
 		public Settings FullLogging;    // Log pick-up rejection events
 		public Settings DropIfListVisible;
 		public Settings PickUpIfListVisible;
+		public Settings EnableSaving;
 
 		private bool _guiVisible;
 		private GUIStyle _guiStyle;
@@ -244,11 +262,12 @@ namespace CarryMore
 		private const float _guiPosBottom = 50.0f;
 		private const float _guiHeight = 20.0f;
 
-
 		public ItemList Items;
 
 		public CarryMore()
 		{
+			SaveFilePath = System.IO.Path.Combine(ModLoader.GetModConfigFolder(this), "SaveData.xml");
+
 			// Add keybinds
 			_pickUpKey = new Keybind("PickUp", "Pick up targeted item", KeyCode.E);
 			_dropAllKey = new Keybind("DropAll", "Drop all items", KeyCode.Y, KeyCode.LeftControl);
@@ -268,6 +287,7 @@ namespace CarryMore
 			FullLogging = new Settings("LogEverything", "Log everything", false);
 			DropIfListVisible = new Settings("DropIfListVisible", "Don't drop items if the list is hidden", true);
 			PickUpIfListVisible = new Settings("PickUpIfListVisible", "Don't pick up items if the list is hidden", false);
+			EnableSaving = new Settings("EnableSaving", "Save backpack contents (EXPERIMENTAL)", false);
 
 			// Initialize the item list
 			Items = new ItemList((int)MaxItems.Value, this);
@@ -281,10 +301,46 @@ namespace CarryMore
 
 		public override void OnLoad()
 		{
+			// Add keybinds
 			Keybind.Add(this, _pickUpKey);
 			Keybind.Add(this, _dropAllKey);
 			Keybind.Add(this, _dropSelectedKey);
 			Keybind.Add(this, _toggleGuiKey);
+
+			// Load save data
+			if ((bool)EnableSaving.Value)
+			{
+				try
+				{
+					GameObject[] objects = GameObject.FindObjectsOfType<GameObject>();
+
+					XmlDocument doc = new XmlDocument();
+					doc.Load(SaveFilePath);
+					XmlElement root = doc.DocumentElement;
+
+					// Loop through child nodes - each one contains a GameObject name
+					foreach (XmlNode n in root.ChildNodes)
+					{
+						// Find objects of that name
+						GameObject[] match = objects.Where(o => o.name == n.InnerText).ToArray();
+						if ((bool)FullLogging.Value) ModConsole.Print(match.Length.ToString() + " matches found for " + n.InnerText);
+
+						foreach (GameObject o in match)
+						{
+							// If they're found, see if there are any within the region where they're stored while in the backpack
+							if ((bool)FullLogging.Value) ModConsole.Print($"{o.name} is at {o.transform.position.x}, {o.transform.position.y}, {o.transform.position.z}");
+							if (o.transform.position.y <= (TempPosition.y + 100.0f) && (o.transform.position.x - TempPosition.x < 10.0f) && (o.transform.position.z - TempPosition.z < 100.0f) && !Items.Contains(o))
+							{
+								Items.PickUp(o);
+							}
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					ModConsole.Error("Error while loading backpack saves:\n" + ex.Message);
+				}
+			}
 		}
 
 		public override void ModSettings()
@@ -295,12 +351,39 @@ namespace CarryMore
 			Settings.AddCheckBox(this, FullLogging);
 			Settings.AddCheckBox(this, DropIfListVisible);
 			Settings.AddCheckBox(this, PickUpIfListVisible);
+			Settings.AddCheckBox(this, EnableSaving);
 		}
 
 		public override void OnSave()
 		{
-			// Drop all items
-			Items.DropAll();
+			if((bool)EnableSaving.Value)
+			{
+				if ((bool)SomeLogging.Value || (bool)FullLogging.Value) ModConsole.Print("Saving backpack contents...");
+
+				// Save item names to XML
+				XmlDocument doc = new XmlDocument();
+				doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
+				XmlElement root = doc.CreateElement("CarryMoreSave");
+				doc.AppendChild(root);
+				XmlElement node;
+
+				for (int i = 0; i < Items.Count; ++i)
+				{
+					GameObject item = Items[i];
+					node = doc.CreateElement("BackpackItem");
+					node.AppendChild(doc.CreateTextNode(item.name));
+					root.AppendChild(node);
+
+					item.GetComponent<Rigidbody>().isKinematic = true;
+					item.transform.position = CarryMore.TempPosition;
+				}
+
+				doc.Save(SaveFilePath);
+			}
+			else
+			{
+				Items.DropAll();
+			}
 		}
 
 		public override void Update()
