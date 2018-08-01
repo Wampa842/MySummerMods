@@ -183,7 +183,7 @@ namespace CarryMore
 		}
 
 		// Scroll the list
-		internal void MoveSelection(float scroll)
+		public void MoveSelection(float scroll)
 		{
 			// Move selected index
 			if (scroll > 0)
@@ -197,13 +197,34 @@ namespace CarryMore
 			if (SelectedIndex >= _list.Count)
 				SelectedIndex = 0;
 		}
+
+		// Resize the list to a given size
+		public void Realloc(int size)
+		{
+			DropAll();
+			_list = new List<GameObject>(size);
+		}
+
+		// Resize the list to the settings value
+		public void Realloc()
+		{
+			try
+			{
+				int val = int.Parse(_mod.MaxItems.GetValue().ToString());   // what the fuck
+				Realloc(val);
+			}
+			catch(Exception ex)
+			{
+				ModConsole.Error(ex.Message);
+			}
+		}
 	}
 
 	public class CarryMore : Mod
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Carry more stuff";
-		public override string Version => "1.2.0";
+		public override string Version => "1.2.1";
 		public override string Author => "Wampa842";
 
 		private Keybind _pickUpKey;
@@ -211,6 +232,7 @@ namespace CarryMore
 		private Keybind _dropSelectedKey;
 		private Keybind _toggleGuiKey;
 		public Settings MaxItems;
+		public Settings MaxItemsApply;
 		public Settings SomeLogging;    // Log only pick-up and drop events
 		public Settings FullLogging;    // Log pick-up rejection events
 		public Settings DropIfListVisible;
@@ -234,15 +256,18 @@ namespace CarryMore
 			_toggleGuiKey = new Keybind("ToggleGUI", "Toggle inventory list", KeyCode.X);
 
 			// Add settings
-			MaxItems = new Settings("MaxItems", "Max items", 10, () =>
+			MaxItems = new Settings("MaxItems", "Max items", 10)
 			{
-				Items.DropAll();
-				Items = new ItemList((int)MaxItems.Value, this);
-			});
+				type = SettingsType.Slider
+			};
+			MaxItemsApply = new Settings("MaxItemsApply", "Apply max items", new Action(() =>
+			{
+				Items.Realloc();
+			}));
 			SomeLogging = new Settings("LogSome", "Log pick-up/drop events", true);
 			FullLogging = new Settings("LogEverything", "Log everything", false);
-			DropIfListVisible = new Settings("DropIfListVisible", "Only drop items if the list is visible", false);
-			PickUpIfListVisible = new Settings("PickUpIfListVisible", "Only pick up items if the list is visible", false);
+			DropIfListVisible = new Settings("DropIfListVisible", "Don't drop items if the list is hidden", true);
+			PickUpIfListVisible = new Settings("PickUpIfListVisible", "Don't pick up items if the list is hidden", false);
 
 			// Initialize the item list
 			Items = new ItemList((int)MaxItems.Value, this);
@@ -265,6 +290,7 @@ namespace CarryMore
 		public override void ModSettings()
 		{
 			Settings.AddSlider(this, MaxItems, 1, 50);
+			Settings.AddButton(this, MaxItemsApply, "Drop all items and resize the backpack");
 			Settings.AddCheckBox(this, SomeLogging);
 			Settings.AddCheckBox(this, FullLogging);
 			Settings.AddCheckBox(this, DropIfListVisible);
@@ -284,20 +310,24 @@ namespace CarryMore
 				// Drop everything
 				if (_dropAllKey.IsDown())
 				{
-					Items.DropAll();
+					if (!(bool)DropIfListVisible.Value || _guiVisible)
+						Items.DropAll();
 				}
 
 				// Drop the last thing
 				if (_dropSelectedKey.IsDown())
 				{
-					if (_guiVisible)
-						Items.DropSelected();
-					else
-						Items.DropLast();
+					if (!(bool)DropIfListVisible.Value || _guiVisible)
+					{
+						if (_guiVisible)
+							Items.DropSelected();
+						else
+							Items.DropLast();
+					}
 				}
 
 				// Pick up
-				if (_pickUpKey.IsDown())
+				if (_pickUpKey.IsDown() && (!(bool)PickUpIfListVisible.Value || _guiVisible))
 				{
 					RaycastHit[] raycastHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 1.0f);
 					for (int i = 0; i < raycastHits.Length; ++i)
