@@ -365,7 +365,7 @@ namespace CarryMore
 					for (int i = 0; i < Items.Count; ++i)
 					{
 						float top = Screen.height - _guiPosBottom - (_guiHeight * (Items.Count - i));
-						string name = Items[i].name.Replace("(Clone)", "").Replace("(itemx)", "");
+						string name = Items[i].name.Replace("(Clone)", "").Replace("(itemx)", "").Replace("(xxxxx)", "");
 						if (i == Items.SelectedIndex)
 							GUI.Label(new Rect(_guiPosLeft - 20.0f, top, 20.0f, _guiHeight), ">");
 						GUI.Label(new Rect(_guiPosLeft, top, Screen.width, _guiHeight), name);
