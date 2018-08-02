@@ -115,7 +115,7 @@ namespace AlivieskaGpsServer
 		public override string ID => "AlivieskaGpsServer";
 		public override string Name => "Alivieska GPS server";
 		public override string Author => "Wampa842";
-		public override string Version => "1.1.2";
+		public override string Version => "1.0.0";
 		public override bool UseAssetsFolder => false;
 
 		private string _serverConfigPath;

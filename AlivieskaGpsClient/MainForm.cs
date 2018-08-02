@@ -29,7 +29,9 @@ namespace AlivieskaGpsClient
 	public partial class MainForm : Form
 	{
 		private readonly string _locationsPath = "resources\\locations.csv";    // A CSV file containing points of interest
+		private readonly string _locationsCustomPath = "resources\\locations_custom.csv";   // A CSV file containing points of interest that the player marked
 		private readonly string _hazardsPath = "resources\\hazards.csv";        // A CSV file containing information about road hazards
+		private readonly string _hazardsCustomPath = "resources\\hazards_custom.csv";        // A CSV file containing information about road hazards that the player marked
 		private readonly string _mapImagePath = "resources\\map.png";           // The map background image file
 		private Bitmap _baseImage = null;                           // The image to display on the form
 		private Point _imageCenter;                                 // The center coordinates of the image
