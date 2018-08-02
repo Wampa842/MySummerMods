@@ -116,7 +116,7 @@ namespace AlivieskaGpsServer
 		public override string ID => "AlivieskaGpsServer";
 		public override string Name => "Alivieska GPS server";
 		public override string Author => "Wampa842";
-		public override string Version => "1.0.1";
+		public override string Version => "1.0.2";
 		public override bool UseAssetsFolder => false;
 
 		private string _serverConfigPath;
@@ -145,10 +145,10 @@ namespace AlivieskaGpsServer
 							switch (tok[0])
 							{
 								case "port":
-									int.TryParse(tok[1], out _port);
+									int.TryParse(tok[1], NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out _port);
 									break;
 								case "autostart":
-									bool.TryParse(tok[1], out _autoStart);
+									bool.TryParse(tok[1].Trim().ToLowerInvariant(), out _autoStart);
 									break;
 								case "output":
 									_outputJson = tok[1].Trim().ToLowerInvariant() == "json";
@@ -166,7 +166,7 @@ namespace AlivieskaGpsServer
 		{
 			using (StreamWriter writer = new StreamWriter(_serverConfigPath))
 			{
-				writer.WriteLine("port " + _port.ToString());
+				writer.WriteLine("port " + _port.ToString(NumberFormatInfo.InvariantInfo));
 				writer.WriteLine("autostart " + _autoStart.ToString().ToLowerInvariant());
 				writer.WriteLine("output " + (_outputJson ? "json" : "xml"));
 			}
@@ -341,7 +341,7 @@ namespace AlivieskaGpsServer
 					int p;
 					if ((p = Array.IndexOf(args, "-p")) >= 0 || (p = Array.IndexOf(args, "--port")) >= 0)
 					{
-						if (args.Length >= p + 1 && int.TryParse(args[p + 1], out int portNumber) && portNumber <= 65535 && portNumber >= 1024)
+						if (args.Length >= p + 1 && int.TryParse(args[p + 1], out int portNumber) && portNumber <= 65535 && portNumber >= 1)
 						{
 							_mod._port = portNumber;
 						}
