@@ -237,7 +237,7 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Carry more stuff";
-		public override string Version => "1.3.0-beta-1";
+		public override string Version => "1.3.0";
 		public override string Author => "Wampa842";
 
 		public readonly string SaveFilePath;
@@ -329,7 +329,7 @@ namespace CarryMore
 						{
 							// If they're found, see if there are any within the region where they're stored while in the backpack
 							if ((bool)FullLogging.Value) ModConsole.Print($"{o.name} is at {o.transform.position.x}, {o.transform.position.y}, {o.transform.position.z}");
-							if (o.transform.position.y <= (TempPosition.y + 100.0f) && (o.transform.position.x - TempPosition.x < 10.0f) && (o.transform.position.z - TempPosition.z < 100.0f) && !Items.Contains(o))
+							if (o.transform.position.y <= (TempPosition.y + 100.0f) && (Mathf.Abs(o.transform.position.x - TempPosition.x) < 10.0f) && (Mathf.Abs(o.transform.position.z - TempPosition.z) < 100.0f) && !Items.Contains(o))
 							{
 								Items.PickUp(o);
 							}
