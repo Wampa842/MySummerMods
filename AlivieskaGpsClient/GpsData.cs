@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
 using System.Xml;
+using System.Globalization;
 
 namespace AlivieskaGpsClient
 {
@@ -26,7 +27,7 @@ namespace AlivieskaGpsClient
 	public class GpsData
 	{
 		private readonly MainForm _form;
-
+		
 		public Size Size = new Size(4200, 3350);
 		public PointF Center = new PointF(-0.0585f, 0.041f);
 
@@ -72,11 +73,11 @@ namespace AlivieskaGpsClient
 			{
 				ResponseString = await response.Content.ReadAsStringAsync();
 				_doc.LoadXml(ResponseString);
-				float.TryParse(_doc.DocumentElement["X"].InnerText.Trim(), out X);
-				float.TryParse(_doc.DocumentElement["Y"].InnerText.Trim(), out Y);
-				float.TryParse(_doc.DocumentElement["Z"].InnerText.Trim(), out Z);
-				float.TryParse(_doc.DocumentElement["Heading"].InnerText.Trim(), out Heading);
-				float.TryParse(_doc.DocumentElement["Speed"].InnerText.Trim(), out Speed);
+				float.TryParse(_doc.DocumentElement["X"].InnerText.Trim(), NumberStyles.Float, NumberFormatInfo.InvariantInfo, out X);
+				float.TryParse(_doc.DocumentElement["Y"].InnerText.Trim(), NumberStyles.Float, NumberFormatInfo.InvariantInfo, out Y);
+				float.TryParse(_doc.DocumentElement["Z"].InnerText.Trim(), NumberStyles.Float, NumberFormatInfo.InvariantInfo, out Z);
+				float.TryParse(_doc.DocumentElement["Heading"].InnerText.Trim(), NumberStyles.Float, NumberFormatInfo.InvariantInfo, out Heading);
+				float.TryParse(_doc.DocumentElement["Speed"].InnerText.Trim(), NumberStyles.Float, NumberFormatInfo.InvariantInfo, out Speed);
 			}
 			_form.UpdateGpsData();
 		}

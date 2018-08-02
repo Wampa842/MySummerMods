@@ -24,6 +24,7 @@ using System.Text;
 using System.IO;
 using System.Collections.Generic;
 using System.Xml;
+using System.Globalization;
 
 namespace AlivieskaGpsServer
 {
@@ -115,7 +116,7 @@ namespace AlivieskaGpsServer
 		public override string ID => "AlivieskaGpsServer";
 		public override string Name => "Alivieska GPS server";
 		public override string Author => "Wampa842";
-		public override string Version => "1.0.0";
+		public override string Version => "1.0.1";
 		public override bool UseAssetsFolder => false;
 
 		private string _serverConfigPath;
@@ -191,27 +192,27 @@ namespace AlivieskaGpsServer
 
 			XmlElement node;
 			node = doc.CreateElement("X");
-			node.InnerText = _car.transform.position.x.ToString();
+			node.InnerText = _car.transform.position.x.ToString(CultureInfo.InvariantCulture);
 			doc.DocumentElement.AppendChild(node);
 
 			node = doc.CreateElement("Y");
-			node.InnerText = _car.transform.position.y.ToString();
+			node.InnerText = _car.transform.position.y.ToString(CultureInfo.InvariantCulture);
 			doc.DocumentElement.AppendChild(node);
 
 			node = doc.CreateElement("Z");
-			node.InnerText = _car.transform.position.z.ToString();
+			node.InnerText = _car.transform.position.z.ToString(CultureInfo.InvariantCulture);
 			doc.DocumentElement.AppendChild(node);
 
 			node = doc.CreateElement("Heading");
-			node.InnerText = _car.transform.eulerAngles.y.ToString();
+			node.InnerText = _car.transform.eulerAngles.y.ToString(CultureInfo.InvariantCulture);
 			doc.DocumentElement.AppendChild(node);
 
 			node = doc.CreateElement("Speed");
-			node.InnerText = FsmVariables.GlobalVariables.FindFsmFloat("SpeedKMH").Value.ToString();
+			node.InnerText = FsmVariables.GlobalVariables.FindFsmFloat("SpeedKMH").Value.ToString(CultureInfo.InvariantCulture);
 			doc.DocumentElement.AppendChild(node);
 
 			node = doc.CreateElement("Time");
-			node.InnerText = FsmVariables.GlobalVariables.FindFsmFloat("GlobalTime").Value.ToString();
+			node.InnerText = FsmVariables.GlobalVariables.FindFsmFloat("GlobalTime").Value.ToString(CultureInfo.InvariantCulture);
 			doc.DocumentElement.AppendChild(node);
 
 			return doc.OuterXml;
