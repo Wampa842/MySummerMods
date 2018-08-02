@@ -59,7 +59,7 @@ namespace ListGameObjects
 
 					foreach (GameObject o in GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[])
 					{
-						writer.WriteLine($"\"{o.name}\",\"{o.tag}\",{o.layer}");
+						writer.WriteLine($"\"{o.name}\",\"{o.tag}\",{o.layer},\"{(o.transform.parent == null ? "NULL" : o.transform.parent.gameObject.name)}\",\"{(o.transform.parent == null ? "NULL" : o.transform.parent.name)}\"");
 					}
 				}
 				catch (IOException ex)

@@ -48,7 +48,8 @@ namespace WhatIsThis
 					ModConsole.Print("\n--- What is this? ---");
 					for(int i = 0; i < hits.Length; ++i)
 					{
-						ModConsole.Print(hits[i].transform.gameObject.name);
+						GameObject o = hits[i].transform.gameObject;
+						ModConsole.Print($"{o.name}, {o.layer}, {o.tag}, {o.transform.parent.name}");
 					}
 				}
 			}
