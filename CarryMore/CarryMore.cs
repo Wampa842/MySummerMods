@@ -28,9 +28,12 @@ namespace CarryMore
 {
 	public class ItemList
 	{
-		public static string[] Blacklist = new string[]
+		public static readonly string[] Blacklist = new string[]
 		{
-			"JONNEZ ES(Clone)"
+			"JONNEZ ES(Clone)",
+			"doorl",
+			"doorr",
+			"doorear"
 		};
 
 		private List<GameObject> _list;
@@ -237,7 +240,7 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Carry more stuff";
-		public override string Version => "1.3.0";
+		public override string Version => "1.3.1";
 		public override string Author => "Wampa842";
 
 		public readonly string SaveFilePath;
