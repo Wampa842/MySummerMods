@@ -56,6 +56,7 @@ namespace ListGameObjects
 				try
 				{
 					writer = new StreamWriter(objectPath);
+					writer.WriteLine($"\"name\",\"tag\",\"layer\",\"parent\",\"parent-transform\"");
 
 					foreach (GameObject o in GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[])
 					{
