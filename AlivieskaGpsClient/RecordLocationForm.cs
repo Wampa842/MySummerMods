@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -68,9 +69,9 @@ namespace AlivieskaGpsClient
 				MessageBox.Show($"The identifier '{poiIDText.Text}' already exists.");
 				return;
 			}
-			using (StreamWriter writer = new StreamWriter(_poiOutPath, true))
+			using (StreamWriter writer = new StreamWriter(_poiOutPath, true, new UTF8Encoding(false)))
 			{
-				writer.WriteLine($"\"{id}\";{poiTypeSelect.SelectedIndex};\"{poiNameText.Text.Trim()}\";{_poiPos.X};{_poiPos.Y}");
+				writer.WriteLine($"\"{id}\";{poiTypeSelect.SelectedIndex.ToString(NumberFormatInfo.InvariantInfo)};\"{poiNameText.Text.Trim()}\";{_poiPos.X.ToString(NumberFormatInfo.InvariantInfo)};{_poiPos.Y.ToString(NumberFormatInfo.InvariantInfo)}");
 			}
 		}
 
@@ -84,9 +85,9 @@ namespace AlivieskaGpsClient
 				MessageBox.Show($"The identifier '{hazardIDText.Text}' already exists.");
 				return;
 			}
-			using (StreamWriter writer = new StreamWriter(_hazardOutPath, true))
+			using (StreamWriter writer = new StreamWriter(_hazardOutPath, true, new UTF8Encoding(false)))
 			{
-				writer.WriteLine($"\"{id}\";{hazardTypeSelect.SelectedIndex};\"{hazardNameText.Text.Trim()}\";\"{hazardDescriptionText.Text.Trim()}\";{_hazardPos.X};{_hazardPos.Y}");
+				writer.WriteLine($"\"{id}\";{hazardTypeSelect.SelectedIndex.ToString(NumberFormatInfo.InvariantInfo)};\"{hazardNameText.Text.Trim()}\";\"{hazardDescriptionText.Text.Trim()}\";{_hazardPos.X.ToString(NumberFormatInfo.InvariantInfo)};{_hazardPos.Y.ToString(NumberFormatInfo.InvariantInfo)}");
 			}
 		}
 

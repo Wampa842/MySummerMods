@@ -15,6 +15,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -237,7 +238,7 @@ namespace AlivieskaGpsClient
 				while(!parser.EndOfData)
 				{
 					string[] tok = parser.ReadFields();
-					set.Add(new PointOfInterest(tok[0].Trim(), tok[2].Trim(), new PointF(float.Parse(tok[3]), float.Parse(tok[4])), CircleStyle.Presets[int.Parse(tok[1])], (PointOfInterestType)int.Parse(tok[1])));
+					set.Add(new PointOfInterest(tok[0].Trim(), tok[2].Trim(), new PointF(float.Parse(tok[3], NumberStyles.Float, NumberFormatInfo.InvariantInfo), float.Parse(tok[4], NumberStyles.Float, NumberFormatInfo.InvariantInfo)), CircleStyle.Presets[int.Parse(tok[1], NumberStyles.Integer, NumberFormatInfo.InvariantInfo)], (PointOfInterestType)int.Parse(tok[1], NumberStyles.Integer, NumberFormatInfo.InvariantInfo)));
 				}
 				return set;
 			}
@@ -328,7 +329,7 @@ namespace AlivieskaGpsClient
 				while(!parser.EndOfData)
 				{
 					string[] tok = parser.ReadFields();
-					set.Add(new RoadHazard(tok[0].Trim(), tok[2].Trim(), tok[3].Trim(), new PointF(float.Parse(tok[4]), float.Parse(tok[5])), (RoadHazardType)int.Parse(tok[1])));
+					set.Add(new RoadHazard(tok[0].Trim(), tok[2].Trim(), tok[3].Trim(), new PointF(float.Parse(tok[4], NumberStyles.Float, NumberFormatInfo.InvariantInfo), float.Parse(tok[5], NumberStyles.Float, NumberFormatInfo.InvariantInfo)), (RoadHazardType)int.Parse(tok[1], NumberStyles.Integer, NumberFormatInfo.InvariantInfo)));
 				}
 				return set;
 			}
