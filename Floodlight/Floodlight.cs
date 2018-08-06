@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+Copyright (C) 2018 Wampa842
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+using System;
 using MSCLoader;
 using UnityEngine;
 using HutongGames.PlayMaker;
@@ -10,12 +26,62 @@ using System.Collections.Generic;
 
 namespace Floodlight
 {
+
 	public class Floodlight : Mod
 	{
+		public class FloodlightCommand : ConsoleCommand
+		{
+			public override string Name => "fl";
+			public override string Help => "Floodlight debug options";
+			public Floodlight Mod;
+
+			public FloodlightCommand(Floodlight mod)
+			{
+				Mod = mod;
+			}
+
+			public override void Run(string[] args)
+			{
+				if (args.Length < 1)
+					return;
+
+				if (args[0] == "flicker")
+				{
+					if (args.Length == 2)
+					{
+						Mod._flickerTimer = float.Parse(args[1]);
+						Mod._flickerLength = 1.0f;
+					}
+					else if (args.Length == 3)
+					{
+						Mod._flickerTimer = float.Parse(args[1]);
+						Mod._flickerLength = float.Parse(args[2]);
+					}
+					else
+					{
+						ModConsole.Print($"Timer: {Mod._flickerTimer.ToString("0")}, length: {Mod._flickerLength.ToString("0")}");
+					}
+				}
+
+				if(args[0] == "health")
+				{
+					if(args.Length == 2)
+					{
+						Mod._bulbHealth = int.Parse(args[1]);
+					}
+					else
+					{
+						ModConsole.Print($"Bulb health: {Mod._bulbHealth}");
+					}
+				}
+			}
+		}
+
 		public class SaveData
 		{
 			public float PosX, PosY, PosZ, RotX, RotY, RotZ, RotW, Pitch;
-			public bool On, Broken;
+			public bool On = false;
+			public int BulbHealth = 1;
 			public Vector3 Pos
 			{
 				get
@@ -96,18 +162,26 @@ namespace Floodlight
 
 		public Settings UseBattery;         // Require charged battery
 		public Settings EnableFlicker;      // Enable periodic flickering (epileptics may want to disable it)
+		public Settings Unbreakable;		// Lightbulb never breaks
 
 		private readonly string _savePath;  // Path to floodlight.xml
 
-		private readonly Vector3 _defaultPos = new Vector3(-16.2f, 4.0f, 11.0f);    // Position in case the save file can't be loaded
-		private Color _lightColor = new Color(0.9f, 0.9f, 1.0f);    // The color of the light and the emissive color of the glass
 		private bool _on = false;                                   // Whether the light is currently on
+		private int _bulbHealth = 1;                                // The health of a new bulb
 		private float _pitch = 0.0f;                                // The lamp's angle
-		private const float _baseIntensity = 2.0f;                  // The light's maximal intensity
 		private float _intensity = 1.0f;                            // Light intensity multiplier
+		private float _bulbCost = 300.0f;                           // The cost of replacing a busted lightbulb
+		private const float _baseIntensity = 2.0f;                  // The light's maximal intensity
 		private const float _dimStartCharge = 50.0f;                // Charge level at which the light starts to dim
 		private const float _turnOffCharge = 30.0f;                 // Charge level at which the light turns off
-		private const float _dischargeRate = 0.1f;					// Battery energy consumption per second
+		private const float _dischargeRate = 0.1f;                  // Battery energy consumption per second
+		private string _bulbText => $"replace lightbulb ({_bulbCost.ToString("0")} mk)";
+
+		private readonly Vector3 _defaultPos = new Vector3(-16.2f, 4.0f, 11.0f);            // Position in case the save file can't be loaded
+		private readonly Vector3 _teimoPos = new Vector3(-1548.23f, 4.644f, 1179.85f);      // New lightbulb's position at Teimo's
+		private readonly Vector3 _fleetariPos = new Vector3(1553.51f, 5.475f, 740.57f);     // New lightbulb's position at Fleetari's
+
+		private Color _lightColor = new Color(0.9f, 0.9f, 1.0f);    // The color of the light and the emissive color of the glass
 
 		private float _flickerTimer;                // The time in seconds until the next flicker event
 		private float _flickerMultiplier = 1.0f;    // Flicker dimming
@@ -119,10 +193,12 @@ namespace Floodlight
 		private GameObject _switch;         // Indicator light
 		private GameObject _battery;        // Connected battery
 		private FsmFloat _batteryCharge;    // The charge level of the connected battery
-		private MeshCollider _lampCollider; // The collider of the tiltable lamp that is detected by raycast
 		private Material _glassMaterial;    // Luminous white textured
 		private Material _switchMaterial;   // Luminous red
 		private Light _light;               // The actual light emitter
+		private MeshCollider _lampCollider; // The collider of the tiltable lamp that is detected by raycast
+		private MeshCollider _boxColliderTeimo; // Collider of the lightbulb box at Teimo's
+		private MeshCollider _boxColliderFleetari;  // Same at Fleetari's
 
 		private FloodlightAudio _audio;     // Audio sources
 
@@ -132,13 +208,14 @@ namespace Floodlight
 			_audio = new FloodlightAudio();
 			UseBattery = new Settings("UseBattery", "Consume battery power", true);
 			EnableFlicker = new Settings("EnableFlicker", "Periodic flickering (EPILEPSY WARNING)", true);
+			Unbreakable = new Settings("UnbreakableBulb", "Lightbulb never breaks", false);
 		}
 
 		private void _flicker(float time)
 		{
 			_flickerTimer -= Time.deltaTime;
 			bool isFlickering = time < _flickerLength && time >= 0.0f;
-			if (isFlickering)
+			if (isFlickering && !(bool)Unbreakable.GetValue())
 			{
 				_flickerMultiplier = UnityEngine.Random.Range(0.5f, 1.0f);
 				_audio.HumLoop.volume = _flickerMultiplier;
@@ -149,7 +226,15 @@ namespace Floodlight
 				_audio.HumLoop.volume = 0.3f;
 				_flickerTimer = UnityEngine.Random.Range(20.0f, 60.0f);
 				_flickerLength = UnityEngine.Random.Range(0.5f, 3.0f);
-				ModConsole.Print($"Floodlight: selected new flicker timing: {_flickerTimer.ToString("0.0")} delay, {_flickerLength.ToString("0.0")} length");
+				if((bool)Unbreakable.GetValue())
+				{
+					_bulbHealth = 100;
+				}
+				else
+				{
+					--_bulbHealth;
+				}
+				ModConsole.Print($"Floodlight: selected new flicker timing: {_flickerTimer.ToString("0.0")} delay, {_flickerLength.ToString("0.0")} length, {_bulbHealth} health");
 			}
 		}
 
@@ -189,7 +274,7 @@ namespace Floodlight
 						if (_batteryIsInstalled(o))
 							continue;
 						_battery = o;
-						ModConsole.Print("Floodlight: battery found");
+						ModConsole.Print($"Floodlight: battery found, {o.GetComponents<PlayMakerFSM>().Single(c => c.FsmName == "Use").FsmVariables.FindFsmFloat("Charge").Value.ToString("0.00")} charge");
 					}
 				}
 				if (_battery == null)
@@ -287,8 +372,44 @@ namespace Floodlight
 			}
 		}
 
+		private void _initLight()
+		{
+
+		}
+
+		private void _initShopStuff()
+		{
+			// Load the lightbulb box
+			GameObject original = LoadAssets.LoadOBJ(this, "model\\box.obj", false, false);
+			original.name = "new_lightbulb";
+			original.GetComponent<MeshRenderer>().material.mainTexture = LoadAssets.LoadTexture(this, "model\\box_d.png");
+			AudioSource audio = original.AddComponent<AudioSource>();
+			audio.clip = GameObject.Find("cash_register_2").GetComponent<AudioSource>().clip;
+			audio.transform.parent = original.transform;
+			audio.spatialBlend = 1.0f;
+			audio.maxDistance = 10.0f;
+
+			GameObject fBox = GameObject.Instantiate<GameObject>(original);
+
+			original.transform.position = _teimoPos;
+			original.transform.rotation = Quaternion.Euler(0.0f, 180.0f, 0.0f);
+			MeshCollider coll = original.AddComponent<MeshCollider>();
+			coll.name = "replace lightbulb (300mk)(Clone)";
+			coll.convex = true;
+			coll.isTrigger = true;
+			_boxColliderTeimo = coll;
+
+			fBox.transform.position = _fleetariPos;
+			coll = fBox.AddComponent<MeshCollider>();
+			coll.name = "replace lightbulb (300mk)(Clone)";
+			coll.convex = true;
+			coll.isTrigger = true;
+			_boxColliderFleetari = coll;
+		}
+
 		public override void OnLoad()
 		{
+			ConsoleCommand.Add(new FloodlightCommand(this));
 			ModConsole.Print("loading floodlight...");
 
 			SaveData saveData;
@@ -303,12 +424,14 @@ namespace Floodlight
 					Pos = _defaultPos,
 					Rot = new Quaternion(),
 					Pitch = 0.0f,
-					On = false
+					On = false,
+					BulbHealth = 1
 				};
 			}
 
 			_pitch = saveData.Pitch;
 			_on = saveData.On;
+			_bulbHealth = saveData.BulbHealth;
 
 			MeshCollider coll;
 			MeshRenderer renderer;
@@ -379,6 +502,7 @@ namespace Floodlight
 			_light.enabled = false;
 
 			// Sounds
+			// TODO: make loading asynchronous?
 			try
 			{
 				WWW load = new WWW("file:///" + Path.Combine(ModLoader.GetModAssetsFolder(this), _audio.SwitchOnFile));
@@ -414,12 +538,23 @@ namespace Floodlight
 				_audio.Disconnect.transform.parent = _lamp.transform;
 				_audio.Disconnect.spatialBlend = 1.0f;
 				_audio.Disconnect.maxDistance = 10.0f;
+
+				load = new WWW("file:///" + Path.Combine(ModLoader.GetModAssetsFolder(this), _audio.BreakFile));
+				while (!load.isDone) ;
+				_audio.Break = _lamp.AddComponent<AudioSource>();
+				_audio.Break.clip = load.GetAudioClip(true);
+				_audio.Break.transform.parent = _lamp.transform;
+				_audio.Break.spatialBlend = 1.0f;
+				_audio.Break.maxDistance = 30.0f;
 			}
 			catch (Exception ex)
 			{
 				ModConsole.Error(ex.ToString());
 			}
 			ModConsole.Print("floodlight loaded");
+
+			_initShopStuff();
+			_flickerTimer = UnityEngine.Random.Range(20.0f, 60.0f);
 
 			_switchLight(false);
 		}
@@ -437,6 +572,7 @@ namespace Floodlight
 		{
 			Settings.AddCheckBox(this, UseBattery);
 			Settings.AddCheckBox(this, EnableFlicker);
+			Settings.AddCheckBox(this, Unbreakable);
 		}
 
 		public override void Update()
@@ -485,6 +621,37 @@ namespace Floodlight
 							_pitch = 10.0f;
 						_lamp.transform.localEulerAngles = new Vector3(_pitch, 0.0f, 0.0f);
 					}
+
+					break;
+				}
+				else if (hits[i].collider == _boxColliderTeimo || hits[i].collider == _boxColliderFleetari)
+				{
+					PlayMakerGlobals.Instance.Variables.FindFsmBool("GUIbuy").Value = true;
+					PlayMakerGlobals.Instance.Variables.FindFsmString("GUIinteraction").Value = _bulbText;
+					if (Input.GetKeyDown(KeyCode.Mouse0))
+					{
+						if (_bulbHealth <= 0)
+						{
+							FsmFloat wealth = PlayMakerGlobals.Instance.Variables.FindFsmFloat("PlayerMoney");
+							if (wealth.Value >= _bulbCost)
+							{
+								wealth.Value -= _bulbCost;
+								hits[i].collider.transform.gameObject.GetComponent<AudioSource>().Play();
+								_bulbHealth = UnityEngine.Random.Range(60, 100);
+								ModConsole.Print($"Floodlight: lightbulb replaced, {_bulbHealth} health");
+							}
+							else
+							{
+								ModConsole.Print($"Floodlight: not enough money ({wealth.Value.ToString("0")} wealth, {_bulbCost.ToString("0")} cost)");
+							}
+						}
+						else
+						{
+							ModConsole.Print($"Floodlight: lightbulb is not broken ({_bulbHealth} health)");
+						}
+					}
+
+					break;
 				}
 				else
 				{
@@ -492,13 +659,19 @@ namespace Floodlight
 				}
 			}
 
-			// Battery
+			// Conditions to switch off
 			if (_on)
 			{
 				if (!_checkBattery(true))
 					_switchLight(false);
+				if(_bulbHealth <= 0)
+				{
+					if(_bulbHealth == 0)
+						_audio.Break.Play();
+					--_bulbHealth;
+					_switchLight(false);
+				}
 			}
 		}
 	}
 }
-
