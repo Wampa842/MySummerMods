@@ -168,27 +168,27 @@ namespace Floodlight
 		public override string ID => "Floodlight";
 		public override string Name => "Floodlight";
 		public override string Author => "Wampa842";
-		public override string Version => "1.0.0-RC2";
+		public override string Version => "1.0.0";
 		public override bool UseAssetsFolder => true;
 
-		public Settings UseBattery;         // Require charged battery
-		public Settings EnableFlicker;      // Enable periodic flickering (epileptics may want to disable it)
-		public Settings Unbreakable;        // Lightbulb never breaks
+		public Settings UseBattery;									// Require charged battery
+		public Settings EnableFlicker;								// Enable periodic flickering (epileptics may want to disable it)
+		public Settings Unbreakable;								// Lightbulb never breaks
 
-		private readonly string _savePath;  // Path to floodlight.xml
+		private readonly string _savePath;							// Path to floodlight.xml
 
-		private bool _on = false;                                   // Whether the light is currently on
-		private int _bulbHealth = 1;                                // The health of a new bulb
-		private float _pitch = 0.0f;                                // The lamp's angle
-		private float _intensity = 1.0f;                            // Light intensity multiplier
-		private float _bulbCost = 300.0f;                           // The cost of replacing a busted lightbulb
-		private const float _baseIntensity = 2.0f;                  // The light's maximal intensity
-		private const float _dimStartCharge = 50.0f;                // Charge level at which the light starts to dim
-		private const float _turnOffCharge = 30.0f;                 // Charge level at which the light turns off
-		private const float _dischargeRate = 0.1f;                  // Battery energy consumption per second
+		private bool _on = false;                       // Whether the light is currently on
+		private int _bulbHealth = 30;                   // The health of a new bulb
+		private float _pitch = 0.0f;                    // The lamp's angle
+		private float _intensity = 1.0f;                // Light intensity multiplier
+		private float _bulbCost = 300.0f;               // The cost of replacing a busted lightbulb
+		private const float _baseIntensity = 2.0f;      // The light's maximal intensity
+		private const float _dimStartCharge = 50.0f;	// Charge level at which the light starts to dim
+		private const float _turnOffCharge = 30.0f;		// Charge level at which the light turns off
+		private const float _dischargeRate = 0.1f;		// Battery energy consumption per second
 		private string _bulbText => $"replace lightbulb ({_bulbCost.ToString("0")} mk)";
 
-		private readonly Vector3 _defaultPos = new Vector3(-16.2f, 4.0f, 11.0f);            // Position in case the save file can't be loaded
+		private readonly Vector3 _defaultPos = new Vector3(-13.673f, 0.4f, 3.741f);            // Position in case the save file can't be loaded
 		private readonly Vector3 _teimoPos = new Vector3(-1548.23f, 4.644f, 1179.85f);      // New lightbulb's position at Teimo's
 		private readonly Vector3 _fleetariPos = new Vector3(1553.51f, 5.475f, 740.57f);     // New lightbulb's position at Fleetari's
 
@@ -226,7 +226,7 @@ namespace Floodlight
 		private void _flicker(float time)
 		{
 			_flickerTimer -= Time.deltaTime;
-			bool isFlickering = time < _flickerLength && time >= 0.0f;
+			bool isFlickering = time < (_bulbHealth <= 1 ? _flickerLength + 2.0f : _flickerLength) && time >= 0.0f;
 			if (isFlickering && !(bool)Unbreakable.GetValue())
 			{
 				_flickerMultiplier = UnityEngine.Random.Range(0.5f, 1.0f);
@@ -448,8 +448,8 @@ namespace Floodlight
 			_light.type = LightType.Spot;
 			_light.color = _lightColor;
 			_light.intensity = _baseIntensity;
-			_light.range = 15.0f;
-			_light.spotAngle = 75.0f;
+			_light.range = 20.0f;
+			_light.spotAngle = 80.0f;
 			_light.transform.localEulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
 			_light.renderMode = LightRenderMode.ForceVertex;
 			_light.enabled = false;
@@ -629,7 +629,7 @@ namespace Floodlight
 					Rot = new Quaternion(),
 					Pitch = 0.0f,
 					On = false,
-					BulbHealth = 1
+					BulbHealth = 60
 				};
 			}
 
@@ -644,6 +644,7 @@ namespace Floodlight
 			_pitch = saveData.Pitch;
 			_bulbHealth = saveData.BulbHealth;
 			_flickerTimer = UnityEngine.Random.Range(20.0f, 60.0f);
+			_flickerLength = UnityEngine.Random.Range(1.0f, 3.0f);
 
 			_switchLight(saveData.On);
 			_lamp.transform.localRotation = Quaternion.Euler(_pitch, 0.0f, 0.0f);
