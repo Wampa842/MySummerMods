@@ -244,6 +244,7 @@ namespace CarryMore
 		public override string Author => "Wampa842";
 
 		public readonly string SaveFilePath;
+		private bool _hasLoaded = false;
 
 		public static readonly Vector3 TempPosition = new Vector3(0.0f, -1000.0f, 0.0f);    // The place where objects are moved when they're "in" the backpack
 
@@ -253,8 +254,8 @@ namespace CarryMore
 		private Keybind _toggleGuiKey;
 		public Settings MaxItems;
 		public Settings MaxItemsApply;
-		public Settings SomeLogging;    // Log only pick-up and drop events
-		public Settings FullLogging;    // Log pick-up rejection events
+		public Settings SomeLogging;			// Log only pick-up and drop events
+		public Settings FullLogging;			// Log pick-up rejection events
 		public Settings DropIfListVisible;
 		public Settings PickUpIfListVisible;
 		public Settings EnableSaving;
@@ -267,9 +268,55 @@ namespace CarryMore
 
 		public ItemList Items;
 
+		private void _save()
+		{
+			XmlDocument doc = new XmlDocument();
+			doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
+			XmlElement root = doc.CreateElement("CarryMore");
+			doc.AppendChild(root);
+
+			XmlElement node;
+
+			for (int i = 0; i < Items.Count; ++i)
+			{
+				GameObject item = Items[i];
+
+				// Determine if the item has a unique ID
+				string id = null;
+				foreach(var fsm in item.GetComponents<PlayMakerFSM>())
+				{
+					if(fsm.FsmName == "Use")
+					{
+						FsmString s = fsm.FsmVariables.FindFsmString("ID");
+						if (s != null)
+							id = s.Value;
+					}
+				}
+
+				node = doc.CreateElement("Item");
+
+				if(id == null)
+				{
+					// Unique parts
+					XmlElement idElement = doc.CreateElement("ID");
+					idElement.AppendChild(doc.CreateTextNode(id));
+					node.AppendChild(idElement);
+				}
+
+				node.AppendChild(doc.CreateTextNode(item.name));
+			}
+
+			doc.Save(SaveFilePath);
+		}
+
+		private void _load()
+		{
+
+		}
+
 		public CarryMore()
 		{
-			SaveFilePath = System.IO.Path.Combine(ModLoader.GetModConfigFolder(this), "SaveData.xml");
+			SaveFilePath = System.IO.Path.Combine(Application.persistentDataPath, "CarryMore.xml");
 
 			// Add keybinds
 			_pickUpKey = new Keybind("PickUp", "Pick up targeted item", KeyCode.E);
@@ -309,41 +356,6 @@ namespace CarryMore
 			Keybind.Add(this, _dropAllKey);
 			Keybind.Add(this, _dropSelectedKey);
 			Keybind.Add(this, _toggleGuiKey);
-
-			// Load save data
-			if ((bool)EnableSaving.Value)
-			{
-				try
-				{
-					GameObject[] objects = GameObject.FindObjectsOfType<GameObject>();
-
-					XmlDocument doc = new XmlDocument();
-					doc.Load(SaveFilePath);
-					XmlElement root = doc.DocumentElement;
-
-					// Loop through child nodes - each one contains a GameObject name
-					foreach (XmlNode n in root.ChildNodes)
-					{
-						// Find objects of that name
-						GameObject[] match = objects.Where(o => o.name == n.InnerText).ToArray();
-						if ((bool)FullLogging.Value) ModConsole.Print(match.Length.ToString() + " matches found for " + n.InnerText);
-
-						foreach (GameObject o in match)
-						{
-							// If they're found, see if there are any within the region where they're stored while in the backpack
-							if ((bool)FullLogging.Value) ModConsole.Print($"{o.name} is at {o.transform.position.x}, {o.transform.position.y}, {o.transform.position.z}");
-							if (o.transform.position.y <= (TempPosition.y + 100.0f) && (Mathf.Abs(o.transform.position.x - TempPosition.x) < 10.0f) && (Mathf.Abs(o.transform.position.z - TempPosition.z) < 100.0f) && !Items.Contains(o))
-							{
-								Items.PickUp(o);
-							}
-						}
-					}
-				}
-				catch (Exception ex)
-				{
-					ModConsole.Error("Error while loading backpack saves:\n" + ex.Message);
-				}
-			}
 		}
 
 		public override void ModSettings()
@@ -361,27 +373,7 @@ namespace CarryMore
 		{
 			if((bool)EnableSaving.Value)
 			{
-				if ((bool)SomeLogging.Value || (bool)FullLogging.Value) ModConsole.Print("Saving backpack contents...");
-
-				// Save item names to XML
-				XmlDocument doc = new XmlDocument();
-				doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
-				XmlElement root = doc.CreateElement("CarryMoreSave");
-				doc.AppendChild(root);
-				XmlElement node;
-
-				for (int i = 0; i < Items.Count; ++i)
-				{
-					GameObject item = Items[i];
-					node = doc.CreateElement("BackpackItem");
-					node.AppendChild(doc.CreateTextNode(item.name));
-					root.AppendChild(node);
-
-					item.GetComponent<Rigidbody>().isKinematic = true;
-					item.transform.position = CarryMore.TempPosition;
-				}
-
-				doc.Save(SaveFilePath);
+				_save();
 			}
 			else
 			{
@@ -393,6 +385,9 @@ namespace CarryMore
 		{
 			if (Application.loadedLevelName == "GAME")
 			{
+				// Load backpack contents
+
+
 				// Drop everything
 				if (_dropAllKey.IsDown())
 				{

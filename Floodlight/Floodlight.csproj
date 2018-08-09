@@ -52,6 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Floodlight.cs" />
+    <Compile Include="FloodlightBehaviour.cs" />
+    <Compile Include="FloodlightCommand.cs" />
+    <Compile Include="FloodlightSaveData.cs" />
+    <Compile Include="GameHook.cs" />
+    <Compile Include="LightbulbBoxBehaviour.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
