@@ -200,23 +200,19 @@ namespace Floodlight
 			_light.enabled = _on;
 			_light.intensity = _baseIntensity * _intensityMult;
 
-			_glassMaterial.SetColor("_EmissionColor", _lightColor * 100);
-			_glassMaterial.SetFloat("_EmissionScaleUI", 100.0f);
-
-			_indicatorMaterial.color = Color.red * (_on ? 1.0f : 0.2f);
-			_indicatorMaterial.SetColor("_EmissionColor", Color.red);
-			_indicatorMaterial.SetFloat("_EmissionScaleUI", _on ? 50.0f : 0.0f);
-
-
 			if (_on)
 			{
+				_indicatorMaterial.SetColor("_EmissionColor", Color.red);
+				_indicatorMaterial.SetFloat("_EmissionScaleUI", 100.0f);
+
 				_glassMaterial.EnableKeyword("_EMISSION");
-				_indicatorMaterial.EnableKeyword("_EMISSION");
 			}
 			else
 			{
+				_indicatorMaterial.SetColor("_EmissionColor", Color.red * 0.3f);
+				_indicatorMaterial.SetFloat("_EmissionScaleUI", 20.0f);
+
 				_glassMaterial.DisableKeyword("_EMISSION");
-				_indicatorMaterial.DisableKeyword("_EMISSION");
 			}
 
 			// Sound
@@ -230,13 +226,14 @@ namespace Floodlight
 			}
 		}
 
+		// MonoBehaviour messages
 		void OnCollisionEnter(Collision collision)
 		{
 			GameObject o = collision.gameObject;
 			if (_health <= 0 && o.GetComponent<LightbulbBoxBehaviour>() != null)
 			{
 				_health = UnityEngine.Random.Range(60, 100);
-				ModConsole.Print($"[Flashlight] New lightbulb: {_health}");
+				ModConsole.Print($"[Floodlight] New lightbulb: {_health}");
 				GameObject.Destroy(collision.gameObject);
 			}
 		}
@@ -259,8 +256,18 @@ namespace Floodlight
 
 			_light = _lamp.GetComponent<Light>();
 
-			_glassMaterial = _glass.GetComponent<MeshRenderer>().material;
-			_indicatorMaterial = _indicator.GetComponent<MeshRenderer>().material;
+			_glassMaterial = new Material(Shader.Find("Standard"));
+			_glassMaterial.mainTexture = _base.GetComponent<Renderer>().material.mainTexture;
+			_glassMaterial.SetColor("_EmissionColor", Color.white);
+			_glassMaterial.SetFloat("_EmissionScaleUI", 100.0f);
+			_glass.GetComponent<MeshRenderer>().material = _glassMaterial;
+
+			_indicatorMaterial = new Material(Shader.Find("Standard"));
+			_indicatorMaterial.color = Color.red * 0.3f;
+			_indicatorMaterial.SetColor("_EmissionColor", Color.red * 0.3f);
+			_indicatorMaterial.SetFloat("_EmissionScaleUI", 100.0f);
+			_indicatorMaterial.EnableKeyword("_EMISSION");
+			_indicator.GetComponent<MeshRenderer>().material = _indicatorMaterial;
 
 			_guiUse = PlayMakerGlobals.Instance.Variables.FindFsmBool("GUIuse");
 			_guiText = PlayMakerGlobals.Instance.Variables.FindFsmString("GUIinteraction");
@@ -329,6 +336,7 @@ namespace Floodlight
 			}
 		}
 
+		// Save/load
 		public void Load(FloodlightSaveData saveData)
 		{
 			_base.transform.position = saveData.Pos;
@@ -343,6 +351,7 @@ namespace Floodlight
 			return new FloodlightSaveData(_base.transform.position, _base.transform.rotation, _on, _pitch, _health, new System.Collections.Generic.List<Vector3>(), new System.Collections.Generic.List<Quaternion>());
 		}
 
+		// Access methods for the console command
 		public void SetHealth(int health)
 		{
 			_health = health;
@@ -363,7 +372,7 @@ namespace Floodlight
 			ModConsole.Print(_battery == null ? "Battery is disconnected" : $"Battery is connected, {_batteryCharge.Value.ToString("0.0")} charge");
 			ModConsole.Print($"Light is {(_on ? "on" : "off")}, tilted {(-_pitch).ToString("0")} degrees");
 			ModConsole.Print($"Bulb health is {_health}, costs {LightbulbBoxBehaviour.Price.ToString("0")}");
-			ModConsole.Print($"Flickering after {_flickerTimer}, for {_flickerLength} seconds");
+			ModConsole.Print($"Flickering after {_flickerTimer.ToString("0.0")} sec, for {_flickerLength.ToString("0.0")} sec");
 		}
 	}
 }
