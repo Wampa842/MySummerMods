@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resizer", "Resizer\Resizer.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightSwitchMarkers", "LightSwitchMarkers\LightSwitchMarkers.csproj", "{A3ABDFFB-3AAC-4620-A93F-8B4DA7F1A0FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SleepingPills", "SleepingPills\SleepingPills.csproj", "{1C7944E2-2E02-4373-AEB9-5A3EC49A62FF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{A3ABDFFB-3AAC-4620-A93F-8B4DA7F1A0FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3ABDFFB-3AAC-4620-A93F-8B4DA7F1A0FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3ABDFFB-3AAC-4620-A93F-8B4DA7F1A0FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C7944E2-2E02-4373-AEB9-5A3EC49A62FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C7944E2-2E02-4373-AEB9-5A3EC49A62FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C7944E2-2E02-4373-AEB9-5A3EC49A62FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C7944E2-2E02-4373-AEB9-5A3EC49A62FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
