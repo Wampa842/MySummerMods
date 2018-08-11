@@ -67,7 +67,7 @@ namespace SleepingPills
 		public override string ID => "SleepingPills";
 		public override string Name => "Sleeping pills";
 		public override string Author => "Wampa842";
-		public override string Version => "1.0.0";
+		public override string Version => "1.0.1";
 		public override bool UseAssetsFolder => true;
 
 		private GameObject _bottle;
