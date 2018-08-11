@@ -82,6 +82,9 @@ namespace Floodlight
 
 		void Awake()
 		{
+			Material m = new Material(Shader.Find("Standard"));
+			m.mainTexture = gameObject.GetComponent<Renderer>().material.mainTexture;
+			gameObject.GetComponent<Renderer>().material = m;
 			_guiBuy = PlayMakerGlobals.Instance.Variables.FindFsmBool("GUIbuy");
 			_guiText = PlayMakerGlobals.Instance.Variables.FindFsmString("GUIinteraction");
 			GameHook.InjectStateHook(GameObject.Find("STORE/StoreCashRegister/Register"), "Purchase", () => { _pay(); });

@@ -139,13 +139,16 @@ namespace SleepingPills
 			GameObject original = b.LoadAsset<GameObject>("pill_bottle.prefab");
 			_bottle = GameObject.Instantiate<GameObject>(original);
 			_bottle.name = "sleeping pills";
+			Material m = new Material(Shader.Find("Standard"));
+			m.mainTexture = original.GetComponent<Renderer>().material.mainTexture;
+			_bottle.GetComponent<Renderer>().material = m;
 
 			GameObject.Destroy(original);
 			b.Unload(false);
 
 			// Load save
 			PillSaveData data = PillSaveData.Deserialize<PillSaveData>(PillSaveData.SavePath);
-			for(int i = 0; i < data.Pos.Count; ++i)
+			for (int i = 0; i < data.Pos.Count; ++i)
 			{
 				GameObject pills = GameObject.Instantiate<GameObject>(_bottle);
 				pills.transform.position = data.Pos[i];

@@ -256,6 +256,12 @@ namespace Floodlight
 
 			_light = _lamp.GetComponent<Light>();
 
+			// Materials
+			Material m = new Material(Shader.Find("Standard"));
+			m.mainTexture = _base.GetComponent<Renderer>().material.mainTexture;
+			_base.GetComponent<Renderer>().material = m;
+			_lamp.GetComponent<Renderer>().material = m;
+
 			_glassMaterial = new Material(Shader.Find("Standard"));
 			_glassMaterial.mainTexture = _base.GetComponent<Renderer>().material.mainTexture;
 			_glassMaterial.SetColor("_EmissionColor", Color.white);
