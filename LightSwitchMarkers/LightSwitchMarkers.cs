@@ -32,7 +32,7 @@ namespace LightSwitchMarkers
 		public override bool UseAssetsFolder => false;
 		public static Vector3 Offset => new Vector3(0.0f, 0.02f, 0.05f);
 		public static Vector3 Size => new Vector3(0.05f, 0.01f, 0.005f);
-		public static Color Emissive => new Color(0.0f, 1.0f, 0.5f);
+		public static Color Emissive => new Color(0.0f, 1.0f, 0.4f);
 
 		public override void OnLoad()
 		{
@@ -54,6 +54,7 @@ namespace LightSwitchMarkers
 				Transform p = parent.GetChild(i);
 				GameObject clone = GameObject.Instantiate<GameObject>(orig);
 				clone.transform.parent = p;
+				clone.transform.localRotation = new Quaternion();
 				clone.transform.localPosition = Offset;
 				clone.transform.localScale = Size;
 			}
