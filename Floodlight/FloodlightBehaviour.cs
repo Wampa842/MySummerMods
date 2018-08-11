@@ -283,41 +283,37 @@ namespace Floodlight
 			float scroll = Input.GetAxis("Mouse ScrollWheel");
 
 			// Interaction
-			RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
-			for (int i = 0; i < hits.Length; ++i)
+			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 2.0f);
+			if(hit.collider == _lampCollider)
 			{
-				if (hits[i].collider == _lampCollider)
-				{
-					_guiUse.Value = true;
-					_guiText.Value = _on ? "Light on" : "Light off";
+				_guiUse.Value = true;
+				_guiText.Value = _on ? "Light on" : "Light off";
 
-					if (use)
+				if (use)
+				{
+					_switchLight(!_on);
+					if (_on)
 					{
-						_switchLight(!_on);
-						if (_on)
-						{
-							_switchOn.Play();
-						}
-						else
-						{
-							_switchOff.Play();
-						}
+						_switchOn.Play();
 					}
-					if (scroll > 0)
+					else
 					{
-						_pitch -= 5.0f;
-						if (_pitch < -60.0f)
-							_pitch = -60.0f;
-						_lamp.transform.localRotation = Quaternion.Euler(_pitch, 0.0f, 0.0f);
+						_switchOff.Play();
 					}
-					else if (scroll < 0)
-					{
-						_pitch += 5.0f;
-						if (_pitch > 15.0f)
-							_pitch = 15.0f;
-						_lamp.transform.localRotation = Quaternion.Euler(_pitch, 0.0f, 0.0f);
-					}
-					break;
+				}
+				if (scroll > 0)
+				{
+					_pitch -= 5.0f;
+					if (_pitch < -60.0f)
+						_pitch = -60.0f;
+					_lamp.transform.localRotation = Quaternion.Euler(_pitch, 0.0f, 0.0f);
+				}
+				else if (scroll < 0)
+				{
+					_pitch += 5.0f;
+					if (_pitch > 15.0f)
+						_pitch = 15.0f;
+					_lamp.transform.localRotation = Quaternion.Euler(_pitch, 0.0f, 0.0f);
 				}
 			}
 

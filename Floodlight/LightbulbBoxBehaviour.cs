@@ -91,21 +91,17 @@ namespace Floodlight
 		{
 			bool activate = Input.GetKeyDown(KeyCode.Mouse0);
 
-			RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
-			for (int i = 0; i < hits.Length; ++i)
+			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1.0f);
+			if(hit.collider.gameObject == this.gameObject)
 			{
-				if (hits[i].collider.gameObject == this.gameObject)
+				if(!_bought)
 				{
-					if(!_bought)
+					_guiBuy.Value = true;
+					_guiText.Value = $"lightbulb ({Price} mk)";
+					if (activate)
 					{
-						_guiBuy.Value = true;
-						_guiText.Value = $"lightbulb ({Price} mk)";
-						if(activate)
-						{
-							_buy();
-						}
+						_buy();
 					}
-					break;
 				}
 			}
 		}

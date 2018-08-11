@@ -77,9 +77,7 @@
     </None>
     <None Include="Assets\floodlight.unity3d" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\model\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetPath)" "G:\Steam\steamapps\common\My Summer Car\Mods" /Y /R</PostBuildEvent>
