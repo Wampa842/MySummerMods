@@ -101,7 +101,7 @@ namespace SleepingPills
 			{
 				if (_bought)
 				{
-					string s = SleepingPills.AmountLeft > 0.0f ? $"sleeping pills (still swallowing) ({Count} left)" : SleepingPills.OverdoseAmount <= 0.0f ? $"sleeping pills ({Count} left)" : $"sleeping pills (already taken one) ({Count} left)";
+					string s = SleepingPills.OverdoseAmount <= 0.0f ? $"sleeping pills ({Count} left)" : SleepingPills.OverdoseAmount <= 50.0f ? $"sleeping pills (already taken one) ({Count} left)" : $"sleeping pills (you still feel the effects of the last dose) ({Count} left)";
 					_guiUse.Value = true;
 					_guiText.Value = s;
 					if (use)

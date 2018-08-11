@@ -93,17 +93,11 @@ namespace SleepingPills
 
 		public static bool Swallow(float amount, float speed)
 		{
-			if (AmountLeft <= 0)
-			{
-				AmountLeft = amount;
-				FatigueSpeed = speed;
-				OverdoseAmount += amount;
-
-				ModConsole.Print($"[Pills] Took a sleeping pill: {SleepingPills.AmountLeft.ToString("0")}, speed: {SleepingPills.FatigueSpeed.ToString("0")}, overdose: {SleepingPills.OverdoseAmount.ToString("0")}");
-				return true;
-			}
-			ModConsole.Print($"Last pill is still in effect ({AmountLeft.ToString("0.0")}, {FatigueSpeed.ToString("0.0")})");
-			return false;
+			AmountLeft += amount;
+			FatigueSpeed = speed;
+			OverdoseAmount += amount;
+			ModConsole.Print($"[Pills] Took a sleeping pill: {SleepingPills.AmountLeft.ToString("0")}, speed: {SleepingPills.FatigueSpeed.ToString("0")}, overdose: {SleepingPills.OverdoseAmount.ToString("0")}");
+			return true;
 		}
 
 		public void InitShop()
