@@ -30,14 +30,14 @@ namespace Floodlight
 		public static Vector3 DefaultPos => new Vector3(-13.673f, 0.4f, 3.741f);
 		public static readonly Vector3[] ShelfPos = new Vector3[]
 		{
-			new Vector3(-1548.23f, 4.644f, 1179.85f),
-			new Vector3(-1548.06f, 4.644f, 1179.784f),
-			new Vector3(-1548.068f, 4.644f, 1179.925f)
+			new Vector3(-1548.23f, 4.63f, 1179.85f),
+			new Vector3(-1548.06f, 4.63f, 1179.784f),
+			new Vector3(-1548.068f, 4.63f, 1179.925f)
 		};
 
 		public override string ID => "Floodlight";
 		public override string Name => "Floodlight";
-		public override string Version => "2.0.0";
+		public override string Version => "2.0.2";
 		public override string Author => "Wampa842";
 		public override bool UseAssetsFolder => true;
 
@@ -65,7 +65,7 @@ namespace Floodlight
 				GameObject box = GameObject.Instantiate<GameObject>(_box);
 				box.tag = "Untagged";
 				box.transform.position = ShelfPos[i];
-				box.transform.rotation = Quaternion.Euler(0.0f, 330.0f, 0.0f);
+				box.transform.rotation = new Quaternion();
 				box.GetComponent<Rigidbody>().isKinematic = true;
 				LightbulbBoxBehaviour comp = box.AddComponent<LightbulbBoxBehaviour>();
 				comp.ShopList = _list;
