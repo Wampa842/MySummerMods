@@ -71,6 +71,7 @@ namespace Floodlight
 				comp.ShopList = _list;
 				_list.Add(box);
 			}
+			GameObject.Destroy(_box);
 		}
 
 		public Floodlight()

@@ -124,6 +124,7 @@ namespace SleepingPills
 				comp.ShopList = _list;
 				_list.Add(pills);
 			}
+			GameObject.Destroy(_bottle);
 		}
 
 		public override void OnLoad()
