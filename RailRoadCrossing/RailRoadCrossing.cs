@@ -14,6 +14,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+using System;
 using System.Linq;
 using MSCLoader;
 using UnityEngine;
@@ -34,24 +35,31 @@ namespace RailRoadCrossing
 
 		public override void Run(string[] args)
 		{
-			if (args[0] == "d")
+			try
 			{
-				foreach (var o in _mod.Signs)
-					o.GetComponent<CrossingBehaviour>().Lower();
+				if (args[0] == "down")
+				{
+					foreach (var o in _mod.Signs)
+						o.GetComponent<CrossingBehaviour>().Lower();
+				}
+				if (args[0] == "up")
+				{
+					foreach (var o in _mod.Signs)
+						o.GetComponent<CrossingBehaviour>().Raise();
+				}
+				if (args[0] == "go")
+				{
+					int n = int.Parse(args[1]);
+					GameObject.Find("PLAYER").transform.position = _mod.SignPos[n];
+				}
+				if (args[0] == "help" || args[0] == "h")
+				{
+					ModConsole.Print("Railroad crossing debug commands\nd: lower all barriers\nu: raise all barriers\ngo <number>: teleport to specified sign");
+				}
 			}
-			if (args[0] == "u")
+			catch(Exception ex)
 			{
-				foreach (var o in _mod.Signs)
-					o.GetComponent<CrossingBehaviour>().Raise();
-			}
-			if (args[0] == "go")
-			{
-				int n = int.Parse(args[1]);
-				GameObject.Find("PLAYER").transform.position = _mod.SignPos[n];
-			}
-			if (args[0] == "help" || args[0] == "h")
-			{
-				ModConsole.Print("Railroad crossing debug commands\nd: lower all barriers\nu: raise all barriers\ngo <number>: teleport to specified sign");
+				ModConsole.Error(ex.ToString());
 			}
 		}
 	}
@@ -100,10 +108,10 @@ namespace RailRoadCrossing
 			CrossingTriggerBehaviour.Mod = this;
 
 			// Create settings
-			Verbose = new Settings("VerboseLogging", "[DEBUG] Verbose logging", true);
-			ShowTriggers = new Settings("ShowTriggers", "[DEBUG] Show triggers", false);
-			EnableSound = new Settings("EnableSound", "Enable sound", true);
+			EnableSound = new Settings("EnableSound", "Enable sounds", true);
 			EnableBarrier = new Settings("EnableBarrier", "Use barrier", true);
+			Verbose = new Settings("VerboseLogging", "[DEBUG] Verbose logging", false);
+			ShowTriggers = new Settings("ShowTriggers", "[DEBUG] Show triggers", false);
 			ApplySettings = new Settings("ApplySettings", "Apply settings", () => { _applyModSettings(); });
 		}
 
@@ -113,9 +121,11 @@ namespace RailRoadCrossing
 			{
 				o.GetComponent<CrossingBehaviour>().UpdateSettings((bool)EnableSound.GetValue(), (bool)EnableBarrier.GetValue());
 			}
+
 			foreach(var o in GameObject.FindObjectsOfType<GameObject>().Where(e => e.GetComponent<CrossingTriggerBehaviour>() != null))
 			{
 				o.GetComponent<Renderer>().enabled = (bool)ShowTriggers.GetValue();
+				o.GetComponent<CrossingTriggerBehaviour>().Verbose = (bool)Verbose.GetValue();
 			}
 		}
 
@@ -125,7 +135,7 @@ namespace RailRoadCrossing
 			Settings.AddCheckBox(this, ShowTriggers);
 			Settings.AddCheckBox(this, EnableSound);
 			Settings.AddCheckBox(this, EnableBarrier);
-			Settings.AddButton(this, ApplySettings, "MSCLoader settings are absolute fucking bollocks.");
+			Settings.AddButton(this, ApplySettings, "MSCLoader settings are absolute bollocks.");
 		}
 
 		public override void OnLoad()

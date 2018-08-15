@@ -23,6 +23,7 @@ namespace RailRoadCrossing
 	public abstract class CrossingTriggerBehaviour : MonoBehaviour
 	{
 		public GameObject[] Signs { get; set; }
+		public bool Verbose { get; set; }
 		public static RailRoadCrossing Mod;
 
 		public void Show(bool enable)
@@ -64,7 +65,7 @@ namespace RailRoadCrossing
 		{
 			if (coll.gameObject.name == "train")
 			{
-				if ((bool)Mod.Verbose.GetValue()) ModConsole.Print("[Train] exits " + gameObject.name);
+				if (Verbose) ModConsole.Print("[Train] exits " + gameObject.name);
 				foreach (var o in Signs)
 				{
 					o.GetComponent<CrossingBehaviour>().Raise();
@@ -88,7 +89,7 @@ namespace RailRoadCrossing
 		{
 			if (coll.gameObject.name == "train")
 			{
-				if ((bool)Mod.Verbose.GetValue()) ModConsole.Print("[Train] enters " + gameObject.name);
+				if (Verbose) ModConsole.Print("[Train] enters " + gameObject.name);
 				foreach (var o in Signs)
 				{
 					o.GetComponent<CrossingBehaviour>().Lower();
