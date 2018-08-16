@@ -26,6 +26,14 @@ namespace RailRoadCrossing
 {
 	class CrossingBehaviour : MonoBehaviour
 	{
+		private class PivotBehaviour : MonoBehaviour
+		{
+			void OnJointBreak(float force)
+			{
+				ModConsole.Print($"[RRC] Joint broke on {gameObject.transform.parent.gameObject.name} with {force.ToString("0")} force");
+			}
+		}
+
 		private enum BarrierStatus { Up, Down, Warning, Rising, Lowering };
 		private BarrierStatus _status;
 		private float _barrierTargetAngle
@@ -40,6 +48,7 @@ namespace RailRoadCrossing
 		private bool _soundEnabled = true;
 
 		private GameObject _barrier;
+		private GameObject _pivot;
 		private GameObject _sign;
 
 		private Material _signMaterial;
@@ -65,10 +74,23 @@ namespace RailRoadCrossing
 			_timer = 0.0f;
 		}
 
-		public void UpdateSettings(bool sound, bool barrier)
+		public void UpdateSettings(bool sound, bool barrier, bool breakable)
 		{
 			_soundEnabled = sound;
 			_barrier.SetActive(barrier);
+			if (breakable)
+			{
+				_barrier.GetComponent<Rigidbody>().isKinematic = false;
+				_barrier.transform.parent = gameObject.transform;
+				_pivot.GetComponent<Joint>().breakForce = 5000.0f;
+			}
+			else
+			{
+				_barrier.GetComponent<Rigidbody>().isKinematic = true;
+				_barrier.transform.parent = _pivot.transform;
+				_barrier.transform.localPosition = new Vector3();
+				_pivot.GetComponent<Joint>().breakForce = float.PositiveInfinity;
+			}
 		}
 
 		void Awake()
@@ -76,6 +98,8 @@ namespace RailRoadCrossing
 			// Find components
 			_barrier = gameObject.transform.FindChild("railway_barrier").gameObject;
 			_sign = gameObject.transform.FindChild("railway_sign").gameObject;
+			_pivot = gameObject.transform.FindChild("barrier_pivot").gameObject;
+			_pivot.AddComponent<PivotBehaviour>();
 
 			// Find textures
 			Texture baseTex = gameObject.GetComponent<Renderer>().material.mainTexture;
@@ -141,7 +165,7 @@ namespace RailRoadCrossing
 				if (_barrierAngle < _barrierTargetAngle)
 				{
 					_barrierAngle += 30.0f * Time.deltaTime;
-					_barrier.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, _barrierAngle);
+					_pivot.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, _barrierAngle);
 				}
 				else
 				{
@@ -153,7 +177,7 @@ namespace RailRoadCrossing
 				if (_barrierAngle > _barrierTargetAngle)
 				{
 					_barrierAngle -= 30.0f * Time.deltaTime;
-					_barrier.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, _barrierAngle);
+					_pivot.transform.localRotation = Quaternion.Euler(0.0f, 0.0f, _barrierAngle);
 				}
 				else
 				{

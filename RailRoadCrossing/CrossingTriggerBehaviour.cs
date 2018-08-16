@@ -65,7 +65,7 @@ namespace RailRoadCrossing
 		{
 			if (coll.gameObject.name == "train")
 			{
-				if (Verbose) ModConsole.Print("[Train] exits " + gameObject.name);
+				if (Verbose) ModConsole.Print("[RRC] exits " + gameObject.name);
 				foreach (var o in Signs)
 				{
 					o.GetComponent<CrossingBehaviour>().Raise();
@@ -89,7 +89,7 @@ namespace RailRoadCrossing
 		{
 			if (coll.gameObject.name == "train")
 			{
-				if (Verbose) ModConsole.Print("[Train] enters " + gameObject.name);
+				if (Verbose) ModConsole.Print("[RRC] enters " + gameObject.name);
 				foreach (var o in Signs)
 				{
 					o.GetComponent<CrossingBehaviour>().Lower();

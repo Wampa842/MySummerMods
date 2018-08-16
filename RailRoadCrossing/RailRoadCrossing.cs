@@ -67,12 +67,12 @@ namespace RailRoadCrossing
 	public class RailRoadCrossing : Mod
 	{
 		public override string ID => "RailRoadCrossing";
-		public override string Name => "RailRoadCrossing";
+		public override string Name => "Railroad crossing";
 		public override string Author => "Wampa842";
-		public override string Version => "1.0.0";
+		public override string Version => "1.1.1";
 		public override bool UseAssetsFolder => true;
 
-		public Settings Verbose, EnableSound, EnableBarrier, ShowTriggers, ApplySettings;
+		public Settings Verbose, EnableSound, EnableBarrier, ShowTriggers, Breakable, ApplySettings;
 
 		public GameObject Parent;
 		public GameObject[] Signs;
@@ -110,6 +110,7 @@ namespace RailRoadCrossing
 			// Create settings
 			EnableSound = new Settings("EnableSound", "Enable sounds", true);
 			EnableBarrier = new Settings("EnableBarrier", "Use barrier", true);
+			Breakable = new Settings("BreakableBarrier", "Breakable barriers", true);
 			Verbose = new Settings("VerboseLogging", "[DEBUG] Verbose logging", false);
 			ShowTriggers = new Settings("ShowTriggers", "[DEBUG] Show triggers", false);
 			ApplySettings = new Settings("ApplySettings", "Apply settings", () => { _applyModSettings(); });
@@ -119,7 +120,7 @@ namespace RailRoadCrossing
 		{
 			foreach(var o in GameObject.FindObjectsOfType<GameObject>().Where(e => e.GetComponent<CrossingBehaviour>() != null))
 			{
-				o.GetComponent<CrossingBehaviour>().UpdateSettings((bool)EnableSound.GetValue(), (bool)EnableBarrier.GetValue());
+				o.GetComponent<CrossingBehaviour>().UpdateSettings((bool)EnableSound.GetValue(), (bool)EnableBarrier.GetValue(), (bool)Breakable.GetValue());
 			}
 
 			foreach(var o in GameObject.FindObjectsOfType<GameObject>().Where(e => e.GetComponent<CrossingTriggerBehaviour>() != null))
@@ -135,6 +136,7 @@ namespace RailRoadCrossing
 			Settings.AddCheckBox(this, ShowTriggers);
 			Settings.AddCheckBox(this, EnableSound);
 			Settings.AddCheckBox(this, EnableBarrier);
+			Settings.AddCheckBox(this, Breakable);
 			Settings.AddButton(this, ApplySettings, "MSCLoader settings are absolute bollocks.");
 		}
 
