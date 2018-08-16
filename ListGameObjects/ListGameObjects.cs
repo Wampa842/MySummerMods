@@ -35,7 +35,7 @@ namespace ListGameObjects
 			public override string Name => "writeobjects";
 			public override string Help => "write GameObjects and FSM stuff into files";
 			private ListGameObjects sender;
-			private string objectPath, varPath, eventPath, compPath;
+			private readonly string objectPath, varPath, compPath;
 
 
 			public ListStuffCommand(ListGameObjects sender)
@@ -43,8 +43,6 @@ namespace ListGameObjects
 				this.sender = sender;
 				this.objectPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "GameObjects.csv");
 				this.varPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "FsmVars.csv");
-				this.eventPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "FsmEvents.csv");
-				this.compPath = Path.Combine(ModLoader.GetModConfigFolder(this.sender), "FsmComponents.csv");
 
 			}
 
@@ -56,11 +54,11 @@ namespace ListGameObjects
 				try
 				{
 					writer = new StreamWriter(objectPath);
-					writer.WriteLine($"\"name\",\"tag\",\"layer\",\"parent\",\"parent-transform\"");
+					writer.WriteLine($"\"name\",\"tag\",\"type\",\"layer\",\"parent\"");
 
 					foreach (GameObject o in GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[])
 					{
-						writer.WriteLine($"\"{o.name}\",\"{o.tag}\",{o.layer},\"{(o.transform.parent == null ? "NULL" : o.transform.parent.gameObject.name)}\",\"{(o.transform.parent == null ? "NULL" : o.transform.parent.name)}\"");
+						writer.WriteLine($"\"{o.name}\",\"{o.tag}\",\"{o.GetType().ToString()}\",{o.layer},\"{(o.transform.parent == null ? "" : o.transform.parent.gameObject.name)}\"");
 					}
 				}
 				catch (IOException ex)
@@ -77,82 +75,38 @@ namespace ListGameObjects
 				try
 				{
 					writer = new StreamWriter(varPath);
-
-					foreach (var v in FsmVariables.GlobalVariables.FloatVariables)
+					writer.WriteLine($"\"fsm-name\",\"object\",\"name\",\"type\",\"value\"");
+					foreach (var v in GameObject.FindObjectsOfType<PlayMakerFSM>())
 					{
-						writer.WriteLine($"\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
-					}
-					foreach (var v in FsmVariables.GlobalVariables.IntVariables)
-					{
-						writer.WriteLine($"\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
-					}
-					foreach (var v in FsmVariables.GlobalVariables.BoolVariables)
-					{
-						writer.WriteLine($"\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
-					}
-					foreach (var v in FsmVariables.GlobalVariables.StringVariables)
-					{
-						writer.WriteLine($"\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
+						foreach (var fsm in v.FsmVariables.StringVariables)
+						{
+							writer.WriteLine($"\"{v.FsmName}\",\"{v.gameObject.name}\",\"{fsm.Name}\",\"{fsm.GetType().ToString().Replace("HutongGames.PlayMaker.", "")}\",\"{fsm.Value}\"");
+						}
+						foreach (var fsm in v.FsmVariables.FloatVariables)
+						{
+							writer.WriteLine($"\"{v.FsmName}\",\"{v.gameObject.name}\",\"{fsm.Name}\",\"{fsm.GetType().ToString().Replace("HutongGames.PlayMaker.", "")}\",\"{fsm.Value}\"");
+						}
+						foreach (var fsm in v.FsmVariables.IntVariables)
+						{
+							writer.WriteLine($"\"{v.FsmName}\",\"{v.gameObject.name}\",\"{fsm.Name}\",\"{fsm.GetType().ToString().Replace("HutongGames.PlayMaker.", "")}\",\"{fsm.Value}\"");
+						}
+						foreach (var fsm in v.FsmVariables.BoolVariables)
+						{
+							writer.WriteLine($"\"{v.FsmName}\",\"{v.gameObject.name}\",\"{fsm.Name}\",\"{fsm.GetType().ToString().Replace("HutongGames.PlayMaker.", "")}\",\"{fsm.Value}\"");
+						}
+						foreach (var fsm in v.FsmVariables.QuaternionVariables)
+						{
+							writer.WriteLine($"\"{v.FsmName}\",\"{v.gameObject.name}\",\"{fsm.Name}\",\"{fsm.GetType().ToString().Replace("HutongGames.PlayMaker.", "")}\",\"{fsm.Value.eulerAngles.ToString()}\"");
+						}
+						foreach (var fsm in v.FsmVariables.Vector3Variables)
+						{
+							writer.WriteLine($"\"{v.FsmName}\",\"{v.gameObject.name}\",\"{fsm.Name}\",\"{fsm.GetType().ToString().Replace("HutongGames.PlayMaker.", "")}\",\"{fsm.Value}\"");
+						}
 					}
 				}
 				catch(IOException ex)
 				{
 					ModConsole.Print("Couldn't write FSM variables:\n" + ex.ToString());
-				}
-				finally
-				{
-					if (writer != null)
-						writer.Dispose();
-				}
-
-				// List FSM events
-				try
-				{
-					writer = new StreamWriter(eventPath);
-
-				}
-				catch(IOException ex)
-				{
-					ModConsole.Print("Couldn't write FSM components:\n" + ex.ToString());
-				}
-				finally
-				{
-					if (writer != null)
-						writer.Dispose();
-				}
-
-				//List FSM components per GameObject
-				try
-				{
-					writer = new StreamWriter(compPath);
-					writer.WriteLine("\"GameObject\",\"Layer\",\"Component\",\"Variable\",\"Type\",\"Value\"");
-
-					foreach (GameObject o in GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[])
-					{
-						foreach(PlayMakerFSM fsm in o.GetComponents<PlayMakerFSM>())
-						{
-							foreach (var v in fsm.FsmVariables.IntVariables)
-							{
-								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
-							}
-							foreach (var v in fsm.FsmVariables.FloatVariables)
-							{
-								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
-							}
-							foreach (var v in fsm.FsmVariables.BoolVariables)
-							{
-								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
-							}
-							foreach (var v in fsm.FsmVariables.StringVariables)
-							{
-								writer.WriteLine($"\"{o.name}\",{o.layer},\"{fsm.FsmName}\",\"{v.Name}\",\"{v.GetType().ToString()}\",\"{v.Value}\"");
-							}
-						}
-					}
-				}
-				catch (IOException ex)
-				{
-					ModConsole.Print("Couldn't write FSM events:\n" + ex.ToString());
 				}
 				finally
 				{
