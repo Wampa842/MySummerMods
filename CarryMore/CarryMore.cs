@@ -49,6 +49,7 @@ namespace CarryMore
 		}
 		public GameObject this[int index] => _list[index];
 		public int Count => _list.Count;
+		public int Capacity => _list.Capacity;
 		public int SelectedIndex { get; private set; } = 0;
 
 		public ItemList(int max, CarryMore mod)
@@ -382,9 +383,10 @@ namespace CarryMore
 			{
 				if (Items.Count > 0)
 				{
+					GUI.Label(new Rect(_guiPosLeft - 20.0f, Screen.height - _guiPosBottom - _guiHeight, Screen.width, _guiHeight), $"Backpack ({Items.Count} / {Items.Capacity})");
 					for (int i = 0; i < Items.Count; ++i)
 					{
-						float top = Screen.height - _guiPosBottom - (_guiHeight * (Items.Count - i));
+						float top = Screen.height - _guiPosBottom - (_guiHeight * (Items.Count - i - 1));
 						string name = Items[i].name.Replace("(Clone)", "").Replace("(itemx)", "").Replace("(xxxxx)", "");
 						if (i == Items.SelectedIndex)
 							GUI.Label(new Rect(_guiPosLeft - 20.0f, top, 20.0f, _guiHeight), ">");
@@ -393,7 +395,7 @@ namespace CarryMore
 				}
 				else
 				{
-					GUI.Label(new Rect(_guiPosLeft, Screen.height - _guiPosBottom - _guiHeight, Screen.width, _guiHeight), "Backpack is empty");
+					GUI.Label(new Rect(_guiPosLeft - 20.0f, Screen.height - _guiPosBottom - _guiHeight, Screen.width, _guiHeight), "Backpack (empty)");
 				}
 			}
 		}
