@@ -53,6 +53,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "G:\Steam\steamapps\common\My Summer Car\Mods" /Y /R</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "G:\Steam\steamapps\common\My Summer Car\Mods" /Y /R
+if /i $(ConfigurationName)==debug xcopy "$(TargetDir)$(TargetName).pdb" "G:\Steam\steamapps\common\My Summer Car\Mods" /Y /R</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -240,7 +240,7 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Carry more stuff";
-		public override string Version => "1.3.1";
+		public override string Version => "1.3.2";
 		public override string Author => "Wampa842";
 
 		public readonly string SaveFilePath;
@@ -258,7 +258,6 @@ namespace CarryMore
 		public Settings FullLogging;			// Log pick-up rejection events
 		public Settings DropIfListVisible;
 		public Settings PickUpIfListVisible;
-		public Settings EnableSaving;
 
 		private bool _guiVisible;
 		private GUIStyle _guiStyle;
@@ -267,57 +266,9 @@ namespace CarryMore
 		private const float _guiHeight = 20.0f;
 
 		public ItemList Items;
-
-		private void _save()
-		{
-			XmlDocument doc = new XmlDocument();
-			doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
-			XmlElement root = doc.CreateElement("CarryMore");
-			doc.AppendChild(root);
-
-			XmlElement node;
-
-			for (int i = 0; i < Items.Count; ++i)
-			{
-				GameObject item = Items[i];
-
-				// Determine if the item has a unique ID
-				string id = null;
-				foreach(var fsm in item.GetComponents<PlayMakerFSM>())
-				{
-					if(fsm.FsmName == "Use")
-					{
-						FsmString s = fsm.FsmVariables.FindFsmString("ID");
-						if (s != null)
-							id = s.Value;
-					}
-				}
-
-				node = doc.CreateElement("Item");
-
-				if(id == null)
-				{
-					// Unique parts
-					XmlElement idElement = doc.CreateElement("ID");
-					idElement.AppendChild(doc.CreateTextNode(id));
-					node.AppendChild(idElement);
-				}
-
-				node.AppendChild(doc.CreateTextNode(item.name));
-			}
-
-			doc.Save(SaveFilePath);
-		}
-
-		private void _load()
-		{
-
-		}
-
+		
 		public CarryMore()
 		{
-			SaveFilePath = System.IO.Path.Combine(Application.persistentDataPath, "CarryMore.xml");
-
 			// Add keybinds
 			_pickUpKey = new Keybind("PickUp", "Pick up targeted item", KeyCode.E);
 			_dropAllKey = new Keybind("DropAll", "Drop all items", KeyCode.Y, KeyCode.LeftControl);
@@ -337,7 +288,6 @@ namespace CarryMore
 			FullLogging = new Settings("LogEverything", "Log everything", false);
 			DropIfListVisible = new Settings("DropIfListVisible", "Don't drop items if the list is hidden", true);
 			PickUpIfListVisible = new Settings("PickUpIfListVisible", "Don't pick up items if the list is hidden", false);
-			EnableSaving = new Settings("EnableSaving", "Save backpack contents (EXPERIMENTAL)", false);
 
 			// Initialize the item list
 			Items = new ItemList((int)MaxItems.Value, this);
@@ -366,28 +316,17 @@ namespace CarryMore
 			Settings.AddCheckBox(this, FullLogging);
 			Settings.AddCheckBox(this, DropIfListVisible);
 			Settings.AddCheckBox(this, PickUpIfListVisible);
-			Settings.AddCheckBox(this, EnableSaving);
 		}
 
 		public override void OnSave()
 		{
-			if((bool)EnableSaving.Value)
-			{
-				_save();
-			}
-			else
-			{
-				Items.DropAll();
-			}
+			Items.DropAll();
 		}
 
 		public override void Update()
 		{
 			if (Application.loadedLevelName == "GAME")
 			{
-				// Load backpack contents
-
-
 				// Drop everything
 				if (_dropAllKey.IsDown())
 				{
