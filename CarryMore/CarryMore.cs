@@ -64,28 +64,28 @@ namespace CarryMore
 			// List is full
 			if (_list.Count >= _list.Capacity)
 			{
-				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"List is full");
+				if (MySettings.Settings.LogAll) ModConsole.Print($"List is full");
 				return false;
 			}
 
 			// Object is not a part or item
 			if (!(o.layer == 16 || o.layer == 19))
 			{
-				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} is on layer {o.layer}");
+				if (MySettings.Settings.LogAll) ModConsole.Print($"{o.name} is on layer {o.layer}");
 				return false;
 			}
 
 			// Item doesn't have a rigid body
 			if (o.GetComponent<Rigidbody>() == null)
 			{
-				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} doesn't have a rigid body");
+				if (MySettings.Settings.LogAll) ModConsole.Print($"{o.name} doesn't have a rigid body");
 				return false;
 			}
 
 			// Item is in the blacklist
 			if (Array.Exists(Blacklist, e => e == o.name))
 			{
-				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} is blacklisted");
+				if (MySettings.Settings.LogAll) ModConsole.Print($"{o.name} is blacklisted");
 				return false;
 			}
 
@@ -129,11 +129,11 @@ namespace CarryMore
 				o.GetComponent<Rigidbody>().isKinematic = true;
 				o.transform.position = CarryMore.TempPosition;
 
-				if ((bool)_mod.SomeLogging.Value || (bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} added ({_list.Count} / {_list.Capacity})");
+				if (MySettings.Settings.LogAll || MySettings.Settings.LogSome) ModConsole.Print($"{o.name} added ({_list.Count} / {_list.Capacity})");
 			}
 			else
 			{
-				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"{o.name} already on the list");
+				if (MySettings.Settings.LogAll) ModConsole.Print($"{o.name} already on the list");
 			}
 
 			// Keep selected index inside limits - can cause issues on first pickup
@@ -159,11 +159,11 @@ namespace CarryMore
 				// If successful, remove it from the list
 				_list.Remove(item);
 
-				if ((bool)_mod.SomeLogging.Value || (bool)_mod.FullLogging.Value) ModConsole.Print($"Dropped #{index} {item.name} ({_list.Count} / {_list.Capacity})");
+				if (MySettings.Settings.LogAll || MySettings.Settings.LogSome) ModConsole.Print($"Dropped #{index} {item.name} ({_list.Count} / {_list.Capacity})");
 			}
 			catch
 			{
-				if ((bool)_mod.FullLogging.Value) ModConsole.Print($"Can't drop #{index}");
+				if (MySettings.Settings.LogAll) ModConsole.Print($"Can't drop #{index}");
 				return null;
 			}
 			return item;
@@ -178,7 +178,7 @@ namespace CarryMore
 		// Drop all items
 		public void DropAll()
 		{
-			if ((bool)_mod.SomeLogging.Value || (bool)_mod.FullLogging.Value) ModConsole.Print($"Dropping {_list.Count} items");
+			if (MySettings.Settings.LogAll || MySettings.Settings.LogSome) ModConsole.Print($"Dropping {_list.Count} items");
 			for (int i = _list.Count - 1; i >= 0; --i)
 			{
 				DropAt(i);
@@ -221,20 +221,6 @@ namespace CarryMore
 			DropAll();
 			_list = new List<GameObject>(size);
 		}
-
-		// Resize the list to the settings value
-		public void Realloc()
-		{
-			try
-			{
-				int val = int.Parse(_mod.MaxItems.GetValue().ToString());   // what the fuck
-				Realloc(val);
-			}
-			catch (Exception ex)
-			{
-				ModConsole.Error(ex.Message);
-			}
-		}
 	}
 
 	public class CarryMore : Mod
@@ -243,9 +229,7 @@ namespace CarryMore
 		public override string Name => "Carry more stuff";
 		public override string Version => "1.3.2";
 		public override string Author => "Wampa842";
-
-		public readonly string SaveFilePath;
-		private bool _hasLoaded = false;
+		public string SavePath => System.IO.Path.Combine(ModLoader.GetModConfigFolder(this), "settings.xml");
 
 		public static readonly Vector3 TempPosition = new Vector3(0.0f, -1000.0f, 0.0f);    // The place where objects are moved when they're "in" the backpack
 
@@ -253,12 +237,6 @@ namespace CarryMore
 		private Keybind _dropAllKey;
 		private Keybind _dropSelectedKey;
 		private Keybind _toggleGuiKey;
-		public Settings MaxItems;
-		public Settings MaxItemsApply;
-		public Settings SomeLogging;			// Log only pick-up and drop events
-		public Settings FullLogging;			// Log pick-up rejection events
-		public Settings DropIfListVisible;
-		public Settings PickUpIfListVisible;
 
 		private bool _guiVisible;
 		private GUIStyle _guiStyle;
@@ -276,22 +254,11 @@ namespace CarryMore
 			_dropSelectedKey = new Keybind("DropSelected", "Drop selected item (or last item if the list is hidden)", KeyCode.Y);
 			_toggleGuiKey = new Keybind("ToggleGUI", "Toggle inventory list", KeyCode.X);
 
-			// Add settings
-			MaxItems = new Settings("MaxItems", "Max items", 10)
-			{
-				type = SettingsType.Slider
-			};
-			MaxItemsApply = new Settings("MaxItemsApply", "Apply max items", new Action(() =>
-			{
-				Items.Realloc();
-			}));
-			SomeLogging = new Settings("LogSome", "Log pick-up/drop events", true);
-			FullLogging = new Settings("LogEverything", "Log everything", false);
-			DropIfListVisible = new Settings("DropIfListVisible", "Don't drop items if the list is hidden", true);
-			PickUpIfListVisible = new Settings("PickUpIfListVisible", "Don't pick up items if the list is hidden", false);
+			// Load settings
+			MySettings.Load(SavePath);
 
 			// Initialize the item list
-			Items = new ItemList((int)MaxItems.Value, this);
+			Items = new ItemList(MySettings.Settings.MaxItems, this);
 
 			// Initialize GUI
 			_guiVisible = false;
@@ -309,19 +276,10 @@ namespace CarryMore
 			Keybind.Add(this, _toggleGuiKey);
 		}
 
-		public override void ModSettings()
-		{
-			Settings.AddSlider(this, MaxItems, 1, 50);
-			Settings.AddButton(this, MaxItemsApply, "Drop all items and resize the backpack");
-			Settings.AddCheckBox(this, SomeLogging);
-			Settings.AddCheckBox(this, FullLogging);
-			Settings.AddCheckBox(this, DropIfListVisible);
-			Settings.AddCheckBox(this, PickUpIfListVisible);
-		}
-
 		public override void OnSave()
 		{
 			Items.DropAll();
+			MySettings.Save(SavePath);
 		}
 
 		public override void Update()
@@ -331,14 +289,14 @@ namespace CarryMore
 				// Drop everything
 				if (_dropAllKey.IsDown())
 				{
-					if (!(bool)DropIfListVisible.Value || _guiVisible)
+					if (!MySettings.Settings.DropIfOpen || _guiVisible)
 						Items.DropAll();
 				}
 
 				// Drop the last thing
 				if (_dropSelectedKey.IsDown())
 				{
-					if (!(bool)DropIfListVisible.Value || _guiVisible)
+					if (!MySettings.Settings.DropIfOpen || _guiVisible)
 					{
 						if (_guiVisible)
 							Items.DropSelected();
@@ -348,7 +306,7 @@ namespace CarryMore
 				}
 
 				// Pick up
-				if (_pickUpKey.IsDown() && (!(bool)PickUpIfListVisible.Value || _guiVisible))
+				if (_pickUpKey.IsDown() && (!MySettings.Settings.AddIfOpen || _guiVisible))
 				{
 					RaycastHit[] raycastHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 1.0f);
 					for (int i = 0; i < raycastHits.Length; ++i)
