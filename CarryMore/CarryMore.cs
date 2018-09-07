@@ -218,15 +218,25 @@ namespace CarryMore
 		// Resize the list to a given size
 		public void Realloc(int size)
 		{
-			DropAll();
+			if (Count > 0)
+			{
+				ModConsole.Error("[Backpack] Could not reallocate - backpack is not empty.");
+				return;
+			}
 			_list = new List<GameObject>(size);
+		}
+
+		// Resize the list to the stored size
+		public void Realloc()
+		{
+			Realloc(MySettings.Settings.MaxItems);
 		}
 	}
 
 	public class CarryMore : Mod
 	{
 		public override string ID => "CarryMore";
-		public override string Name => "Carry more stuff";
+		public override string Name => "Backpack";
 		public override string Version => "1.3.2";
 		public override string Author => "Wampa842";
 		public string SavePath => System.IO.Path.Combine(ModLoader.GetModConfigFolder(this), "settings.xml");
@@ -237,15 +247,18 @@ namespace CarryMore
 		private Keybind _dropAllKey;
 		private Keybind _dropSelectedKey;
 		private Keybind _toggleGuiKey;
+		private Keybind _toggleSettingsKey;
 
-		private bool _guiVisible;
-		private GUIStyle _guiStyle;
-		private const float _guiPosLeft = 150.0f;
-		private const float _guiPosBottom = 50.0f;
-		private const float _guiHeight = 20.0f;
+		//private bool _alertVisible;
+		private bool _resize = false;
+		private bool _listVisible;
+		private GUIStyle _listStyle;
+		private const float _listPosLeft = 150.0f;
+		private const float _listPosBottom = 50.0f;
+		private const float _listLineHeight = 20.0f;
 
 		public ItemList Items;
-		
+
 		public CarryMore()
 		{
 			// Add keybinds
@@ -253,18 +266,20 @@ namespace CarryMore
 			_dropAllKey = new Keybind("DropAll", "Drop all items", KeyCode.Y, KeyCode.LeftControl);
 			_dropSelectedKey = new Keybind("DropSelected", "Drop selected item (or last item if the list is hidden)", KeyCode.Y);
 			_toggleGuiKey = new Keybind("ToggleGUI", "Toggle inventory list", KeyCode.X);
+			_toggleSettingsKey = new Keybind("ToggleSettingsGUI", "Toggle settings", KeyCode.X, KeyCode.LeftControl);
 
 			// Load settings
 			MySettings.Load(SavePath);
+			//_alertVisible = false;
 
 			// Initialize the item list
 			Items = new ItemList(MySettings.Settings.MaxItems, this);
 
-			// Initialize GUI
-			_guiVisible = false;
-			_guiStyle = new GUIStyle();
-			_guiStyle.fontSize = 12;
-			_guiStyle.normal.textColor = Color.white;
+			// Initialize list UI
+			_listVisible = false;
+			_listStyle = new GUIStyle();
+			_listStyle.fontSize = 12;
+			_listStyle.normal.textColor = Color.white;
 		}
 
 		public override void OnLoad()
@@ -274,6 +289,11 @@ namespace CarryMore
 			Keybind.Add(this, _dropAllKey);
 			Keybind.Add(this, _dropSelectedKey);
 			Keybind.Add(this, _toggleGuiKey);
+			Keybind.Add(this, _toggleSettingsKey);
+
+			// Welcome text
+			ModConsole.Print("[Backpack] Loaded!");
+			ModConsole.Print("[Backpack] Settings can be accessed by pressing Ctrl + X.");
 		}
 
 		public override void OnSave()
@@ -286,19 +306,26 @@ namespace CarryMore
 		{
 			if (Application.loadedLevelName == "GAME")
 			{
+				// Reallocate if needed
+				if (_resize)
+				{
+					Items.Realloc();
+					_resize = false;
+				}
+
 				// Drop everything
 				if (_dropAllKey.IsDown())
 				{
-					if (!MySettings.Settings.DropIfOpen || _guiVisible)
+					if (!MySettings.Settings.DropIfOpen || _listVisible)
 						Items.DropAll();
 				}
 
 				// Drop the last thing
 				if (_dropSelectedKey.IsDown())
 				{
-					if (!MySettings.Settings.DropIfOpen || _guiVisible)
+					if (!MySettings.Settings.DropIfOpen || _listVisible)
 					{
-						if (_guiVisible)
+						if (_listVisible)
 							Items.DropSelected();
 						else
 							Items.DropLast();
@@ -306,7 +333,7 @@ namespace CarryMore
 				}
 
 				// Pick up
-				if (_pickUpKey.IsDown() && (!MySettings.Settings.AddIfOpen || _guiVisible))
+				if (_pickUpKey.IsDown() && (!MySettings.Settings.AddIfOpen || _listVisible))
 				{
 					RaycastHit[] raycastHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition), 1.0f);
 					for (int i = 0; i < raycastHits.Length; ++i)
@@ -319,42 +346,84 @@ namespace CarryMore
 					}
 				}
 
-				// Toggle GUI
+				// Toggle list
 				if (_toggleGuiKey.IsDown())
 				{
-					_guiVisible = !_guiVisible;
+					_listVisible = !_listVisible;
 				}
 
-				// Scroll GUI
-				if (_guiVisible)
+				// Scroll list
+				if (_listVisible)
 				{
 					float scroll = Input.GetAxis("Mouse ScrollWheel");
 					if (scroll != 0.0f)
 						Items.MoveSelection(scroll);
+				}
+
+				// Show settings
+				if (_toggleSettingsKey.IsDown())
+				{
+					MySettings.Temporary = MySettings.Settings.Clone() as MySettings.SettingsData;
+					MySettings.GuiVisible = true;
 				}
 			}
 		}
 
 		public override void OnGUI()
 		{
-			if (_guiVisible)
+			if (_listVisible)
 			{
-				if (Items.Count > 0)
+				GUI.Label(new Rect(_listPosLeft - 20.0f, Screen.height - _listPosBottom - _listLineHeight, Screen.width, _listLineHeight), $"Backpack ({Items.Count} / {Items.Capacity})");
+				for (int i = 0; i < Items.Count; ++i)
 				{
-					GUI.Label(new Rect(_guiPosLeft - 20.0f, Screen.height - _guiPosBottom - _guiHeight, Screen.width, _guiHeight), $"Backpack ({Items.Count} / {Items.Capacity})");
-					for (int i = 0; i < Items.Count; ++i)
+					float top = Screen.height - _listPosBottom - (_listLineHeight * ((Items.Count - i) + 1));
+					string name = Items[i].name.Replace("(Clone)", "").Replace("(itemx)", "").Replace("(xxxxx)", "");
+					if (i == Items.SelectedIndex)
+						GUI.Label(new Rect(_listPosLeft - 20.0f, top, 20.0f, _listLineHeight), ">");
+					GUI.Label(new Rect(_listPosLeft, top, Screen.width, _listLineHeight), name);
+				}
+			}
+
+			if (MySettings.GuiVisible)
+			{
+				GUI.Box(MySettings.GuiBackground, "Settings");
+
+				GUILayout.BeginArea(MySettings.GuiArea);
+
+				GUILayout.BeginVertical();
+				MySettings.Temporary.LogAll = GUILayout.Toggle(MySettings.Temporary.LogAll, "Log everything");
+				MySettings.Temporary.LogSome = GUILayout.Toggle(MySettings.Temporary.LogSome, "Log pick-up and drop events");
+				MySettings.Temporary.AddIfOpen = GUILayout.Toggle(MySettings.Temporary.AddIfOpen, "Pick up only if the list is visible");
+				MySettings.Temporary.DropIfOpen = GUILayout.Toggle(MySettings.Temporary.DropIfOpen, "Drop only if the list is visible");
+				GUILayout.Label(string.Format("\nCapacity: {0}", MySettings.Temporary.MaxItems));
+				MySettings.Temporary.MaxItems = Mathf.RoundToInt(GUILayout.HorizontalSlider(MySettings.Temporary.MaxItems, 1.0f, 50.0f));
+				GUILayout.Label("WARNING:\nBackpack must be emptied in order to apply the settings.");
+				GUILayout.EndVertical();
+				GUILayout.BeginHorizontal();
+				if (GUILayout.Button("OK"))
+				{
+					if (Items.Count <= 0)
 					{
-						float top = Screen.height - _guiPosBottom - (_guiHeight * (Items.Count - i - 1));
-						string name = Items[i].name.Replace("(Clone)", "").Replace("(itemx)", "").Replace("(xxxxx)", "");
-						if (i == Items.SelectedIndex)
-							GUI.Label(new Rect(_guiPosLeft - 20.0f, top, 20.0f, _guiHeight), ">");
-						GUI.Label(new Rect(_guiPosLeft, top, Screen.width, _guiHeight), name);
+						ModConsole.Error("[Backpack] Can't apply settings - backpack is not empty.");
+					}
+					else
+					{
+						MySettings.Settings.AddIfOpen = MySettings.Temporary.AddIfOpen;
+						MySettings.Settings.DropIfOpen = MySettings.Temporary.DropIfOpen;
+						MySettings.Settings.LogAll = MySettings.Temporary.LogAll;
+						MySettings.Settings.LogSome = MySettings.Temporary.LogSome;
+						MySettings.Settings.MaxItems = MySettings.Temporary.MaxItems;
+						Items.Realloc();
+						MySettings.Save(SavePath);
+						MySettings.GuiVisible = false;
 					}
 				}
-				else
+				if (GUILayout.Button("Cancel"))
 				{
-					GUI.Label(new Rect(_guiPosLeft - 20.0f, Screen.height - _guiPosBottom - _guiHeight, Screen.width, _guiHeight), "Backpack (empty)");
+					MySettings.GuiVisible = false;
 				}
+				GUILayout.EndHorizontal();
+				GUILayout.EndArea();
 			}
 		}
 	}

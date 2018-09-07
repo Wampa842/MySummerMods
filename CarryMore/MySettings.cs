@@ -7,12 +7,14 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.Schema;
 using MSCLoader;
+using UnityEngine;
 
 namespace CarryMore
 {
 	public class MySettings
 	{
 		public static SettingsData Settings { get; private set; }
+		public static SettingsData Temporary { get; set; }
 
 		public static void Save(string path)
 		{
@@ -24,7 +26,7 @@ namespace CarryMore
 			Settings = SettingsData.Deserialize(path);
 		}
 
-		public class SettingsData
+		public class SettingsData : ICloneable
 		{
 			public bool LogAll;
 			public bool LogSome;
@@ -70,7 +72,7 @@ namespace CarryMore
 					stream.Close();
 					return o;
 				}
-				catch(IOException ex) when (ex is FileNotFoundException || ex is DirectoryNotFoundException)
+				catch(Exception ex) when (ex is FileNotFoundException || ex is DirectoryNotFoundException || ex is System.IO.IsolatedStorage.IsolatedStorageException)
 				{
 					return new SettingsData();
 				}
@@ -80,6 +82,31 @@ namespace CarryMore
 				}
 				return new SettingsData();
 			}
+
+			public object Clone()
+			{
+				return new SettingsData
+				{
+					AddIfOpen = this.AddIfOpen,
+					DropIfOpen = this.DropIfOpen,
+					LogAll = this.LogAll,
+					LogSome = this.LogSome,
+					MaxItems = this.MaxItems
+				};
+			}
+
+			public void CloneFrom(SettingsData other)
+			{
+				this.AddIfOpen = other.AddIfOpen;
+				this.DropIfOpen = other.DropIfOpen;
+				this.LogAll = other.LogAll;
+				this.LogSome = other.LogSome;
+				this.MaxItems = other.MaxItems;
+			}
 		}
+
+		public static bool GuiVisible { get; set; } = false;
+		public static Rect GuiArea { get; } =		new Rect(Screen.width / 2 - 200, 225, 400, 285);
+		public static Rect GuiBackground { get; } =	new Rect(Screen.width / 2 - 205, 200, 410, 290);
 	}
 }
