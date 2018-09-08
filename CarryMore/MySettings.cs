@@ -72,11 +72,11 @@ namespace CarryMore
 					stream.Close();
 					return o;
 				}
-				catch(Exception ex) when (ex is FileNotFoundException || ex is DirectoryNotFoundException || ex is System.IO.IsolatedStorage.IsolatedStorageException)
+				catch (Exception ex) when (ex is FileNotFoundException || ex is DirectoryNotFoundException || ex is System.IO.IsolatedStorage.IsolatedStorageException)
 				{
 					return new SettingsData();
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					ModConsole.Error(ex.ToString());
 				}
@@ -106,7 +106,7 @@ namespace CarryMore
 		}
 
 		public static bool GuiVisible { get; set; } = false;
-		public static Rect GuiArea { get; } =		new Rect(Screen.width / 2 - 200, 225, 400, 285);
-		public static Rect GuiBackground { get; } =	new Rect(Screen.width / 2 - 205, 200, 410, 290);
+		public static Rect GuiArea { get; } = new Rect(Screen.width / 2 - 200, 225, 400, 285);
+		public static Rect GuiBackground { get; } = new Rect(Screen.width / 2 - 205, 200, 410, 290);
 	}
 }

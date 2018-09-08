@@ -237,7 +237,7 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Backpack";
-		public override string Version => "1.4.0";
+		public override string Version => "1.4.1";
 		public override string Author => "Wampa842";
 		public string SavePath => System.IO.Path.Combine(ModLoader.GetModConfigFolder(this), "settings.xml");
 
@@ -249,7 +249,7 @@ namespace CarryMore
 		private Keybind _toggleGuiKey;
 		private Keybind _toggleSettingsKey;
 
-		//private bool _alertVisible;
+		private FsmBool _playerInMenu;
 		private bool _resize = false;
 		private bool _listVisible;
 		private GUIStyle _listStyle;
@@ -290,6 +290,9 @@ namespace CarryMore
 			Keybind.Add(this, _dropSelectedKey);
 			Keybind.Add(this, _toggleGuiKey);
 			Keybind.Add(this, _toggleSettingsKey);
+
+			// Find Playmaker variables
+			_playerInMenu = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu");
 
 			// Welcome text
 			ModConsole.Print("[Backpack] Loaded!");
@@ -386,6 +389,7 @@ namespace CarryMore
 
 			if (MySettings.GuiVisible)
 			{
+				_playerInMenu.Value = true;
 				GUI.Box(MySettings.GuiBackground, "Settings");
 
 				GUILayout.BeginArea(MySettings.GuiArea);
@@ -424,6 +428,10 @@ namespace CarryMore
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.EndArea();
+			}
+			else
+			{
+				_playerInMenu.Value = false;
 			}
 		}
 	}
