@@ -237,7 +237,7 @@ namespace CarryMore
 	{
 		public override string ID => "CarryMore";
 		public override string Name => "Backpack";
-		public override string Version => "1.4.1";
+		public override string Version => "1.4.3";
 		public override string Author => "Wampa842";
 		public string SavePath => System.IO.Path.Combine(ModLoader.GetModConfigFolder(this), "settings.xml");
 
@@ -250,6 +250,7 @@ namespace CarryMore
 		private Keybind _toggleSettingsKey;
 
 		private FsmBool _playerInMenu;
+		private GameObject _pauseMenu;
 		private bool _resize = false;
 		private bool _listVisible;
 		private GUIStyle _listStyle;
@@ -291,8 +292,9 @@ namespace CarryMore
 			Keybind.Add(this, _toggleGuiKey);
 			Keybind.Add(this, _toggleSettingsKey);
 
-			// Find Playmaker variables
+			// Find gameobjects and variables
 			_playerInMenu = PlayMakerGlobals.Instance.Variables.FindFsmBool("PlayerInMenu");
+			_pauseMenu = Resources.FindObjectsOfTypeAll<GameObject>().Single(o => o.name == "OptionsMenu");
 
 			// Welcome text
 			ModConsole.Print("[Backpack] Loaded!");
@@ -406,9 +408,9 @@ namespace CarryMore
 				GUILayout.BeginHorizontal();
 				if (GUILayout.Button("OK"))
 				{
-					if (Items.Count <= 0)
+					if (Items.Count > 0)
 					{
-						ModConsole.Error("[Backpack] Can't apply settings - backpack is not empty.");
+						ModConsole.Error($"[Backpack] Can't apply settings - backpack is not empty ({Items.Count})");
 					}
 					else
 					{
@@ -420,18 +422,22 @@ namespace CarryMore
 						Items.Realloc();
 						MySettings.Save(SavePath);
 						MySettings.GuiVisible = false;
+						if (!_pauseMenu.activeInHierarchy)
+						{
+							_playerInMenu.Value = false;
+						}
 					}
 				}
 				if (GUILayout.Button("Cancel"))
 				{
 					MySettings.GuiVisible = false;
+					if (!_pauseMenu.activeInHierarchy)
+					{
+						_playerInMenu.Value = false;
+					}
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.EndArea();
-			}
-			else
-			{
-				_playerInMenu.Value = false;
 			}
 		}
 	}
