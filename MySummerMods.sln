@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameObjectTree", "GameObjec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisableDisabler", "DisableDisabler\DisableDisabler.csproj", "{4BF42B2B-0D8D-4895-BDD5-87EB23E2C33A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirtyWindow", "DirtyWindow\DirtyWindow.csproj", "{5A5F7D0D-4052-4B8C-BF9F-D41165EBB377}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuideMagazine", "GuideMagazine\GuideMagazine.csproj", "{DF95A934-721C-4F8B-B904-50F43E1D5CF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +103,14 @@ Global
 		{4BF42B2B-0D8D-4895-BDD5-87EB23E2C33A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BF42B2B-0D8D-4895-BDD5-87EB23E2C33A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BF42B2B-0D8D-4895-BDD5-87EB23E2C33A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A5F7D0D-4052-4B8C-BF9F-D41165EBB377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A5F7D0D-4052-4B8C-BF9F-D41165EBB377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A5F7D0D-4052-4B8C-BF9F-D41165EBB377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A5F7D0D-4052-4B8C-BF9F-D41165EBB377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF95A934-721C-4F8B-B904-50F43E1D5CF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF95A934-721C-4F8B-B904-50F43E1D5CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF95A934-721C-4F8B-B904-50F43E1D5CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF95A934-721C-4F8B-B904-50F43E1D5CF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
