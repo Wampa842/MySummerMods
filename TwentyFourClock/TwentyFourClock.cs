@@ -19,37 +19,33 @@ using System.IO;
 using MSCLoader;
 using UnityEngine;
 using HutongGames.PlayMaker;
-using Clock24Hour;
 
-namespace Clock24Hour
+namespace TwentyFourClock
 {
 	public class Clock24
 	{
 		private GameObject _sun;
 		private FsmFloat _rot;
-		private GameObject _needleH, _needleM;
+		private Quaternion _rotH, _rotM;
 		public Clock24()
 		{
 			_sun = GameObject.Find("SUN/Pivot");
 			_rot = _sun.GetComponent<PlayMakerFSM>().FsmVariables.FindFsmFloat("Rotation");
-			_needleH = GameObject.Find("SuomiClock/Clock/hour/NeedleHour");
-			_needleM = GameObject.Find("SuomiClock/Clock/minute/NeedleMinute");
+			_rotH = GameObject.Find("SuomiClock/Clock/hour/NeedleHour").transform.localRotation;
+			_rotM = GameObject.Find("SuomiClock/Clock/minute/NeedleMinute").transform.localRotation;
 		}
 
-		public float Hour12 => ((360.0f - _needleH.transform.localRotation.eulerAngles.y) / 30.0f + 2.0f) % 12;
+		public float Hour12 => ((360.0f - _rotH.eulerAngles.y) / 30.0f + 2.0f) % 12;
 
 		public float Hour24 => (_rot.Value > 330.0f || _rot.Value <= 150.0f) ? Hour12 + 12.0f : Hour12;
 
-		public float Minute => (360.0f - _needleM.transform.localRotation.eulerAngles.y) / 6.0f;
+		public float Minute => (360.0f - _rotM.eulerAngles.y) / 6.0f;
 
 		public float Second => (Minute * 60) % 60;
 
 		public override string ToString() => $"{Mathf.Floor(Hour24).ToString("00")}:{Mathf.Floor(Minute).ToString("00")}";
 	}
-}
 
-namespace TwentyFourClock
-{
 	public class TwentyFourClock : Mod
 	{
 		public override string ID => "TwentyFourClock";
