@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="cInput">
+      <HintPath>G:\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\cInput.dll</HintPath>
+    </Reference>
     <Reference Include="MSCLoader">
       <HintPath>G:\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\MSCLoader.dll</HintPath>
     </Reference>
@@ -46,8 +49,16 @@
     <Reference Include="UnityEngine">
       <HintPath>G:\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>G:\Steam\steamapps\common\My Summer Car\mysummercar_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clock24.cs" />
+    <Compile Include="ClockCommand.cs" />
+    <Compile Include="DigitalClockBehaviour.cs" />
+    <Compile Include="ClockSaveData.cs" />
     <Compile Include="TwentyFourClock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

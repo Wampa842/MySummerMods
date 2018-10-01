@@ -1,75 +1,79 @@
 ﻿/*
-Copyright <YEAR> <COPYRIGHT HOLDER>
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
-and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Copyright (C) 2018 Wampa842
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-using System;
 using System.IO;
 using MSCLoader;
 using UnityEngine;
-using HutongGames.PlayMaker;
 
 namespace TwentyFourClock
 {
-	public class Clock24
-	{
-		private GameObject _sun;
-		private FsmFloat _rot;
-		private Quaternion _rotH, _rotM;
-		public Clock24()
-		{
-			_sun = GameObject.Find("SUN/Pivot");
-			_rot = _sun.GetComponent<PlayMakerFSM>().FsmVariables.FindFsmFloat("Rotation");
-			_rotH = GameObject.Find("SuomiClock/Clock/hour/NeedleHour").transform.localRotation;
-			_rotM = GameObject.Find("SuomiClock/Clock/minute/NeedleMinute").transform.localRotation;
-		}
-
-		public float Hour12 => ((360.0f - _rotH.eulerAngles.y) / 30.0f + 2.0f) % 12;
-
-		public float Hour24 => (_rot.Value > 330.0f || _rot.Value <= 150.0f) ? Hour12 + 12.0f : Hour12;
-
-		public float Minute => (360.0f - _rotM.eulerAngles.y) / 6.0f;
-
-		public float Second => (Minute * 60) % 60;
-
-		public override string ToString() => $"{Mathf.Floor(Hour24).ToString("00")}:{Mathf.Floor(Minute).ToString("00")}";
-	}
-
 	public class TwentyFourClock : Mod
 	{
 		public override string ID => "TwentyFourClock";
 		public override string Name => "24-hour clock";
 		public override string Author => "Wampa842";
 		public override string Version => "1.0.0";
-		public override bool UseAssetsFolder => false;
+		public override bool UseAssetsFolder => true;
 
-		private Clock24 _clock;
-		private Rect _rect;
-		private GUIStyle _style;
+		private readonly string _savePath;
+
+		private GameObject _clock;
+
+		public TwentyFourClock()
+		{
+			_savePath = Path.Combine(Application.persistentDataPath, "digitalclock.xml");
+		}
+
+		public override void OnSave()
+		{
+			DigitalClockBehaviour c = _clock.GetComponent<DigitalClockBehaviour>();
+
+			ClockSaveData.Serialize(new ClockSaveData()
+			{
+				Position = this._clock.transform.position,
+				Rotation = this._clock.transform.rotation,
+				AlarmEnabled = c.AlarmEnabled,
+				AlarmHour = c.AlarmHour,
+				AlarmMinute = c.AlarmMinute,
+				DisplayColor = c.DisplayColor
+			}, this._savePath);
+		}
 
 		public override void OnLoad()
 		{
-			_clock = new Clock24();
-			_rect = new Rect(Screen.width / 2 - 80.0f, 40.0f, 160.0f, 30.0f);
-			_style = new GUIStyle();
-			_style.fontSize = 20;	
-			_style.normal.textColor = Color.white;
-			_style.alignment = TextAnchor.MiddleCenter;
-		}
+			AssetBundle ab = LoadAssets.LoadBundle(this, "digitalclock.unity3d");
+			GameObject original = ab.LoadAsset<GameObject>("digitalclock.prefab");
+			
+			_clock = GameObject.Instantiate<GameObject>(original);
+			_clock.name = "'Atomnyje' clock(Clone)";
+			_clock.layer = LayerMask.NameToLayer("Parts");
+			_clock.tag = "PART";
+			DigitalClockBehaviour c = _clock.AddComponent<DigitalClockBehaviour>();
 
-		public override void OnGUI()
-		{
-			GUI.Label(_rect, _clock.ToString(), _style);
+			ClockSaveData save = ClockSaveData.Deserialize(_savePath);
+			_clock.transform.position = save.Position;
+			_clock.transform.rotation = save.Rotation;
+			c.Setup(save);
+
+			GameObject.Destroy(original);
+			ab.Unload(false);
+
+			ConsoleCommand.Add(new ClockCommand(this, c));
+
+			ModConsole.Print(string.Format("[Clock24] 24-hour clock has loaded.\nThe current time is {0:0}:{1:00}", c.Clock.Hour24, c.Clock.Minute));
 		}
 	}
 }
