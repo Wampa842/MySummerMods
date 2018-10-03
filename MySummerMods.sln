@@ -41,6 +41,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirtyWindow", "DirtyWindow\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuideMagazine", "GuideMagazine\GuideMagazine.csproj", "{DF95A934-721C-4F8B-B904-50F43E1D5CF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JackStand", "JackStand\JackStand.csproj", "{08004F05-7CF4-4F35-A0EB-C98E8E7F5608}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Standpipe", "Standpipe\Standpipe.csproj", "{2A3950FF-47D1-4661-A2D3-7CE5C69DF727}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +115,14 @@ Global
 		{DF95A934-721C-4F8B-B904-50F43E1D5CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF95A934-721C-4F8B-B904-50F43E1D5CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF95A934-721C-4F8B-B904-50F43E1D5CF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08004F05-7CF4-4F35-A0EB-C98E8E7F5608}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08004F05-7CF4-4F35-A0EB-C98E8E7F5608}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08004F05-7CF4-4F35-A0EB-C98E8E7F5608}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08004F05-7CF4-4F35-A0EB-C98E8E7F5608}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A3950FF-47D1-4661-A2D3-7CE5C69DF727}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A3950FF-47D1-4661-A2D3-7CE5C69DF727}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A3950FF-47D1-4661-A2D3-7CE5C69DF727}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A3950FF-47D1-4661-A2D3-7CE5C69DF727}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
