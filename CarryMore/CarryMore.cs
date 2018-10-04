@@ -70,6 +70,7 @@ namespace CarryMore
 			// Initialize list UI
 			_listVisible = false;
 			_listStyle = new GUIStyle();
+			_listStyle.alignment = TextAnchor.MiddleLeft;
 			_listStyle.fontSize = 12;
 			_listStyle.normal.textColor = Color.white;
 		}
@@ -169,14 +170,14 @@ namespace CarryMore
 		{
 			if (_listVisible)
 			{
-				GUI.Label(new Rect(_listPosLeft - 20.0f, Screen.height - _listPosBottom - _listLineHeight, Screen.width, _listLineHeight), $"Backpack ({Items.Count} / {Items.Capacity})");
+				GUI.Label(new Rect(_listPosLeft - 20.0f, Screen.height - _listPosBottom - _listLineHeight, Screen.width, _listLineHeight), $"Backpack ({Items.Count} / {Items.Capacity})", _listStyle);
 				for (int i = 0; i < Items.Count; ++i)
 				{
 					float top = Screen.height - _listPosBottom - (_listLineHeight * ((Items.Count - i) + 1));
 					string name = Items[i].name.Replace("(Clone)", "").Replace("(itemx)", "").Replace("(xxxxx)", "");
 					if (i == Items.SelectedIndex)
-						GUI.Label(new Rect(_listPosLeft - 20.0f, top, 20.0f, _listLineHeight), ">");
-					GUI.Label(new Rect(_listPosLeft, top, Screen.width, _listLineHeight), name);
+						GUI.Label(new Rect(_listPosLeft - 20.0f, top, 20.0f, _listLineHeight), ">", _listStyle);
+					GUI.Label(new Rect(_listPosLeft, top, Screen.width, _listLineHeight), name, _listStyle);
 				}
 			}
 
