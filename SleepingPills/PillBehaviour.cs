@@ -96,8 +96,7 @@ namespace SleepingPills
 			bool interact = Input.GetKeyDown(KeyCode.Mouse0);
 			bool use = cInput.GetButtonDown("Use");
 
-			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1.0f);
-			if (hit.collider.gameObject == this.gameObject)
+			if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1.0f) && hit.collider.gameObject == this.gameObject)
 			{
 				if (_bought)
 				{
