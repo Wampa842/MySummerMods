@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Standpipe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StandpipeBehaviour.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

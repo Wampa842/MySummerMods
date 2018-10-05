@@ -18,7 +18,7 @@ namespace Standpipe
 		{
 			new Vector3(51, -1.46f, -71.5f),	// Home
 			new Vector3(-849.5f, -3.16f, 502),	// Island
-			new Vector3(-1533, 2.96f, 1188),	// Peräjärvi
+			new Vector3(-1532.5f, 2.96f, 1185),	// Peräjärvi
 			new Vector3(-1217, 0.33f, -621),	// Strawberry patch
 			new Vector3(1540, 4.44f, 711),		// Loppe
 			new Vector3(463.3f, 9.32f, 1320.5f)	// Dance pavilion
@@ -71,6 +71,10 @@ namespace Standpipe
 			Transform particle = tap.transform.Find("Particle");
 			particle.SetParent(prefab.transform, false);
 			particle.localPosition = new Vector3(0.0f, 0.7887f, 0.215f);
+
+			// Set up component
+			prefab.AddComponent<StandpipeBehaviour>();
+			particle.GetComponent<AudioSource>().clip = ab.LoadAsset<AudioClip>("assets/audio/waterflow.ogg");
 
 			// Carve out the remains
 			GameObject.DestroyImmediate(leverParent.Find("Pivot/kitchen_tap_handle").gameObject);
